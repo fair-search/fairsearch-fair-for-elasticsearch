@@ -6,7 +6,7 @@ import org.apache.lucene.util.PriorityQueue;
 import java.util.List;
 
 /**
- * 
+ *
  */
 public class FairTopK {
 
