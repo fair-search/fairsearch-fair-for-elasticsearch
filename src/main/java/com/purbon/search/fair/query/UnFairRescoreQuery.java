@@ -23,7 +23,7 @@ public class UnFairRescoreQuery extends Query {
      * <p>
      * Only implemented by primitive queries, which re-write to themselves.
      *
-     * @param searcher
+     * @param searcher    IndexSearcher
      * @param needsScores True if document scores ({@link Scorer#score}) or match
      *                    frequencies ({@link Scorer#freq}) are needed.
      * @param boost       The boost that is propagated by the parent queries.
@@ -51,7 +51,7 @@ public class UnFairRescoreQuery extends Query {
          * method will only extract terms which are used for scoring, otherwise it
          * will extract all terms which are used for matching.
          *
-         * @param terms
+         * @param terms Set of terms
          */
         @Override
         public void extractTerms(Set<Term> terms) {
@@ -98,8 +98,6 @@ public class UnFairRescoreQuery extends Query {
         /**
      * Prints a query to a string, with <code>field</code> assumed to be the
      * default field and omitted.
-     *
-     * @param field
      */
     @Override
     public String toString(String field) {
@@ -114,7 +112,6 @@ public class UnFairRescoreQuery extends Query {
      * the same class and its document-filtering properties are identical that other
      * instance. Utility methods are provided for certain repetitive code.
      *
-     * @param obj
      * @see #sameClassAs(Object)
      * @see #classHash()
      */

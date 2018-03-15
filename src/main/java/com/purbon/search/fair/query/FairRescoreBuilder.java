@@ -80,9 +80,6 @@ public class FairRescoreBuilder extends RescorerBuilder<FairRescoreBuilder> {
 
     /**
      * Extensions override this to build the context that they need for rescoring.
-     *
-     * @param windowSize
-     * @param context
      */
     @Override
     protected RescoreContext innerBuildContext(int windowSize, QueryShardContext context) throws IOException {
@@ -101,8 +98,6 @@ public class FairRescoreBuilder extends RescorerBuilder<FairRescoreBuilder> {
      * Rewrites this instance based on the provided context. The returned
      * objects will be the same instance as this if no changes during the
      * rewrite were applied.
-     *
-     * @param ctx
      */
     @Override
     public RescorerBuilder<FairRescoreBuilder> rewrite(QueryRewriteContext ctx) throws IOException {
@@ -158,10 +153,6 @@ public class FairRescoreBuilder extends RescorerBuilder<FairRescoreBuilder> {
          * Extracts all terms needed to execute this {@link Rescorer}. This method
          * is executed in a distributed frequency collection roundtrip for
          * {@link SearchType#DFS_QUERY_THEN_FETCH}
-         *
-         * @param searcher
-         * @param rescoreContext
-         * @param termsSet
          */
         @Override
         public void extractTerms(IndexSearcher searcher, RescoreContext rescoreContext, Set<Term> termsSet) throws IOException {

@@ -82,14 +82,6 @@ public class FairSearchQueryParserPlugin extends Plugin implements ActionPlugin,
 
     /**
      * Rest handlers added by this plugin.
-     *
-     * @param settings
-     * @param restController
-     * @param clusterSettings
-     * @param indexScopedSettings
-     * @param settingsFilter
-     * @param indexNameExpressionResolver
-     * @param nodesInCluster
      */
     @Override
     public List<RestHandler> getRestHandlers(Settings settings, RestController restController,

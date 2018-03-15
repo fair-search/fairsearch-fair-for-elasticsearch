@@ -99,11 +99,6 @@ public class FairQuery extends Query {
      * Expert: Constructs an appropriate Weight implementation for this query.
      * <p>
      * Only implemented by primitive queries, which re-write to themselves.
-     *
-     * @param searcher
-     * @param needsScores True if document scores ({@link Scorer#score}) or match
-     *                    frequencies ({@link Scorer#freq}) are needed.
-     * @param boost       The boost that is propagated by the parent queries.
      */
     @Override
     public Weight createWeight(IndexSearcher searcher, boolean needsScores, float boost) throws IOException {
@@ -118,7 +113,6 @@ public class FairQuery extends Query {
      * the same class and its document-filtering properties are identical that other
      * instance. Utility methods are provided for certain repetitive code.
      *
-     * @param other
      * @see #sameClassAs(Object)
      * @see #classHash()
      */
@@ -162,8 +156,6 @@ public class FairQuery extends Query {
          * {@link Weight} was created with {@code needsScores == true} then this
          * method will only extract terms which are used for scoring, otherwise it
          * will extract all terms which are used for matching.
-         *
-         * @param terms
          */
         @Override
         public void extractTerms(Set<Term> terms) {

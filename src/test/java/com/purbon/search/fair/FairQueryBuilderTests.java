@@ -66,10 +66,6 @@ public class FairQueryBuilderTests extends AbstractQueryTestCase<FairQueryBuilde
     /**
      * Checks the result of {@link QueryBuilder#toQuery(QueryShardContext)} given the original {@link QueryBuilder}
      * and {@link QueryShardContext}. Contains the query specific checks to be implemented by subclasses.
-     *
-     * @param queryBuilder
-     * @param query
-     * @param context
      */
     @Override
     protected void doAssertLuceneQuery(FairQueryBuilder queryBuilder, Query query, SearchContext context) throws IOException {

@@ -70,8 +70,6 @@ public class FairQueryBuilder extends AbstractQueryBuilder<FairQueryBuilder>  {
 
     /**
      * Indicates whether some other {@link QueryBuilder} object of the same type is "equal to" this one.
-     *
-     * @param other
      */
     @Override
     protected boolean doEquals(FairQueryBuilder other) {
