@@ -1,0 +1,11 @@
+"Test that the fair search plugin is loaded in Elasticsearch":
+
+  # Use the Plain text Plugins API to retrieve the list of plugins
+  - do:
+      cat.plugins:
+        local: true
+        h: component
+
+  - match:
+      $body: /^fairsearch\n
+              $/

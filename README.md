@@ -1,2 +1,3 @@
-# fairsearch-elasticsearch-plugin
-Fair search elasticsearch plugin
+# Fair search algorithms for elasticsearch
+
+TBA

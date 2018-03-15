@@ -1,0 +1,13 @@
+{
+  "explain.example": {
+    "documentation": "",
+    "methods": ["GET"],
+    "url": {
+      "path": "/_explainME",
+      "paths": ["/_explainME"],
+      "parts": {},
+      "params": { }
+    },
+    "body": null
+  }
+}

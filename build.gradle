@@ -1,0 +1,82 @@
+buildscript {
+
+    ext {
+        // ES version we depend upon/ compile against.
+        version_es = '6.1.2'
+    }
+
+    repositories {
+        mavenCentral()
+        jcenter()
+        mavenLocal()
+    }
+
+    dependencies {
+        classpath "org.elasticsearch.gradle:build-tools:" + version_es
+    }
+}
+
+group 'com.purbon.search'
+version '1.0-es6.1.2-SNAPSHOT'
+
+apply plugin: 'java'
+apply plugin: 'elasticsearch.esplugin'
+apply plugin: 'idea'
+
+// this is temporal and will be fixed in 6.0
+ext.projectSubstitutions = [:]
+
+sourceCompatibility = 1.8
+
+// license of this project
+licenseFile = rootProject.file('LICENSE')
+// copyright notices
+noticeFile = rootProject.file('NOTICE')
+
+esplugin {
+    name 'fairsearch'
+    description 'Fair search plugin'
+    classname 'com.purbon.search.fair.FairSearchQueryParserPlugin'
+    // license of this project
+    licenseFile = rootProject.file('LICENSE')
+    // copyright notices
+    noticeFile = rootProject.file('NOTICE')
+}
+
+// In this section you declare the dependencies for your production and test code
+// Note, the two dependencies are not really needed as the buildscript dependency gets them in already
+// they are just here as an example
+repositories {
+    mavenCentral()
+    mavenLocal()
+    jcenter()
+}
+
+dependencies {
+    compile "org.apache.lucene:lucene-expressions:7.1.0"
+    compile 'org.elasticsearch:elasticsearch:'+version_es
+    compile "com.github.spullara.mustache.java:compiler:0.9.3"
+    compile group: 'org.apache.commons', name: 'commons-math3', version: '3.6.1'
+
+    testCompile 'org.elasticsearch.test:framework:'+version_es
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+    testCompile group: 'com.mashape.unirest', name: 'unirest-java', version: '1.4.9'
+
+}
+
+dependencyLicenses {
+    mapping from: /lucene-.*/, to: 'lucene'
+}
+
+// Set to false to not use elasticsearch checkstyle rules
+checkstyleMain.enabled = true
+checkstyleTest.enabled = true
+
+// FIXME dependency license check needs to be enabled
+dependencyLicenses.enabled = false
+
+// FIXME thirdparty audit needs to be enabled
+thirdPartyAudit.enabled = false
+
+// Uncomment this to skip license header checks
+licenseHeaders.enabled = false

@@ -1,0 +1,38 @@
+---
+setup:
+  - do:
+      indices.create:
+        index:  test
+        body:
+          settings:
+            number_of_shards: 1
+            number_of_replicas: 1
+
+  - do:
+      index:
+        index:  test
+        type:   test
+        id:     1
+        body:   { "city": "barcelona" }
+  - do:
+      index:
+        index:  test
+        type:   test
+        id:     2
+        body:   { "city": "Berlin" }
+  - do:
+      indices.refresh: {}
+
+---
+"just factor":
+  - do:
+      search:
+        index: test
+        body:
+          rescore:
+            fair_rescorer: {}
+
+  - length: { hits.hits: 2 }
+  - match:  { hits.hits.0._score: 10.0 }
+  - match:  { hits.hits.1._score: 10.0 }
+
