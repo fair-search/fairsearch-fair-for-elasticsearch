@@ -68,6 +68,11 @@ dependencyLicenses {
     mapping from: /lucene-.*/, to: 'lucene'
 }
 
+test {
+    systemProperties = System.properties
+    systemProperties['jna.boot.library.path'] = null
+}
+
 // Set to false to not use elasticsearch checkstyle rules
 checkstyleMain.enabled = true
 checkstyleTest.enabled = true
