@@ -74,6 +74,12 @@ setup:
         type:   test
         id:     10
         body:   { "name": "Hannah", "city": "Berlin", "gender": "Female", "langs": "Scala, Kotlin, Java" }
+  - do:
+      index:
+        index:  test
+        type:   test
+        id:     11
+        body:   { "name": "Anna", "city": "Berlin", "gender": "Female", "langs": "Scala, Kotlin, Java" }
 
   - do:
       indices.refresh: {}
@@ -91,5 +97,6 @@ setup:
 
   - length: { hits.hits: 10 }
   - match:  { hits.hits.0._score: 1 }
+  - match:  { hits.hits.0._source: { "name": "Pere", "city": "Berlin", "gender": "Male", "langs": "Java, Scala, Ruby" } }
   - match:  { hits.hits.1._score: 1 }
 

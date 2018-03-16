@@ -1,10 +1,16 @@
 package com.purbon.search.fair.query;
 
+import com.purbon.search.fair.lib.DocPriorityQueue;
+import com.purbon.search.fair.utils.DocumentPriorityQueue;
+import com.purbon.search.fair.utils.IntPriorityQueue;
+import org.apache.commons.math3.distribution.BinomialDistribution;
 import org.apache.lucene.document.Document;
-import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.index.Term;
-import org.apache.lucene.queryparser.flexible.core.util.StringUtils;
-import org.apache.lucene.search.*;
+import org.apache.lucene.search.Explanation;
+import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.ScoreDoc;
+import org.apache.lucene.search.TopDocs;
+import org.apache.lucene.util.PriorityQueue;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.common.ParseField;
 import org.elasticsearch.common.io.stream.StreamInput;
@@ -12,23 +18,18 @@ import org.elasticsearch.common.io.stream.StreamOutput;
 import org.elasticsearch.common.xcontent.ConstructingObjectParser;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentParser;
-import org.elasticsearch.index.fielddata.IndexFieldData;
 import org.elasticsearch.index.query.QueryRewriteContext;
 import org.elasticsearch.index.query.QueryShardContext;
-import org.elasticsearch.index.query.TermQueryBuilder;
-import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.rescore.RescoreContext;
 import org.elasticsearch.search.rescore.Rescorer;
 import org.elasticsearch.search.rescore.RescorerBuilder;
+import org.elasticsearch.search.suggest.term.TermSuggestion;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static java.util.Arrays.asList;
 import static org.elasticsearch.common.xcontent.ConstructingObjectParser.constructorArg;
@@ -133,7 +134,21 @@ public class FairRescoreBuilder extends RescorerBuilder<FairRescoreBuilder> {
     }
 
     private static class FairRescorer implements Rescorer {
+
         private static final FairRescorer INSTANCE = new FairRescorer();
+
+        private float proportion = 0.6f;
+        private float significance = 0.1f;
+
+        public FairRescorer() {
+            this(0.6f, 0.1f);
+        }
+
+
+        public FairRescorer(float proportion, float significance) {
+            this.proportion = proportion;
+            this.significance = significance;
+        }
 
         /**
          * Modifies the result of the previously executed search ({@link TopDocs})
@@ -146,24 +161,69 @@ public class FairRescoreBuilder extends RescorerBuilder<FairRescoreBuilder> {
          */
         @Override
         public TopDocs rescore(TopDocs topDocs, IndexSearcher searcher, RescoreContext rescoreContext) throws IOException {
+
             FairRescoreContext context = (FairRescoreContext)rescoreContext;
-            int max = Math.min(topDocs.scoreDocs.length, rescoreContext.getWindowSize());
+            int k = Math.min(topDocs.scoreDocs.length, rescoreContext.getWindowSize());
 
-            for(int i=0; i < max; i++) {
+            PriorityQueue<ScoreDoc> p0 = new DocumentPriorityQueue(k);
+            PriorityQueue<ScoreDoc> p1 = new DocumentPriorityQueue(k);
 
-                ScoreDoc scoredoc = topDocs.scoreDocs[i];
-                Document doc = searcher.doc(scoredoc.doc);
-                assert doc != null;
-
-                if (doc.get("gender").equals(context.protectedValue)) {
-                    topDocs.scoreDocs[i].score = 1;
+            for(int i=0; i < k; i++) {
+                ScoreDoc scoreDoc = topDocs.scoreDocs[i];
+                Document doc = searcher.doc(scoreDoc.doc);
+                if (isProtected(doc, context)) {
+                    p1.add(scoreDoc);
                 } else {
-                    topDocs.scoreDocs[i].score = 0;
+                    p0.add(scoreDoc);
+                }
+            }
+            assert p0.size() + p1.size() == k;
+            float [] m = new float[k];
+
+            for(int i=0; i < k; i++) {
+                m[i] = fairness(i, proportion, significance);
+            }
+
+            //ScoreDoc[] t = new ScoreDoc[k];
+            List<ScoreDoc> t = new ArrayList<ScoreDoc>();
+            int tp = 0;
+            int tn = 0;
+            float maxScore = 0.0f;
+            while ( ((tp+tn) < k)) {
+                ScoreDoc scoreDoc;
+                if (tp  > p1.size() + 1) {
+                    scoreDoc = p0.pop();
+                    t.add(scoreDoc);
+                    tn = tn + 1;
+                } else if (tn > p0.size() + 1) {
+                    scoreDoc = p1.pop();
+                    t.add(scoreDoc);
+                    tp = tp + 1;
+                } else if (tp < m[tp+tn]) { // protected candidates
+                    scoreDoc = p1.pop();
+                    t.add(scoreDoc);
+                    tp = tp + 1;
+                } else { // Non protected candidates
+                    assert p1.size() > 0 && p0.size() > 0;
+                    if (p1.top().score >= p0.top().score) {
+                        scoreDoc = p1.pop();
+                        t.add(scoreDoc);
+                        tp = tp + 1;
+                    } else {
+                        scoreDoc = p0.pop();
+                        t.add(scoreDoc);
+                        tn = tn + 1;
+                    }
+                }
+                if (scoreDoc != null) {
+                    if (scoreDoc.score > maxScore) {
+                        maxScore = scoreDoc.score;
+                    }
                 }
             }
 
-            // Sort by score descending, then docID ascending, just like lucene's QueryRescorer
-            Arrays.sort(topDocs.scoreDocs, (a, b) -> {
+            TopDocs docs = new TopDocs(t.size(), t.toArray(new ScoreDoc[t.size()]), maxScore);
+            Arrays.sort(docs.scoreDocs, (a, b) -> {
                 if (a.score > b.score) {
                     return -1;
                 }
@@ -173,7 +233,30 @@ public class FairRescoreBuilder extends RescorerBuilder<FairRescoreBuilder> {
                 // Safe because doc ids >= 0
                 return a.doc - b.doc;
             });
-            return topDocs;
+
+            return docs;
+        }
+
+        private boolean isProtected(Document doc, FairRescoreContext context) {
+            return doc.get(context.protectedKey).equals(context.protectedValue);
+        }
+
+        // m[i] ← F-1(αc ;i, p)
+        private float fairness(int trials, float proportion, float significance) {
+
+            // trials == k , p == p
+            BinomialDistribution d = new BinomialDistribution(trials, proportion);
+        /*
+           NOTE:
+             if alpha is 0.1,  the output should be the first value x where
+             the cumulative probability is bigger than alpha (significance)
+         */
+            int x = 0;
+            do {
+                x = x + 1;
+            } while (d.cumulativeProbability(x) > significance);
+
+            return x;
         }
 
         /**
