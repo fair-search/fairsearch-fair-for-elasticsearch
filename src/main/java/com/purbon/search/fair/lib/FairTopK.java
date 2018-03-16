@@ -62,8 +62,8 @@ public class FairTopK {
         /*
            NOTE:
              if alpha is 0.1,  the output should be the first value x where
-               the cumulative probability is bigger than alpha (significance)
-          */
+             the cumulative probability is bigger than alpha (significance)
+         */
         int x = 0;
         do {
             x = x + 1;

@@ -1,81 +1,96 @@
 package com.purbon.search.fair.query;
 
+import org.apache.lucene.document.Document;
+import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.index.Term;
-import org.apache.lucene.search.Explanation;
-import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.TopDocs;
+import org.apache.lucene.queryparser.flexible.core.util.StringUtils;
+import org.apache.lucene.search.*;
 import org.elasticsearch.action.search.SearchType;
-import org.elasticsearch.common.ParsingException;
+import org.elasticsearch.common.ParseField;
 import org.elasticsearch.common.io.stream.StreamInput;
 import org.elasticsearch.common.io.stream.StreamOutput;
 import org.elasticsearch.common.xcontent.ConstructingObjectParser;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentParser;
+import org.elasticsearch.index.fielddata.IndexFieldData;
 import org.elasticsearch.index.query.QueryRewriteContext;
 import org.elasticsearch.index.query.QueryShardContext;
+import org.elasticsearch.index.query.TermQueryBuilder;
+import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.rescore.RescoreContext;
 import org.elasticsearch.search.rescore.Rescorer;
 import org.elasticsearch.search.rescore.RescorerBuilder;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.util.Arrays.asList;
+import static org.elasticsearch.common.xcontent.ConstructingObjectParser.constructorArg;
 
 public class FairRescoreBuilder extends RescorerBuilder<FairRescoreBuilder> {
 
     public static final String NAME = "fair_rescorer";
 
-    private float factor;
+    private static final ParseField PROTECTED_KEY   = new ParseField("protected_key");
+    private static final ParseField PROTECTED_VALUE = new ParseField("protected_value");
 
-    public  FairRescoreBuilder() {
+    private float factor;
+    private String protectedKey;
+    private String protectedValue;
+
+    public FairRescoreBuilder() {
+
+    }
+
+    public FairRescoreBuilder(String protectedKey, String protectedValue) {
         this.factor = 0.0f;
+
+        if (protectedKey == null) {
+            throw new IllegalArgumentException("[\" + NAME + \"] requires protected_key");
+        }
+
+        if (protectedValue == null) {
+            throw new IllegalArgumentException("[\" + NAME + \"] requires protected_value");
+        }
+
+        this.protectedKey = protectedKey;
+        this.protectedValue = protectedValue;
     }
 
     public FairRescoreBuilder(StreamInput in) throws IOException {
         super(in);
+        this.protectedKey = in.readString();
+        this.protectedValue = in.readString();
     }
 
     @Override
     protected void doWriteTo(StreamOutput out) throws IOException {
-        super.writeTo(out);
+        out.writeString(protectedKey);
+        out.writeString(protectedValue);
     }
 
     @Override
     protected void doXContent(XContentBuilder builder, Params params) throws IOException {
-        //builder.startObject(NAME);
-        //builder.endObject();
+        builder.field(PROTECTED_KEY.getPreferredName(), protectedKey);
+        builder.field(PROTECTED_VALUE.getPreferredName(), protectedValue);
     }
 
     private static final ConstructingObjectParser<FairRescoreBuilder, Void> PARSER = new ConstructingObjectParser<>(NAME,
-            args -> new FairRescoreBuilder());
+            args -> new FairRescoreBuilder((String)args[0], (String)args[1]));
+
+    static {
+        PARSER.declareString(constructorArg(), PROTECTED_KEY);
+        PARSER.declareString(constructorArg(), PROTECTED_VALUE);
+    }
 
     public static FairRescoreBuilder fromXContent(XContentParser parser) throws IOException {
-        String fieldName = null;
-        FairRescoreBuilder rescorer = new FairRescoreBuilder();
-        Integer windowSize = null;
-        XContentParser.Token token;
-        while ((token = parser.nextToken()) != XContentParser.Token.END_OBJECT) {
-            if (token == XContentParser.Token.FIELD_NAME) {
-                fieldName = parser.currentName();
-            } else if (token.isValue()) {
-                if (NAME == fieldName) {
-                    windowSize = parser.intValue();
-                } else {
-                    throw new ParsingException(parser.getTokenLocation(), "rescore doesn't support [" + fieldName + "]");
-                }
-            } else if (token == XContentParser.Token.VALUE_NULL) {
-                //rescorer = parser.namedObject(FairRescoreBuilder.class, fieldName, null);
-            } else {
-                throw new ParsingException(parser.getTokenLocation(), "unexpected token [" + token + "] after [" + fieldName + "]");
-            }
-        }
-
-        if (windowSize != null) {
-            rescorer.windowSize(windowSize.intValue());
-        }
-        return rescorer;
+        return PARSER.apply(parser, null);
     }
 
     /**
@@ -83,7 +98,7 @@ public class FairRescoreBuilder extends RescorerBuilder<FairRescoreBuilder> {
      */
     @Override
     protected RescoreContext innerBuildContext(int windowSize, QueryShardContext context) throws IOException {
-        return new FairRescoreContext(windowSize, context);
+        return new FairRescoreContext(windowSize, protectedKey, protectedValue, context);
     }
 
     /**
@@ -105,9 +120,16 @@ public class FairRescoreBuilder extends RescorerBuilder<FairRescoreBuilder> {
     }
 
     private class FairRescoreContext extends RescoreContext {
-        FairRescoreContext(int windowSize, QueryShardContext context) {
+
+        private String protectedKey;
+        private String protectedValue;
+
+        FairRescoreContext(int windowSize, String protectedKey, String protectedValue, QueryShardContext context) {
             super(windowSize, FairRescorer.INSTANCE);
+            this.protectedKey = protectedKey;
+            this.protectedValue = protectedValue;
         }
+
     }
 
     private static class FairRescorer implements Rescorer {
@@ -124,10 +146,33 @@ public class FairRescoreBuilder extends RescorerBuilder<FairRescoreBuilder> {
          */
         @Override
         public TopDocs rescore(TopDocs topDocs, IndexSearcher searcher, RescoreContext rescoreContext) throws IOException {
+            FairRescoreContext context = (FairRescoreContext)rescoreContext;
             int max = Math.min(topDocs.scoreDocs.length, rescoreContext.getWindowSize());
+
             for(int i=0; i < max; i++) {
-                topDocs.scoreDocs[i].score = 10;
+
+                ScoreDoc scoredoc = topDocs.scoreDocs[i];
+                Document doc = searcher.doc(scoredoc.doc);
+                assert doc != null;
+
+                if (doc.get("gender").equals(context.protectedValue)) {
+                    topDocs.scoreDocs[i].score = 1;
+                } else {
+                    topDocs.scoreDocs[i].score = 0;
+                }
             }
+
+            // Sort by score descending, then docID ascending, just like lucene's QueryRescorer
+            Arrays.sort(topDocs.scoreDocs, (a, b) -> {
+                if (a.score > b.score) {
+                    return -1;
+                }
+                if (a.score < b.score) {
+                    return 1;
+                }
+                // Safe because doc ids >= 0
+                return a.doc - b.doc;
+            });
             return topDocs;
         }
 
