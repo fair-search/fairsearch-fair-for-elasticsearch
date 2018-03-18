@@ -99,4 +99,11 @@ setup:
   - match:  { hits.hits.0._score: 1 }
   - match:  { hits.hits.0._source: { "name": "Pere", "city": "Berlin", "gender": "Male", "langs": "Java, Scala, Ruby" } }
   - match:  { hits.hits.1._score: 1 }
-
+  - match:  { hits.hits.1._source: { "name": "Maria", "city": "Barcelona", "gender": "Female", "langs": "Scala, Ruby, Python" } }
+  - match:  { hits.hits.2._score: 1 }
+  - match:  { hits.hits.2._source: { "name": "Moritz", "city": "Munich", "gender": "Male", "langs": "Ruby, Python" } }
+  - match:  { hits.hits.3._score: 1 }
+  - match:  { hits.hits.3._source: { "name": "Mia", "city": "Berlin", "gender": "Female", "langs": "Java" } }
+  - match:  { hits.hits.4._score: 1 }
+  - match:  { hits.hits.4._source: { "name": "Hannah", "city": "Berlin", "gender": "Female", "langs": "Scala, Kotlin, Java" } }
+  - match:  { hits.hits.5._score: 0 }

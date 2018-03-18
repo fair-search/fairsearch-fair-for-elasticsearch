@@ -163,12 +163,13 @@ public class FairRescoreBuilder extends RescorerBuilder<FairRescoreBuilder> {
         public TopDocs rescore(TopDocs topDocs, IndexSearcher searcher, RescoreContext rescoreContext) throws IOException {
 
             FairRescoreContext context = (FairRescoreContext)rescoreContext;
-            int k = Math.min(topDocs.scoreDocs.length, rescoreContext.getWindowSize());
+            int max = Math.min(topDocs.scoreDocs.length, rescoreContext.getWindowSize());
+            int k   = 5;
 
-            PriorityQueue<ScoreDoc> p0 = new DocumentPriorityQueue(k);
-            PriorityQueue<ScoreDoc> p1 = new DocumentPriorityQueue(k);
+            PriorityQueue<ScoreDoc> p0 = new DocumentPriorityQueue(max);
+            PriorityQueue<ScoreDoc> p1 = new DocumentPriorityQueue(max);
 
-            for(int i=0; i < k; i++) {
+            for(int i=0; i < max; i++) {
                 ScoreDoc scoreDoc = topDocs.scoreDocs[i];
                 Document doc = searcher.doc(scoreDoc.doc);
                 if (isProtected(doc, context)) {
@@ -177,7 +178,7 @@ public class FairRescoreBuilder extends RescorerBuilder<FairRescoreBuilder> {
                     p0.add(scoreDoc);
                 }
             }
-            assert p0.size() + p1.size() == k;
+            assert p0.size() + p1.size() == max;
             float [] m = new float[k];
 
             for(int i=0; i < k; i++) {
@@ -193,24 +194,29 @@ public class FairRescoreBuilder extends RescorerBuilder<FairRescoreBuilder> {
                 ScoreDoc scoreDoc;
                 if (tp  > p1.size() + 1) {
                     scoreDoc = p0.pop();
+                    scoreDoc.score = 1;
                     t.add(scoreDoc);
                     tn = tn + 1;
                 } else if (tn > p0.size() + 1) {
                     scoreDoc = p1.pop();
+                    scoreDoc.score = 1;
                     t.add(scoreDoc);
                     tp = tp + 1;
                 } else if (tp < m[tp+tn]) { // protected candidates
                     scoreDoc = p1.pop();
+                    scoreDoc.score = 1;
                     t.add(scoreDoc);
                     tp = tp + 1;
                 } else { // Non protected candidates
                     assert p1.size() > 0 && p0.size() > 0;
                     if (p1.top().score >= p0.top().score) {
                         scoreDoc = p1.pop();
+                        scoreDoc.score = 1;
                         t.add(scoreDoc);
                         tp = tp + 1;
                     } else {
                         scoreDoc = p0.pop();
+                        scoreDoc.score = 1;
                         t.add(scoreDoc);
                         tn = tn + 1;
                     }
@@ -220,6 +226,17 @@ public class FairRescoreBuilder extends RescorerBuilder<FairRescoreBuilder> {
                         maxScore = scoreDoc.score;
                     }
                 }
+            }
+            while(p1.size() > 0) {
+                ScoreDoc doc = p1.pop();
+                doc.score = 0;
+                t.add(doc);
+            }
+
+            while(p0.size() > 0) {
+                ScoreDoc doc = p0.pop();
+                doc.score = 0;
+                t.add(doc);
             }
 
             TopDocs docs = new TopDocs(t.size(), t.toArray(new ScoreDoc[t.size()]), maxScore);
