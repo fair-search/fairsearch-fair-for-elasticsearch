@@ -1,0 +1,101 @@
+---
+setup:
+  - do:
+      indices.create:
+        index:  test
+        body:
+          settings:
+            number_of_shards: 1
+            number_of_replicas: 1
+          mappings:
+            test:
+              properties:
+                gender:
+                  type: text
+                  store: true
+
+  - do:
+      index:
+        index:  test
+        type:   test
+        id:     1
+        body:   { "name": "Pere", "city": "Berlin", "gender": "Male", "langs": "Java, Scala, Ruby" }
+  - do:
+      index:
+        index:  test
+        type:   test
+        id:     2
+        body:   { "name": "Maria", "city": "Barcelona", "gender": "Female", "langs": "Scala, Ruby, Python" }
+  - do:
+      index:
+        index:  test
+        type:   test
+        id:     3
+        body:   { "name": "Dirk", "city": "Munich", "gender": "Male", "langs": "Java, Scala, Kotlin" }
+  - do:
+      index:
+        index:  test
+        type:   test
+        id:     4
+        body:   { "name": "John", "city": "Berlin", "gender": "Male", "langs": "Java" }
+  - do:
+      index:
+        index:  test
+        type:   test
+        id:     5
+        body:   { "name": "Ben", "city": "Berlin", "gender": "Male", "langs": "Ruby" }
+  - do:
+      index:
+        index:  test
+        type:   test
+        id:     6
+        body:   { "name": "Max", "city": "Berlin", "gender": "Male", "langs": "Java, Scala"}
+  - do:
+      index:
+        index:  test
+        type:   test
+        id:     7
+        body:   { "name": "Jonas", "city": "Barcelona", "gender": "Male", "langs": "Java, Scala, Ruby" }
+  - do:
+      index:
+        index:  test
+        type:   test
+        id:     8
+        body:   { "name": "Moritz", "city": "Munich", "gender": "Male", "langs": "Ruby, Python" }
+  - do:
+      index:
+        index:  test
+        type:   test
+        id:     9
+        body:   { "name": "Mia", "city": "Berlin", "gender": "Female", "langs": "Java" }
+  - do:
+      index:
+        index:  test
+        type:   test
+        id:     10
+        body:   { "name": "Hannah", "city": "Berlin", "gender": "Female", "langs": "Scala, Kotlin, Java" }
+  - do:
+      index:
+        index:  test
+        type:   test
+        id:     11
+        body:   { "name": "Anna", "city": "Berlin", "gender": "Female", "langs": "Scala, Kotlin, Java" }
+
+  - do:
+      indices.refresh: {}
+
+---
+"scala engs":
+  - do:
+      search:
+        index: test
+        body:
+          query:
+            fair-match:
+              langs:
+                query: Scala
+                protected_key: gender
+                protected_value: Female
+                protected_elements: 5
+
+  - length: { hits.hits: 7}
