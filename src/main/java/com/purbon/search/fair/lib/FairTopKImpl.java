@@ -17,6 +17,7 @@ public class FairTopKImpl implements FairTopK {
     }
     public TopDocs fairTopK(PriorityQueue<ScoreDoc> p0, PriorityQueue<ScoreDoc> p1, int k, float p, float alpha) {
 
+        FairScorer scorer = new FairScorer(k);
         float [] m = new float[k];
 
         for(int i=0; i < k; i++) {
@@ -28,39 +29,39 @@ public class FairTopKImpl implements FairTopK {
         int tn = 0;
         float maxScore = 0.0f;
         while ( ((tp+tn) < k)) {
-            ScoreDoc scoreDoc;
+            ScoreDoc doc;
             if (tp  > p1.size() + 1) {
-                scoreDoc = p0.pop();
-                scoreDoc.score = 1;
-                t.add(scoreDoc);
+                doc = p0.pop();
+                doc.score = scorer.score(doc);
+                t.add(doc);
                 tn = tn + 1;
             } else if (tn > p0.size() + 1) {
-                scoreDoc = p1.pop();
-                scoreDoc.score = 1;
-                t.add(scoreDoc);
+                doc = p1.pop();
+                doc.score = scorer.score(doc);
+                t.add(doc);
                 tp = tp + 1;
             } else if (tp < m[tp+tn]) { // protected candidates
-                scoreDoc = p1.pop();
-                scoreDoc.score = 1;
-                t.add(scoreDoc);
+                doc = p1.pop();
+                doc.score = scorer.score(doc);
+                t.add(doc);
                 tp = tp + 1;
             } else { // Non protected candidates
                 assert p1.size() > 0 && p0.size() > 0;
                 if (p1.top().score >= p0.top().score) {
-                    scoreDoc = p1.pop();
-                    scoreDoc.score = 1;
-                    t.add(scoreDoc);
+                    doc = p1.pop();
+                    doc.score = scorer.score(doc);
+                    t.add(doc);
                     tp = tp + 1;
                 } else {
-                    scoreDoc = p0.pop();
-                    scoreDoc.score = 1;
-                    t.add(scoreDoc);
+                    doc = p0.pop();
+                    doc.score = scorer.score(doc);
+                    t.add(doc);
                     tn = tn + 1;
                 }
             }
-            if (scoreDoc != null) {
-                if (scoreDoc.score > maxScore) {
-                    maxScore = scoreDoc.score;
+            if (doc != null) {
+                if (doc.score > maxScore) {
+                    maxScore = doc.score;
                 }
             }
         }
@@ -68,7 +69,7 @@ public class FairTopKImpl implements FairTopK {
         accumulatePendingDocs(p1, t);
         accumulatePendingDocs(p0, t);
 
-        TopDocs docs = new TopDocs(t.size(), t.toArray(new ScoreDoc[t.size()]), maxScore);
+        TopDocs docs = new TopDocs(t.size(), t.toArray(new ScoreDoc[t.size()]), k);
         Arrays.sort(docs.scoreDocs, (a, b) -> {
             if (a.score > b.score) {
                 return -1;

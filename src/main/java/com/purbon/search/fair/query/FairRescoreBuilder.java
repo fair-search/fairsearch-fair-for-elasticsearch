@@ -1,11 +1,7 @@
 package com.purbon.search.fair.query;
 
-import com.purbon.search.fair.lib.DocPriorityQueue;
-import com.purbon.search.fair.lib.FairTopK;
 import com.purbon.search.fair.lib.FairTopKImpl;
 import com.purbon.search.fair.utils.DocumentPriorityQueue;
-import com.purbon.search.fair.utils.IntPriorityQueue;
-import org.apache.commons.math3.distribution.BinomialDistribution;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Explanation;
@@ -25,12 +21,8 @@ import org.elasticsearch.index.query.QueryShardContext;
 import org.elasticsearch.search.rescore.RescoreContext;
 import org.elasticsearch.search.rescore.Rescorer;
 import org.elasticsearch.search.rescore.RescorerBuilder;
-import org.elasticsearch.search.suggest.term.TermSuggestion;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Set;
 
 import static java.util.Arrays.asList;
@@ -42,16 +34,18 @@ public class FairRescoreBuilder extends RescorerBuilder<FairRescoreBuilder> {
 
     private static final ParseField PROTECTED_KEY   = new ParseField("protected_key");
     private static final ParseField PROTECTED_VALUE = new ParseField("protected_value");
+    private static final ParseField PROTECTED_ELEMENTS_COUNT = new ParseField("protected_elements");
 
     private float factor;
     private String protectedKey;
     private String protectedValue;
+    private int protectedElementsCount;
 
     public FairRescoreBuilder() {
 
     }
 
-    public FairRescoreBuilder(String protectedKey, String protectedValue) {
+    public FairRescoreBuilder(String protectedKey, String protectedValue, int protectedElementsCount) {
         this.factor = 0.0f;
 
         if (protectedKey == null) {
@@ -64,32 +58,38 @@ public class FairRescoreBuilder extends RescorerBuilder<FairRescoreBuilder> {
 
         this.protectedKey = protectedKey;
         this.protectedValue = protectedValue;
+        this.protectedElementsCount = protectedElementsCount;
+
     }
 
     public FairRescoreBuilder(StreamInput in) throws IOException {
         super(in);
         this.protectedKey = in.readString();
         this.protectedValue = in.readString();
+        this.protectedElementsCount = in.readInt();
     }
 
     @Override
     protected void doWriteTo(StreamOutput out) throws IOException {
         out.writeString(protectedKey);
         out.writeString(protectedValue);
+        out.writeInt(protectedElementsCount);
     }
 
     @Override
     protected void doXContent(XContentBuilder builder, Params params) throws IOException {
         builder.field(PROTECTED_KEY.getPreferredName(), protectedKey);
         builder.field(PROTECTED_VALUE.getPreferredName(), protectedValue);
+        builder.field(PROTECTED_ELEMENTS_COUNT.getPreferredName(), protectedElementsCount);
     }
 
     private static final ConstructingObjectParser<FairRescoreBuilder, Void> PARSER = new ConstructingObjectParser<>(NAME,
-            args -> new FairRescoreBuilder((String)args[0], (String)args[1]));
+            args -> new FairRescoreBuilder((String)args[0], (String)args[1], (Integer)args[2]));
 
     static {
         PARSER.declareString(constructorArg(), PROTECTED_KEY);
         PARSER.declareString(constructorArg(), PROTECTED_VALUE);
+        PARSER.declareInt(constructorArg(), PROTECTED_ELEMENTS_COUNT);
     }
 
     public static FairRescoreBuilder fromXContent(XContentParser parser) throws IOException {
@@ -101,7 +101,7 @@ public class FairRescoreBuilder extends RescorerBuilder<FairRescoreBuilder> {
      */
     @Override
     protected RescoreContext innerBuildContext(int windowSize, QueryShardContext context) throws IOException {
-        return new FairRescoreContext(windowSize, protectedKey, protectedValue, context);
+        return new FairRescoreContext(windowSize, protectedKey, protectedValue, protectedElementsCount, context);
     }
 
     /**
@@ -126,11 +126,13 @@ public class FairRescoreBuilder extends RescorerBuilder<FairRescoreBuilder> {
 
         private String protectedKey;
         private String protectedValue;
+        private int protectedElementsCount;
 
-        FairRescoreContext(int windowSize, String protectedKey, String protectedValue, QueryShardContext context) {
+        FairRescoreContext(int windowSize, String protectedKey, String protectedValue, int protectedElementsCount, QueryShardContext context) {
             super(windowSize, FairRescorer.INSTANCE);
             this.protectedKey = protectedKey;
             this.protectedValue = protectedValue;
+            this.protectedElementsCount = protectedElementsCount;
         }
 
     }
@@ -165,9 +167,9 @@ public class FairRescoreBuilder extends RescorerBuilder<FairRescoreBuilder> {
          */
         @Override
         public TopDocs rescore(TopDocs topDocs, IndexSearcher searcher, RescoreContext rescoreContext) throws IOException {
+
             FairRescoreContext context = (FairRescoreContext)rescoreContext;
             int max = Math.min(topDocs.scoreDocs.length, rescoreContext.getWindowSize());
-            int k   = 5;
 
             PriorityQueue<ScoreDoc> p0 = new DocumentPriorityQueue(max);
             PriorityQueue<ScoreDoc> p1 = new DocumentPriorityQueue(max);
@@ -183,8 +185,7 @@ public class FairRescoreBuilder extends RescorerBuilder<FairRescoreBuilder> {
             }
             assert p0.size() + p1.size() == max;
 
-            return fairTopK.fairTopK(p0, p1, k, proportion, significance);
-
+            return fairTopK.fairTopK(p0, p1, context.protectedElementsCount, proportion, significance);
         }
 
         private boolean isProtected(Document doc, FairRescoreContext context) {
