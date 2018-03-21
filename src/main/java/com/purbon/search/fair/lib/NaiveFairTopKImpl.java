@@ -1,5 +1,7 @@
 package com.purbon.search.fair.lib;
 
+import com.purbon.search.fair.lib.naive.DocPriorityQueue;
+import com.purbon.search.fair.lib.naive.Document;
 import org.apache.commons.math3.distribution.BinomialDistribution;
 import org.apache.lucene.util.PriorityQueue;
 

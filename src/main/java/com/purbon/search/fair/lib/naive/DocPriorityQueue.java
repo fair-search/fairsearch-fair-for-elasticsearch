@@ -1,4 +1,4 @@
-package com.purbon.search.fair.lib;
+package com.purbon.search.fair.lib.naive;
 
 import org.apache.lucene.util.PriorityQueue;
 

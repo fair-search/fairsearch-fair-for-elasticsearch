@@ -1,5 +1,6 @@
 package com.purbon.search.fair.lib;
 
+import com.purbon.search.fair.lib.fairness.BionomialFairnessTableLookup;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.util.PriorityQueue;

@@ -1,5 +1,6 @@
-package com.purbon.search.fair.lib;
+package com.purbon.search.fair.lib.fairness;
 
+import com.purbon.search.fair.lib.FairnessTableLookup;
 import org.apache.commons.math3.distribution.BinomialDistribution;
 
 public class BionomialFairnessTableLookup implements FairnessTableLookup {
