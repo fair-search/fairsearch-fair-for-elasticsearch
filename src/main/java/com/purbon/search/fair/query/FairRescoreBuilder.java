@@ -1,6 +1,8 @@
 package com.purbon.search.fair.query;
 
 import com.purbon.search.fair.lib.DocPriorityQueue;
+import com.purbon.search.fair.lib.FairTopK;
+import com.purbon.search.fair.lib.FairTopKImpl;
 import com.purbon.search.fair.utils.DocumentPriorityQueue;
 import com.purbon.search.fair.utils.IntPriorityQueue;
 import org.apache.commons.math3.distribution.BinomialDistribution;
@@ -136,6 +138,7 @@ public class FairRescoreBuilder extends RescorerBuilder<FairRescoreBuilder> {
     private static class FairRescorer implements Rescorer {
 
         private static final FairRescorer INSTANCE = new FairRescorer();
+        private final FairTopKImpl fairTopK;
 
         private float proportion = 0.6f;
         private float significance = 0.1f;
@@ -148,6 +151,7 @@ public class FairRescoreBuilder extends RescorerBuilder<FairRescoreBuilder> {
         public FairRescorer(float proportion, float significance) {
             this.proportion = proportion;
             this.significance = significance;
+            this.fairTopK = new FairTopKImpl();
         }
 
         /**
@@ -161,7 +165,6 @@ public class FairRescoreBuilder extends RescorerBuilder<FairRescoreBuilder> {
          */
         @Override
         public TopDocs rescore(TopDocs topDocs, IndexSearcher searcher, RescoreContext rescoreContext) throws IOException {
-
             FairRescoreContext context = (FairRescoreContext)rescoreContext;
             int max = Math.min(topDocs.scoreDocs.length, rescoreContext.getWindowSize());
             int k   = 5;
@@ -179,101 +182,13 @@ public class FairRescoreBuilder extends RescorerBuilder<FairRescoreBuilder> {
                 }
             }
             assert p0.size() + p1.size() == max;
-            float [] m = new float[k];
 
-            for(int i=0; i < k; i++) {
-                m[i] = fairness(i, proportion, significance);
-            }
+            return fairTopK.fairTopK(p0, p1, k, proportion, significance);
 
-            //ScoreDoc[] t = new ScoreDoc[k];
-            List<ScoreDoc> t = new ArrayList<ScoreDoc>();
-            int tp = 0;
-            int tn = 0;
-            float maxScore = 0.0f;
-            while ( ((tp+tn) < k)) {
-                ScoreDoc scoreDoc;
-                if (tp  > p1.size() + 1) {
-                    scoreDoc = p0.pop();
-                    scoreDoc.score = 1;
-                    t.add(scoreDoc);
-                    tn = tn + 1;
-                } else if (tn > p0.size() + 1) {
-                    scoreDoc = p1.pop();
-                    scoreDoc.score = 1;
-                    t.add(scoreDoc);
-                    tp = tp + 1;
-                } else if (tp < m[tp+tn]) { // protected candidates
-                    scoreDoc = p1.pop();
-                    scoreDoc.score = 1;
-                    t.add(scoreDoc);
-                    tp = tp + 1;
-                } else { // Non protected candidates
-                    assert p1.size() > 0 && p0.size() > 0;
-                    if (p1.top().score >= p0.top().score) {
-                        scoreDoc = p1.pop();
-                        scoreDoc.score = 1;
-                        t.add(scoreDoc);
-                        tp = tp + 1;
-                    } else {
-                        scoreDoc = p0.pop();
-                        scoreDoc.score = 1;
-                        t.add(scoreDoc);
-                        tn = tn + 1;
-                    }
-                }
-                if (scoreDoc != null) {
-                    if (scoreDoc.score > maxScore) {
-                        maxScore = scoreDoc.score;
-                    }
-                }
-            }
-            while(p1.size() > 0) {
-                ScoreDoc doc = p1.pop();
-                doc.score = 0;
-                t.add(doc);
-            }
-
-            while(p0.size() > 0) {
-                ScoreDoc doc = p0.pop();
-                doc.score = 0;
-                t.add(doc);
-            }
-
-            TopDocs docs = new TopDocs(t.size(), t.toArray(new ScoreDoc[t.size()]), maxScore);
-            Arrays.sort(docs.scoreDocs, (a, b) -> {
-                if (a.score > b.score) {
-                    return -1;
-                }
-                if (a.score < b.score) {
-                    return 1;
-                }
-                // Safe because doc ids >= 0
-                return a.doc - b.doc;
-            });
-
-            return docs;
         }
 
         private boolean isProtected(Document doc, FairRescoreContext context) {
             return doc.get(context.protectedKey).equals(context.protectedValue);
-        }
-
-        // m[i] ← F-1(αc ;i, p)
-        private float fairness(int trials, float proportion, float significance) {
-
-            // trials == k , p == p
-            BinomialDistribution d = new BinomialDistribution(trials, proportion);
-        /*
-           NOTE:
-             if alpha is 0.1,  the output should be the first value x where
-             the cumulative probability is bigger than alpha (significance)
-         */
-            int x = 0;
-            do {
-                x = x + 1;
-            } while (d.cumulativeProbability(x) > significance);
-
-            return x;
         }
 
         /**
