@@ -1,6 +1,8 @@
 package com.purbon.search.fair.utils;
 
 
+import org.apache.commons.math3.distribution.BinomialDistribution;
+
 public class MTableGenerator {
 
     private int[] mTable;
@@ -16,12 +18,12 @@ public class MTableGenerator {
      * @param alpha the significance level
      */
     public MTableGenerator(int n, int k, double p, double alpha) {
-        if(parametersAreValid(n,k,p,alpha)) {
+        if (parametersAreValid(n, k, p, alpha)) {
             this.n = n;
             this.k = k;
             this.p = p;
             this.alpha = alpha;
-        }else {
+        } else {
             throw new IllegalArgumentException("Invalid Input Parameters for MTable calculation.");
         }
     }
@@ -29,7 +31,7 @@ public class MTableGenerator {
     private boolean parametersAreValid(int n, int k, double p, double alpha) {
         boolean alphaIsValid = false;
 
-        return nIsValid(n) && kIsValid(k,n) && pIsValid(p) && alphaIsValid(alpha);
+        return nIsValid(n) && kIsValid(k, n) && pIsValid(p) && alphaIsValid(alpha);
     }
 
     private boolean nIsValid(int n) {
@@ -77,10 +79,8 @@ public class MTableGenerator {
 
     private Integer m(int k) {
 
-        //care
-        //TODO Find new package for Binomial Calculations esp. quantile function
         BinomialDistribution dist = new BinomialDistribution(k, p);
-        return (int) dist.quantile(alpha);
+        return dist.inverseCumulativeProbability(alpha);
     }
 
     public int[] getMTable() {
@@ -105,4 +105,5 @@ public class MTableGenerator {
     public double getAlpha() {
         return alpha;
     }
+
 }
