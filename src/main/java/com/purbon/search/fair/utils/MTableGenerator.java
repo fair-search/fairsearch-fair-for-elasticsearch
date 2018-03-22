@@ -16,10 +16,54 @@ public class MTableGenerator {
      * @param alpha the significance level
      */
     public MTableGenerator(int n, int k, double p, double alpha) {
-        this.n = n;
-        this.k = k;
-        this.p = p;
-        this.alpha = alpha;
+        if(parametersAreValid(n,k,p,alpha)) {
+            this.n = n;
+            this.k = k;
+            this.p = p;
+            this.alpha = alpha;
+        }else {
+            throw new IllegalArgumentException("Invalid Input Parameters for MTable calculation.");
+        }
+    }
+
+    private boolean parametersAreValid(int n, int k, double p, double alpha) {
+        boolean alphaIsValid = false;
+
+        return nIsValid(n) && kIsValid(k,n) && pIsValid(p) && alphaIsValid(alpha);
+    }
+
+    private boolean nIsValid(int n) {
+        if (n < 1) {
+            throw new IllegalArgumentException("Parameter n must be at least 1");
+        } else {
+            return true;
+        }
+    }
+
+    private boolean kIsValid(int k, int n) {
+        if (k < 1)
+            throw new IllegalArgumentException("Parameter k must be at least 1");
+        else if (k > n) {
+            throw new IllegalArgumentException("Parameter k must be at most n");
+        } else {
+            return true;
+        }
+    }
+
+    private boolean pIsValid(double p) {
+        if (p >= 1d || p <= 0d) {
+            throw new IllegalArgumentException("Parameter p must be in ]0.0, 1.0[");
+        } else {
+            return true;
+        }
+    }
+
+    private boolean alphaIsValid(double alpha) {
+        if (alpha <= 0d || alpha >= 1d) {
+            throw new IllegalArgumentException("Parameter alpha must be in ]0.0, 1.0[");
+        } else {
+            return true;
+        }
     }
 
     private int[] computeMTable() {
@@ -32,11 +76,7 @@ public class MTableGenerator {
     }
 
     private Integer m(int k) {
-        if (k < 1)
-            throw new IllegalArgumentException("Parameter k must be at least 1");
-        else if (k > n) {
-            throw new IllegalArgumentException("Parameter k must be at most n");
-        }
+
         //care
         //TODO Find new package for Binomial Calculations esp. quantile function
         BinomialDistribution dist = new BinomialDistribution(k, p);
@@ -44,7 +84,7 @@ public class MTableGenerator {
     }
 
     public int[] getMTable() {
-        if(this.mTable==null){
+        if (this.mTable == null) {
             this.mTable = computeMTable();
         }
         return mTable;
@@ -54,11 +94,11 @@ public class MTableGenerator {
         return k;
     }
 
-    public int getN(){
+    public int getN() {
         return n;
     }
 
-    public double getP(){
+    public double getP() {
         return p;
     }
 
