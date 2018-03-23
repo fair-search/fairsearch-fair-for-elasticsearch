@@ -5,3 +5,8 @@
 
 
 TBA
+
+## Developers
+
+- Pere Urbon
+- Tom Sühr
