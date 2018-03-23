@@ -128,7 +128,9 @@ public class FairRescoreBuilder extends RescorerBuilder<FairRescoreBuilder> {
         private String protectedValue;
         private int protectedElementsCount;
 
-        FairRescoreContext(int windowSize, String protectedKey, String protectedValue, int protectedElementsCount, QueryShardContext context) {
+        FairRescoreContext(int windowSize, String protectedKey, String protectedValue,
+                           int protectedElementsCount,
+                           QueryShardContext context) {
             super(windowSize, FairRescorer.INSTANCE);
             this.protectedKey = protectedKey;
             this.protectedValue = protectedValue;
@@ -145,12 +147,12 @@ public class FairRescoreBuilder extends RescorerBuilder<FairRescoreBuilder> {
         private float proportion = 0.6f;
         private float significance = 0.1f;
 
-        public FairRescorer() {
+        FairRescorer() {
             this(0.6f, 0.1f);
         }
 
 
-        public FairRescorer(float proportion, float significance) {
+        FairRescorer(float proportion, float significance) {
             this.proportion = proportion;
             this.significance = significance;
             this.fairTopK = new FairTopKImpl();
