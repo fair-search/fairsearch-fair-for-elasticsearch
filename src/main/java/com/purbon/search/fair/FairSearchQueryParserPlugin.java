@@ -91,8 +91,6 @@ public class FairSearchQueryParserPlugin extends Plugin implements ActionPlugin,
                                              Supplier<DiscoveryNodes> nodesInCluster) {
 
         List<RestHandler> list = new ArrayList<RestHandler>();
-        list.add(new PlainTextRestAction(settings, restController));
-
         return list;
     }
 }
