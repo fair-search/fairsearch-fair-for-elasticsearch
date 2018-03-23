@@ -20,14 +20,26 @@ public class FairQueryBuilder extends AbstractQueryBuilder<FairQueryBuilder>  {
 
     private static final ParseField QUERY_FIELD = new ParseField("query");
 
+    private static final ParseField PROTECTED_KEY   = new ParseField("protected_key");
+    private static final ParseField PROTECTED_VALUE = new ParseField("protected_value");
+    private static final ParseField PROTECTED_ELEMENTS_COUNT = new ParseField("protected_elements");
+
     private Object value;
     private String fieldName;
+
+    private String protectedKey;
+    private String protectedValue;
+    private int protectedElementsCount;
 
     public FairQueryBuilder() {
 
     }
 
     public FairQueryBuilder(String fieldName, Object value) {
+        this(fieldName, value, "", "", -1);
+    }
+
+    public FairQueryBuilder(String fieldName, Object value, String protectedKey, String protectedValue, int protectedElementsCount) {
         if (fieldName == null) {
             throw new IllegalArgumentException("[\" + NAME + \"] requires fieldName");
         }
@@ -38,18 +50,27 @@ public class FairQueryBuilder extends AbstractQueryBuilder<FairQueryBuilder>  {
 
         this.fieldName = fieldName;
         this.value     = value;
+        this.protectedKey = protectedKey;
+        this.protectedValue = protectedValue;
+        this.protectedElementsCount = protectedElementsCount;
     }
 
     public FairQueryBuilder(StreamInput in) throws IOException {
         super(in);
-        fieldName = in.readString();
-        value = in.readGenericValue();
+        this.fieldName = in.readString();
+        this.value = in.readGenericValue();
+        this.protectedKey = in.readString();
+        this.protectedValue = in.readString();
+        this.protectedElementsCount = in.readInt();
     }
 
     @Override
     protected void doWriteTo(StreamOutput out) throws IOException {
         out.writeString(fieldName);
         out.writeGenericValue(value);
+        out.writeString(protectedKey);
+        out.writeString(protectedValue);
+        out.writeInt(protectedElementsCount);
     }
 
     @Override
@@ -57,6 +78,9 @@ public class FairQueryBuilder extends AbstractQueryBuilder<FairQueryBuilder>  {
         builder.startObject(NAME);
         builder.startObject(fieldName);
         builder.field(QUERY_FIELD.getPreferredName(), value);
+        builder.field(PROTECTED_KEY.getPreferredName(), protectedKey);
+        builder.field(PROTECTED_VALUE.getPreferredName(), protectedValue);
+        builder.field(PROTECTED_ELEMENTS_COUNT.getPreferredName(), protectedElementsCount);
         printBoostAndQueryName(builder);
         builder.endObject();
         builder.endObject();
@@ -86,6 +110,9 @@ public class FairQueryBuilder extends AbstractQueryBuilder<FairQueryBuilder>  {
     public static FairQueryBuilder fromXContent(XContentParser parser) throws IOException {
         String fieldName = null;
         Object value = null;
+        String protectedKey = null;
+        String protectedValue = null;
+        int protectedElementsCount = -1;
 
         float boost = AbstractQueryBuilder.DEFAULT_BOOST;
 
@@ -105,7 +132,13 @@ public class FairQueryBuilder extends AbstractQueryBuilder<FairQueryBuilder>  {
                     } else if (token.isValue()) {
                         if (QUERY_FIELD.match(currentFieldName)) {
                             value = parser.objectText();
-                        }  else if (AbstractQueryBuilder.BOOST_FIELD.match(currentFieldName)) {
+                        } else if (PROTECTED_KEY.match(currentFieldName)) {
+                            protectedKey = parser.text();
+                        } else if (PROTECTED_VALUE.match(currentFieldName)) {
+                            protectedValue = parser.text();
+                        } else if (PROTECTED_ELEMENTS_COUNT.match(currentFieldName)) {
+                            protectedElementsCount = parser.intValue();
+                        } else if (AbstractQueryBuilder.BOOST_FIELD.match(currentFieldName)) {
                             boost = parser.floatValue();
                         } else if (AbstractQueryBuilder.NAME_FIELD.match(currentFieldName)) {
                             queryName = parser.text();
@@ -130,7 +163,7 @@ public class FairQueryBuilder extends AbstractQueryBuilder<FairQueryBuilder>  {
             throw new ParsingException(parser.getTokenLocation(), "No text specified for text query");
         }
 
-        FairQueryBuilder queryBuilder = new FairQueryBuilder(fieldName, value);
+        FairQueryBuilder queryBuilder = new FairQueryBuilder(fieldName, value, protectedKey, protectedValue, protectedElementsCount);
         queryBuilder.boost(boost);
         queryBuilder.queryName(queryName);
         return queryBuilder;
