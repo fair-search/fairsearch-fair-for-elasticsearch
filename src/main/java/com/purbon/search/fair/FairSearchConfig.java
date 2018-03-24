@@ -5,35 +5,62 @@ import org.elasticsearch.common.settings.Setting.Property;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.env.Environment;
 
-import java.nio.file.Path;
-
 public class FairSearchConfig {
 
 
-    static final Setting<String> SIMPLE_SETTING = Setting.simpleString("custom.simple", Property.NodeScope, Property.Dynamic);
-    static final Setting<Float>  FLOAT_SETTING = Setting.floatSetting("custom.float", 10, Property.NodeScope);
+    public static final String MIN_PROPORTION_PROTECTED_KEY = "fairsearch.min_proportion_protected";
+    public static final String SIGNIFICANCE_LEVEL_KEY = "fairsearch.significance_level";
 
-    private String _simple;
-    private Float _float;
+    static final Setting<String> PROPORTION_STRATEGY_SETTING = Setting.simpleString("fairsearch.proportion_strategy",
+            Property.NodeScope,
+            Property.Dynamic);
+
+    static final Setting<Float> SIGNIFICANCE_LEVEL_SETTING = Setting.floatSetting(SIGNIFICANCE_LEVEL_KEY,
+            0.1f,
+            Property.NodeScope,
+            Property.Dynamic);
+
+    static final Setting<String> ON_FEW_PROTECTED_ELELEMENTS_SETTING = Setting.simpleString("fairsearch.on_few_protected_elements",
+            (value, settings) -> {
+                if (value.equalsIgnoreCase("abort") || value.equalsIgnoreCase("proceed")) {
+                    throw new IllegalArgumentException("Value [" + value + "] is not a valid setting for on_few_protected_elements");
+
+                }
+            },
+            Property.NodeScope,
+            Property.Dynamic);
+
+    static final Setting<Float> MIN_PROPORTION_PROTECTED_SETTING = Setting.floatSetting(MIN_PROPORTION_PROTECTED_KEY,
+            0.5f,
+            Property.NodeScope,
+            Property.Dynamic);
+
+    private String proportionStrategy;
+    private String onFewProtectedElements;
+    private Float significanceLevel;
+    private Float proportionProtected;
 
     FairSearchConfig(final Environment env, final Settings settings) {
 
-        Path configDir = env.configFile();
-        Path pluginConfig = configDir.resolve("fairsearch-plugin-config.yml");
-        Settings customSettings = settings;
-
-          //  customSettings = settings; //Settings.builder().loadFromPath(pluginConfig).build();
-
-        this._simple = SIMPLE_SETTING.get(customSettings);
-        this._float  = FLOAT_SETTING.get(customSettings);
-
+        this.proportionStrategy = PROPORTION_STRATEGY_SETTING.get(settings);
+        this.significanceLevel = SIGNIFICANCE_LEVEL_SETTING.get(settings);
+        this.onFewProtectedElements = ON_FEW_PROTECTED_ELELEMENTS_SETTING.get(settings);
+        this.proportionProtected = MIN_PROPORTION_PROTECTED_SETTING.get(settings);
     }
 
-    public String getSimple() {
-        return _simple;
+    public Float getProportionProtected() {
+        return proportionProtected;
     }
 
-    public Float getFloat() {
-        return _float;
+    public String getOnFewProtectedElements() {
+        return onFewProtectedElements;
+    }
+
+    public String getProportionStrategy() {
+        return proportionStrategy;
+    }
+
+    public Float getSignificanceLevel() {
+        return significanceLevel;
     }
 }

@@ -1,5 +1,6 @@
 package com.purbon.search.fair.query;
 
+import com.purbon.search.fair.FairSearchConfig;
 import com.purbon.search.fair.lib.FairTopKImpl;
 import com.purbon.search.fair.utils.DocumentPriorityQueue;
 import org.apache.lucene.document.Document;
@@ -13,6 +14,7 @@ import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.common.ParseField;
 import org.elasticsearch.common.io.stream.StreamInput;
 import org.elasticsearch.common.io.stream.StreamOutput;
+import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.xcontent.ConstructingObjectParser;
 import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.common.xcontent.XContentParser;
@@ -35,18 +37,30 @@ public class FairRescoreBuilder extends RescorerBuilder<FairRescoreBuilder> {
     private static final ParseField PROTECTED_KEY   = new ParseField("protected_key");
     private static final ParseField PROTECTED_VALUE = new ParseField("protected_value");
     private static final ParseField PROTECTED_ELEMENTS_COUNT = new ParseField("protected_elements");
+    private static Settings settings = null;
 
-    private float factor;
     private String protectedKey;
     private String protectedValue;
     private int protectedElementsCount;
 
+    @Deprecated
     public FairRescoreBuilder() {
 
     }
 
+    @Deprecated
     public FairRescoreBuilder(String protectedKey, String protectedValue, int protectedElementsCount) {
-        this.factor = 0.0f;
+        this(protectedKey, protectedValue, protectedElementsCount, null);
+    }
+
+    public FairRescoreBuilder(StreamInput in) throws IOException {
+        super(in);
+        this.protectedKey = in.readString();
+        this.protectedValue = in.readString();
+        this.protectedElementsCount = in.readInt();
+    }
+
+    public FairRescoreBuilder(String protectedKey, String protectedValue, int protectedElementsCount, Settings settings) {
 
         if (protectedKey == null) {
             throw new IllegalArgumentException("[\" + NAME + \"] requires protected_key");
@@ -59,14 +73,7 @@ public class FairRescoreBuilder extends RescorerBuilder<FairRescoreBuilder> {
         this.protectedKey = protectedKey;
         this.protectedValue = protectedValue;
         this.protectedElementsCount = protectedElementsCount;
-
-    }
-
-    public FairRescoreBuilder(StreamInput in) throws IOException {
-        super(in);
-        this.protectedKey = in.readString();
-        this.protectedValue = in.readString();
-        this.protectedElementsCount = in.readInt();
+        FairRescoreBuilder.settings = settings;
     }
 
     @Override
@@ -83,8 +90,9 @@ public class FairRescoreBuilder extends RescorerBuilder<FairRescoreBuilder> {
         builder.field(PROTECTED_ELEMENTS_COUNT.getPreferredName(), protectedElementsCount);
     }
 
-    private static final ConstructingObjectParser<FairRescoreBuilder, Void> PARSER = new ConstructingObjectParser<>(NAME,
-            args -> new FairRescoreBuilder((String)args[0], (String)args[1], (Integer)args[2]));
+    private static final ConstructingObjectParser<FairRescoreBuilder, ParserContext> PARSER = new ConstructingObjectParser<>(NAME,
+            false,
+            (args, context) -> new FairRescoreBuilder((String)args[0], (String)args[1], (Integer)args[2], context.getSettings()));
 
     static {
         PARSER.declareString(constructorArg(), PROTECTED_KEY);
@@ -92,8 +100,21 @@ public class FairRescoreBuilder extends RescorerBuilder<FairRescoreBuilder> {
         PARSER.declareInt(constructorArg(), PROTECTED_ELEMENTS_COUNT);
     }
 
-    public static FairRescoreBuilder fromXContent(XContentParser parser) throws IOException {
-        return PARSER.apply(parser, null);
+    public static FairRescoreBuilder fromXContent(XContentParser parser, Settings settings) throws IOException {
+        return PARSER.apply(parser, new ParserContext(settings));
+    }
+
+    private static class ParserContext {
+
+        private Settings settings;
+
+        ParserContext(Settings settings) {
+            this.settings = settings;
+        }
+
+        public Settings getSettings() {
+            return settings;
+        }
     }
 
     /**
@@ -122,8 +143,10 @@ public class FairRescoreBuilder extends RescorerBuilder<FairRescoreBuilder> {
         return this;
     }
 
+
     private class FairRescoreContext extends RescoreContext {
 
+        private QueryShardContext context;
         private String protectedKey;
         private String protectedValue;
         private int protectedElementsCount;
@@ -135,6 +158,7 @@ public class FairRescoreBuilder extends RescorerBuilder<FairRescoreBuilder> {
             this.protectedKey = protectedKey;
             this.protectedValue = protectedValue;
             this.protectedElementsCount = protectedElementsCount;
+            this.context = context;
         }
 
     }
@@ -144,17 +168,10 @@ public class FairRescoreBuilder extends RescorerBuilder<FairRescoreBuilder> {
         private static final FairRescorer INSTANCE = new FairRescorer();
         private final FairTopKImpl fairTopK;
 
-        private float proportion = 0.6f;
-        private float significance = 0.1f;
+        private float proportion = settings.getAsFloat(FairSearchConfig.MIN_PROPORTION_PROTECTED_KEY, 0.5f);
+        private float significance = settings.getAsFloat(FairSearchConfig.SIGNIFICANCE_LEVEL_KEY, 0.1f);
 
         FairRescorer() {
-            this(0.6f, 0.1f);
-        }
-
-
-        FairRescorer(float proportion, float significance) {
-            this.proportion = proportion;
-            this.significance = significance;
             this.fairTopK = new FairTopKImpl();
         }
 
