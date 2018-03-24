@@ -1,12 +1,10 @@
 package com.purbon.search.fair;
 
-import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.common.settings.Setting;
 import org.elasticsearch.common.settings.Setting.Property;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.env.Environment;
 
-import java.io.IOException;
 import java.nio.file.Path;
 
 public class FairSearchConfig {

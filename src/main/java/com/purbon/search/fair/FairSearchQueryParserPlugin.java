@@ -1,33 +1,17 @@
 package com.purbon.search.fair;
 
-import com.purbon.search.fair.query.FairQueryBuilder;
 import com.purbon.search.fair.query.FairRescoreBuilder;
-import org.apache.lucene.search.Query;
-import org.elasticsearch.cluster.metadata.IndexNameExpressionResolver;
-import org.elasticsearch.cluster.node.DiscoveryNodes;
 import org.elasticsearch.common.settings.Setting;
 import org.elasticsearch.common.settings.Settings;
-
-import org.elasticsearch.common.settings.ClusterSettings;
-import org.elasticsearch.common.settings.IndexScopedSettings;
-import org.elasticsearch.common.settings.SettingsFilter;
-
 import org.elasticsearch.env.Environment;
 import org.elasticsearch.plugins.ActionPlugin;
 import org.elasticsearch.plugins.Plugin;
 import org.elasticsearch.plugins.SearchPlugin;
-import org.elasticsearch.rest.RestController;
-import org.elasticsearch.rest.RestHandler;
 import org.elasticsearch.search.rescore.Rescorer;
 
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
-import java.util.function.Supplier;
 
-import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 
 public class FairSearchQueryParserPlugin extends Plugin implements ActionPlugin, SearchPlugin {
@@ -68,29 +52,5 @@ public class FairSearchQueryParserPlugin extends Plugin implements ActionPlugin,
         return singletonList(
                 new RescorerSpec<FairRescoreBuilder>(FairRescoreBuilder.NAME, FairRescoreBuilder::new, FairRescoreBuilder::fromXContent)
         );
-    }
-
-    /**
-     * The new {@link Query}s defined by this plugin.
-     */
-    @Override
-    public List<QuerySpec<?>> getQueries() {
-        return asList(
-                new QuerySpec<>(FairQueryBuilder.NAME, FairQueryBuilder::new, FairQueryBuilder::fromXContent)
-        );
-    }
-
-    /**
-     * Rest handlers added by this plugin.
-     */
-    @Override
-    public List<RestHandler> getRestHandlers(Settings settings, RestController restController,
-                                             ClusterSettings clusterSettings, IndexScopedSettings indexScopedSettings,
-                                             SettingsFilter settingsFilter,
-                                             IndexNameExpressionResolver indexNameExpressionResolver,
-                                             Supplier<DiscoveryNodes> nodesInCluster) {
-
-        List<RestHandler> list = new ArrayList<RestHandler>();
-        return list;
     }
 }
