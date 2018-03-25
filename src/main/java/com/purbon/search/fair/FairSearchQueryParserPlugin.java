@@ -64,8 +64,5 @@ public class FairSearchQueryParserPlugin extends Plugin implements ActionPlugin,
                 xContentParser -> FairRescoreBuilder.fromXContent(xContentParser, settings));
 
         return singletonList(rescorer);
-        /*return singletonList(
-                new RescorerSpec<FairRescoreBuilder>(FairRescoreBuilder.NAME, FairRescoreBuilder::new, FairRescoreBuilder::fromXContent)
-        );*/
     }
 }

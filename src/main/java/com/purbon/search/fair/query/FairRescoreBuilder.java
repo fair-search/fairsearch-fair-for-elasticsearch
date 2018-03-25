@@ -10,6 +10,7 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.util.PriorityQueue;
+import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.common.ParseField;
 import org.elasticsearch.common.io.stream.StreamInput;
@@ -161,6 +162,9 @@ public class FairRescoreBuilder extends RescorerBuilder<FairRescoreBuilder> {
             this.context = context;
         }
 
+        public QueryShardContext getShardContext() {
+            return context;
+        }
     }
 
     private static class FairRescorer implements Rescorer {
@@ -208,7 +212,11 @@ public class FairRescoreBuilder extends RescorerBuilder<FairRescoreBuilder> {
         }
 
         private boolean isProtected(Document doc, FairRescoreContext context) {
-            return doc.get(context.protectedKey).equals(context.protectedValue);
+            try {
+                return doc.get(context.protectedKey).equals(context.protectedValue);
+            } catch (Exception ex) {
+                throw new ElasticsearchException(context.protectedKey+" should be an stored value for this plugin to work properly.");
+            }
         }
 
         /**
