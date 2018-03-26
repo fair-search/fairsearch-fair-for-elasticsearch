@@ -5,8 +5,6 @@ import org.elasticsearch.common.settings.Setting.Property;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.env.Environment;
 
-import java.util.Map;
-
 public class FairSearchConfig {
 
 
@@ -42,33 +40,10 @@ public class FairSearchConfig {
             Property.NodeScope,
             Property.Dynamic);
 
-    /*
     static final Setting<Float> MIN_PROPORTION_PROTECTED_SETTING = Setting.floatSetting(MIN_PROPORTION_PROTECTED_KEY,
             0.5f,
             Property.NodeScope,
             Property.Dynamic);
-    */
-
-    static final Setting<Float> MIN_PROPORTION_PROTECTED_SETTING = new Setting<>(MIN_PROPORTION_PROTECTED_KEY,
-            (s) -> Float.toString(0.5f), Float::parseFloat,
-            new Setting.Validator<String>() {
-
-                /**
-                 * The validation routine for this validator.
-                 *
-                 * @param value    the value of this setting
-                 * @param settings a map from the settings specified by {@link #settings()}} to their values
-                 */
-                @Override
-                public void validate(String value, Map<Setting<String>, String> settings) {
-                    if (!settings.get(PROPORTION_STRATEGY_KEY).equalsIgnoreCase("fixed")) {
-                        throw new IllegalArgumentException("Min proportion of protected elements is not valid with a proportion strategy fixed.");
-                    }
-                }
-            },
-            Property.NodeScope,
-            Property.Dynamic);
-
 
     private String proportionStrategy;
     private String onFewProtectedElements;
