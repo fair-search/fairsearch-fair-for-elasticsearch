@@ -172,8 +172,11 @@ public class FairRescoreBuilder extends RescorerBuilder<FairRescoreBuilder> {
         private static final FairRescorer INSTANCE = new FairRescorer();
         private final FairTopKImpl fairTopK;
 
-        private float proportion = settings.getAsFloat(FairSearchConfig.MIN_PROPORTION_PROTECTED_KEY, 0.5f);
-        private float significance = settings.getAsFloat(FairSearchConfig.SIGNIFICANCE_LEVEL_KEY, 0.1f);
+        private Settings setting = settings.getAsSettings(FairSearchConfig.KEY);
+
+        private float proportion = setting.getAsFloat(FairSearchConfig.MIN_PROPORTION_PROTECTED_KEY, 0.5f);
+        private float significance = setting.getAsFloat(FairSearchConfig.SIGNIFICANCE_LEVEL_KEY, 0.1f);
+        private String onTooFewElements = setting.get(FairSearchConfig.ON_FEW_PROTECTED_ELEMENTS_KEY, "proceed");
 
         FairRescorer() {
             this.fairTopK = new FairTopKImpl();
@@ -207,6 +210,11 @@ public class FairRescoreBuilder extends RescorerBuilder<FairRescoreBuilder> {
                 }
             }
             assert p0.size() + p1.size() == max;
+
+            if ( onTooFewElements.equalsIgnoreCase("abort") && p0.size() <  context.protectedElementsCount )
+            {
+                throw new ElasticsearchException("Fair rescorer can not proceed, too few protected elements");
+            }
 
             return fairTopK.fairTopK(p0, p1, context.protectedElementsCount, proportion, significance);
         }
