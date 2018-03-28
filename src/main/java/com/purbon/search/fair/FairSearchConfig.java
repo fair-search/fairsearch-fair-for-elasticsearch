@@ -10,7 +10,7 @@ public class FairSearchConfig {
 
     public static final String MIN_PROPORTION_PROTECTED_KEY    = "fairsearch.min_proportion_protected";
 
-    public static final String SIGNIFICANCE_LEVEL_KEY          = "fairsearch_significance_level";
+    public static final String SIGNIFICANCE_LEVEL_KEY          = "fairsearch.significance_level";
 
     public static final String PROPORTION_STRATEGY_KEY         = "fairsearch.proportion_strategy";
 

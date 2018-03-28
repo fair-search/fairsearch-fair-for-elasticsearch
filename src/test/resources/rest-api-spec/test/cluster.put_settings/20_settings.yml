@@ -9,7 +9,7 @@
   - do:
       cluster.put_settings:
         body:
-          persistent:
+          transient:
             fairsearch.on_few_protected_elements: "proceed"
 ---
 "Test proportion strategy settings":
@@ -24,3 +24,10 @@
         body:
           persistent:
             fairsearch.proportion_strategy: "fixed"
+  - do:
+      cluster.get_settings:
+        flat_settings: true
+
+  - match:
+      persistent:
+        fairsearch.proportion_strategy: "fixed"
