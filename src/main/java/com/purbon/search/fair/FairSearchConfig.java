@@ -8,16 +8,21 @@ import org.elasticsearch.env.Environment;
 public class FairSearchConfig {
 
 
-    public static final String MIN_PROPORTION_PROTECTED_KEY = "fairsearch.min_proportion_protected";
+    public static final String MIN_PROPORTION_PROTECTED_KEY    = "fairsearch.min_proportion_protected";
 
-    public static final String SIGNIFICANCE_LEVEL_KEY = "fairsearch.significance_level";
+    public static final String SIGNIFICANCE_LEVEL_KEY          = "fairsearch_significance_level";
 
-    public static final String PROPORTION_STRATEGY_KEY = "fairsearch.proportion_strategy";
+    public static final String PROPORTION_STRATEGY_KEY         = "fairsearch.proportion_strategy";
 
+    public static final String LOOKUP_MEASURING_PROPORTION_KEY = "fairsearch.lookup_for_measuring_proportion";
 
-    static final Setting<String> PROPORTION_STRATEGY_SETTING = Setting.simpleString(PROPORTION_STRATEGY_KEY,
+    public static final String ON_FEW_PROTECTED_ELEMENTS_KEY   = "fairsearch.on_few_protected_elements";
+
+    static final Setting<String> PROPORTION_STRATEGY_SETTING = new Setting<String>(PROPORTION_STRATEGY_KEY,
+            "fixed",
+            (s) -> new String(s),
             (value, settings) -> {
-                if (value.equalsIgnoreCase("fixed") || value.equalsIgnoreCase("variable")) {
+                if (!value.equalsIgnoreCase("fixed") && !value.equalsIgnoreCase("variable")) {
                     throw new IllegalArgumentException("Value [" + value + "] is not a valid setting for proportion_strategy");
 
                 }
@@ -30,32 +35,51 @@ public class FairSearchConfig {
             Property.NodeScope,
             Property.Dynamic);
 
-    static final Setting<String> ON_FEW_PROTECTED_ELELEMENTS_SETTING = Setting.simpleString("fairsearch.on_few_protected_elements",
+
+    static final Setting<String> ON_FEW_PROTECTED_ELEMENTS_SETTING = new Setting<String>(ON_FEW_PROTECTED_ELEMENTS_KEY,
+            "proceed",
+            (s) -> new String(s),
             (value, settings) -> {
-                if (value.equalsIgnoreCase("abort") || value.equalsIgnoreCase("proceed")) {
+                if (!value.equalsIgnoreCase("abort") && !value.equalsIgnoreCase("proceed")) {
                     throw new IllegalArgumentException("Value [" + value + "] is not a valid setting for on_few_protected_elements");
 
                 }
             },
             Property.NodeScope,
-            Property.Dynamic);
+            Property.Dynamic
+    );
 
+
+    /**
+     * minimum proportion of elements having the protected attribute.
+     */
     static final Setting<Float> MIN_PROPORTION_PROTECTED_SETTING = Setting.floatSetting(MIN_PROPORTION_PROTECTED_KEY,
             0.5f,
             Property.NodeScope,
             Property.Dynamic);
 
+    /**
+     * The number of top elements that are examined to determine the target proportion of protected elements.
+     */
+    static final Setting<Float> LOOKUP_MEASURING_PROPORTION_SETTING = Setting.floatSetting(LOOKUP_MEASURING_PROPORTION_KEY,
+            100f,
+            Property.NodeScope,
+            Property.Dynamic);
+
+
     private String proportionStrategy;
     private String onFewProtectedElements;
     private Float significanceLevel;
     private Float proportionProtected;
+    private Float lookupMeasuringProportion;
 
     FairSearchConfig(final Environment env, final Settings settings) {
 
         this.proportionStrategy = PROPORTION_STRATEGY_SETTING.get(settings);
         this.significanceLevel = SIGNIFICANCE_LEVEL_SETTING.get(settings);
-        this.onFewProtectedElements = ON_FEW_PROTECTED_ELELEMENTS_SETTING.get(settings);
+        this.onFewProtectedElements = ON_FEW_PROTECTED_ELEMENTS_SETTING.get(settings);
         this.proportionProtected = MIN_PROPORTION_PROTECTED_SETTING.get(settings);
+        this.lookupMeasuringProportion = LOOKUP_MEASURING_PROPORTION_SETTING.get(settings);
     }
 
     public Float getProportionProtected() {
@@ -72,5 +96,9 @@ public class FairSearchConfig {
 
     public Float getSignificanceLevel() {
         return significanceLevel;
+    }
+
+    public Float getLookupMeasuringProportion() {
+        return lookupMeasuringProportion;
     }
 }

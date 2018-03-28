@@ -1,17 +1,14 @@
 package com.purbon.search.fair;
 
 import com.purbon.search.fair.query.FairRescoreBuilder;
-import org.elasticsearch.common.CheckedFunction;
 import org.elasticsearch.common.settings.Setting;
 import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.common.xcontent.XContentParser;
 import org.elasticsearch.env.Environment;
 import org.elasticsearch.plugins.ActionPlugin;
 import org.elasticsearch.plugins.Plugin;
 import org.elasticsearch.plugins.SearchPlugin;
 import org.elasticsearch.search.rescore.Rescorer;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -33,8 +30,9 @@ public class FairSearchQueryParserPlugin extends Plugin implements ActionPlugin,
     {
         return Arrays.asList(FairSearchConfig.SIGNIFICANCE_LEVEL_SETTING,
                 FairSearchConfig.PROPORTION_STRATEGY_SETTING,
-                FairSearchConfig.ON_FEW_PROTECTED_ELELEMENTS_SETTING,
-                FairSearchConfig.MIN_PROPORTION_PROTECTED_SETTING);
+                FairSearchConfig.ON_FEW_PROTECTED_ELEMENTS_SETTING,
+                FairSearchConfig.MIN_PROPORTION_PROTECTED_SETTING,
+                FairSearchConfig.LOOKUP_MEASURING_PROPORTION_SETTING);
     }
 
     /**
@@ -47,8 +45,9 @@ public class FairSearchQueryParserPlugin extends Plugin implements ActionPlugin,
 
         builder.put(FairSearchConfig.PROPORTION_STRATEGY_SETTING.getKey(), config.getProportionStrategy());
         builder.put(FairSearchConfig.SIGNIFICANCE_LEVEL_SETTING.getKey(), config.getSignificanceLevel());
-        builder.put(FairSearchConfig.ON_FEW_PROTECTED_ELELEMENTS_SETTING.getKey(), config.getOnFewProtectedElements());
+        builder.put(FairSearchConfig.ON_FEW_PROTECTED_ELEMENTS_SETTING.getKey(), config.getOnFewProtectedElements());
         builder.put(FairSearchConfig.MIN_PROPORTION_PROTECTED_SETTING.getKey(), config.getProportionProtected());
+        builder.put(FairSearchConfig.LOOKUP_MEASURING_PROPORTION_SETTING.getKey(), config.getProportionProtected());
 
         return builder.build();
     }

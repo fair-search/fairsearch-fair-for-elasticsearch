@@ -1,0 +1,26 @@
+---
+"Test on few protected elements settings":
+  - do:
+      catch: bad_request
+      cluster.put_settings:
+        body:
+          transient:
+            fairsearch.on_few_protected_elements: "break"
+  - do:
+      cluster.put_settings:
+        body:
+          persistent:
+            fairsearch.on_few_protected_elements: "proceed"
+---
+"Test proportion strategy settings":
+  - do:
+      catch: bad_request
+      cluster.put_settings:
+        body:
+          transient:
+            fairsearch.proportion_strategy: "break"
+  - do:
+      cluster.put_settings:
+        body:
+          persistent:
+            fairsearch.proportion_strategy: "fixed"

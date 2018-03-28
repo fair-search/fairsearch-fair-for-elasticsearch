@@ -1,8 +1,14 @@
 package com.purbon.search.fair;
 
+import org.elasticsearch.action.ActionFuture;
+import org.elasticsearch.action.ActionListener;
+import org.elasticsearch.action.admin.cluster.settings.ClusterUpdateSettingsRequest;
+import org.elasticsearch.action.admin.cluster.settings.ClusterUpdateSettingsResponse;
+import org.elasticsearch.client.ClusterAdminClient;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.plugins.Plugin;
 import org.elasticsearch.test.ESIntegTestCase;
+import org.junit.Before;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -28,9 +34,23 @@ public class FairRescoreTests extends ESIntegTestCase {
                 .build();
     }
 
-    public void testSimpleMatch() throws ExecutionException, InterruptedException {
+    public void testWrongOnFewProtectedElementsSettings() {
 
-      assertEquals(true, true);
+       ClusterAdminClient adminClient = client().admin().cluster();
+
+       Settings settings = Settings.builder()
+               .put("fairsearch.on_few_protected_elements", "break")
+               .build();
+
+       ClusterUpdateSettingsRequest request = new ClusterUpdateSettingsRequest().
+               persistentSettings(settings);
+
+        try {
+            adminClient.updateSettings(request);
+            assertTrue(false);
+        } catch (AssertionError ex) {
+            assertTrue(true);
+        }
     }
 
 }
