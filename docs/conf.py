@@ -47,8 +47,8 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'Elasticsearch Fair search plugin'
-copyright = '2017, Pere Urbón Bayes'
-author = 'Pere Urbón'
+copyright = '2017, Pere Urbon Bayes'
+author = 'Pere Urbon'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -143,7 +143,7 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
     (master_doc, 'ElasticsearchFairSearch.tex', 'Elasticsearch Learning to Rank Documentation',
-     'Pere Urbón', 'manual'),
+     'Pere Urbon', 'manual'),
 ]
 
 
