@@ -112,9 +112,11 @@ setup:
 "search way too much protected elements":
   - do:
       cluster.put_settings:
+        timeout: "5m"
         body:
           transient:
             fairsearch.on_few_protected_elements: "abort"
+
   - do:
       catch: request
       search:
