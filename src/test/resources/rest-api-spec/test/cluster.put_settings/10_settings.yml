@@ -6,4 +6,3 @@
 
   - is_false: fairsearch.significance_level"
   - match: { defaults.fairsearch.significance_level: "0.1" }
-  - match: { defaults.fairsearch.min_proportion_protected: "0.5" }
