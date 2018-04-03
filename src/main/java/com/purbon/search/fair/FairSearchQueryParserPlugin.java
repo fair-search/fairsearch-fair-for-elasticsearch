@@ -47,7 +47,7 @@ public class FairSearchQueryParserPlugin extends Plugin implements ActionPlugin,
         builder.put(FairSearchConfig.SIGNIFICANCE_LEVEL_SETTING.getKey(), config.getSignificanceLevel());
         builder.put(FairSearchConfig.ON_FEW_PROTECTED_ELEMENTS_SETTING.getKey(), config.getOnFewProtectedElements());
         builder.put(FairSearchConfig.MIN_PROPORTION_PROTECTED_SETTING.getKey(), config.getProportionProtected());
-        builder.put(FairSearchConfig.LOOKUP_MEASURING_PROPORTION_SETTING.getKey(), config.getProportionProtected());
+        builder.put(FairSearchConfig.LOOKUP_MEASURING_PROPORTION_SETTING.getKey(), config.getLookupMeasuringProportion());
 
         return builder.build();
     }

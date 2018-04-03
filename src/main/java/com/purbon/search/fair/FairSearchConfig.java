@@ -7,19 +7,19 @@ import org.elasticsearch.env.Environment;
 
 public class FairSearchConfig {
 
-    public static final String KEY = "fairsearch";
+    private static final String KEY = "fairsearch";
 
-    public static final String MIN_PROPORTION_PROTECTED_KEY    = "min_proportion_protected";
+    private static final String MIN_PROPORTION_PROTECTED_KEY    = "min_proportion_protected";
 
-    public static final String SIGNIFICANCE_LEVEL_KEY          = "significance_level";
+    private static final String SIGNIFICANCE_LEVEL_KEY          = "significance_level";
 
-    public static final String PROPORTION_STRATEGY_KEY         = "proportion_strategy";
+    private static final String PROPORTION_STRATEGY_KEY         = "proportion_strategy";
 
-    public static final String LOOKUP_MEASURING_PROPORTION_KEY = "lookup_for_measuring_proportion";
+    private static final String LOOKUP_MEASURING_PROPORTION_KEY = "lookup_for_measuring_proportion";
 
-    public static final String ON_FEW_PROTECTED_ELEMENTS_KEY   = "on_few_protected_elements";
+    private static final String ON_FEW_PROTECTED_ELEMENTS_KEY   = "on_few_protected_elements";
 
-    static final Setting<String> PROPORTION_STRATEGY_SETTING = new Setting<String>(KEY+"."+PROPORTION_STRATEGY_KEY,
+    public static final Setting<String> PROPORTION_STRATEGY_SETTING = new Setting<String>(KEY+"."+PROPORTION_STRATEGY_KEY,
             "fixed",
             (s) -> new String(s),
             (value, settings) -> {
@@ -31,13 +31,13 @@ public class FairSearchConfig {
             Property.NodeScope,
             Property.Dynamic);
 
-    static final Setting<Float> SIGNIFICANCE_LEVEL_SETTING = Setting.floatSetting(KEY+"."+SIGNIFICANCE_LEVEL_KEY,
+    public static final Setting<Float> SIGNIFICANCE_LEVEL_SETTING = Setting.floatSetting(KEY+"."+SIGNIFICANCE_LEVEL_KEY,
             0.1f,
             Property.NodeScope,
             Property.Dynamic);
 
 
-    static final Setting<String> ON_FEW_PROTECTED_ELEMENTS_SETTING = new Setting<>(KEY + "." + ON_FEW_PROTECTED_ELEMENTS_KEY,
+    public static final Setting<String> ON_FEW_PROTECTED_ELEMENTS_SETTING = new Setting<>(KEY + "." + ON_FEW_PROTECTED_ELEMENTS_KEY,
             "proceed",
             (s) -> new String(s),
             (value, settings) -> {
@@ -61,7 +61,7 @@ public class FairSearchConfig {
     /**
      * The number of top elements that are examined to determine the target proportion of protected elements.
      */
-    static final Setting<Float> LOOKUP_MEASURING_PROPORTION_SETTING = Setting.floatSetting(KEY+"."+LOOKUP_MEASURING_PROPORTION_KEY,
+    public static final Setting<Float> LOOKUP_MEASURING_PROPORTION_SETTING = Setting.floatSetting(KEY+"."+LOOKUP_MEASURING_PROPORTION_KEY,
             100f,
             Property.NodeScope,
             Property.Dynamic);
@@ -71,7 +71,7 @@ public class FairSearchConfig {
     private String onFewProtectedElements;
     private Float significanceLevel;
     private Float proportionProtected;
-    private Float lookupMeasuringProportion;
+    private Integer lookupMeasuringProportion;
 
     FairSearchConfig(final Environment env, final Settings settings) {
 
@@ -79,7 +79,7 @@ public class FairSearchConfig {
         this.significanceLevel = SIGNIFICANCE_LEVEL_SETTING.get(settings);
         this.onFewProtectedElements = ON_FEW_PROTECTED_ELEMENTS_SETTING.get(settings);
         this.proportionProtected = MIN_PROPORTION_PROTECTED_SETTING.get(settings);
-        this.lookupMeasuringProportion = LOOKUP_MEASURING_PROPORTION_SETTING.get(settings);
+        this.lookupMeasuringProportion = Math.round(LOOKUP_MEASURING_PROPORTION_SETTING.get(settings));
     }
 
     public Float getProportionProtected() {
@@ -98,7 +98,7 @@ public class FairSearchConfig {
         return significanceLevel;
     }
 
-    public Float getLookupMeasuringProportion() {
-        return lookupMeasuringProportion;
+    public Integer getLookupMeasuringProportion() {
+        return Math.round(lookupMeasuringProportion);
     }
 }

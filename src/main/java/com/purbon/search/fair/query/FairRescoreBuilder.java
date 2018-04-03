@@ -13,6 +13,7 @@ import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.util.PriorityQueue;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.search.SearchType;
+import org.elasticsearch.client.Client;
 import org.elasticsearch.common.ParseField;
 import org.elasticsearch.common.io.stream.StreamInput;
 import org.elasticsearch.common.io.stream.StreamOutput;
@@ -28,6 +29,8 @@ import org.elasticsearch.search.rescore.Rescorer;
 import org.elasticsearch.search.rescore.RescorerBuilder;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import static java.util.Arrays.asList;
@@ -63,7 +66,7 @@ public class FairRescoreBuilder extends RescorerBuilder<FairRescoreBuilder> {
         super(in);
         this.protectedKey = in.readString();
         this.protectedValue = in.readString();
-        this.protectedElementsProportion = in.readOptionalFloat();
+        this.protectedElementsProportion = in.readFloat();
     }
 
     public FairRescoreBuilder(String protectedKey, String protectedValue, float protectedElementsProportion, Settings settings) {
@@ -103,7 +106,7 @@ public class FairRescoreBuilder extends RescorerBuilder<FairRescoreBuilder> {
                 if (args[2] != null) {
                     proportion = (float)args[2];
                 }
-                return new FairRescoreBuilder((String) args[0], (String) args[1], proportion, context.getSettings());
+                return new FairRescoreBuilder((String) args[0], (String) args[1], proportion, context.getConfig());
             });
 
     static {
@@ -124,7 +127,7 @@ public class FairRescoreBuilder extends RescorerBuilder<FairRescoreBuilder> {
             this.settings = settings;
         }
 
-        public Settings getSettings() {
+        public Settings getConfig() {
             return settings;
         }
     }
@@ -183,14 +186,13 @@ public class FairRescoreBuilder extends RescorerBuilder<FairRescoreBuilder> {
         private static final FairRescorer INSTANCE = new FairRescorer();
         private final FairTopKImpl fairTopK;
 
-        private Settings setting = settings.getAsSettings(FairSearchConfig.KEY);
 
-        private float significance = setting.getAsFloat(FairSearchConfig.SIGNIFICANCE_LEVEL_KEY, 0.1f);
+        private float significance = settings.getAsFloat(FairSearchConfig.SIGNIFICANCE_LEVEL_SETTING.getKey(),
+                0.1f);
 
-        private String onTooFewElements = setting.get(FairSearchConfig.ON_FEW_PROTECTED_ELEMENTS_KEY, "proceed");
+        private String proportionStrategy = FairSearchConfig.PROPORTION_STRATEGY_SETTING.get(settings);
 
-        private String proportionStragey = setting.get(FairSearchConfig.PROPORTION_STRATEGY_KEY, "fixed");
-        private int lookupProportionCheck = setting.getAsInt(FairSearchConfig.LOOKUP_MEASURING_PROPORTION_KEY, 100);
+        private int lookupProportionCheck = FairSearchConfig.LOOKUP_MEASURING_PROPORTION_SETTING.get(settings).intValue();
 
         FairRescorer() {
             this.fairTopK = new FairTopKImpl();
@@ -228,7 +230,7 @@ public class FairRescoreBuilder extends RescorerBuilder<FairRescoreBuilder> {
             float proportion = context.protectedElementsProportion;
             int protectedElementsCount = Math.round(proportion * topDocs.scoreDocs.length);
 
-            if ( proportionStragey.equalsIgnoreCase("variable") ) {
+            if ( proportionStrategy.equalsIgnoreCase("variable") ) {
                 if (abortIfError() && lookupProportionCheck < topDocs.scoreDocs.length) {
                     throw new ElasticsearchException("Lookup proportion below number of docs returned by the query");
                 }
@@ -244,7 +246,7 @@ public class FairRescoreBuilder extends RescorerBuilder<FairRescoreBuilder> {
                 protectedElementsCount = count;
             }
 
-            if ( abortIfError() && proportionStragey.equalsIgnoreCase("fixed") &&
+            if ( abortIfError() && proportionStrategy.equalsIgnoreCase("fixed") &&
                     p0.size() < protectedElementsCount) {
                 throw new ElasticsearchException("Fair rescorer can not proceed, too few protected elements");
             }
@@ -255,9 +257,10 @@ public class FairRescoreBuilder extends RescorerBuilder<FairRescoreBuilder> {
             return fairTopK.fairTopK(p0, p1, protectedElementsCount, proportion, significance);
         }
 
+
         private boolean abortIfError() {
-            // TODO: Implement proper settings handling
-            return true; //onTooFewElements.equalsIgnoreCase("abort");
+            String strategy = FairSearchConfig.ON_FEW_PROTECTED_ELEMENTS_SETTING.get(settings);
+            return strategy.equalsIgnoreCase("abort");
         }
 
         private boolean isProtected(Document doc, FairRescoreContext context) {
