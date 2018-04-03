@@ -174,9 +174,13 @@ public class FairRescoreBuilder extends RescorerBuilder<FairRescoreBuilder> {
 
         private Settings setting = settings.getAsSettings(FairSearchConfig.KEY);
 
-        private float proportion = setting.getAsFloat(FairSearchConfig.MIN_PROPORTION_PROTECTED_KEY, 0.5f);
+        private float minProportion = setting.getAsFloat(FairSearchConfig.MIN_PROPORTION_PROTECTED_KEY, 0.5f);
         private float significance = setting.getAsFloat(FairSearchConfig.SIGNIFICANCE_LEVEL_KEY, 0.1f);
+
         private String onTooFewElements = setting.get(FairSearchConfig.ON_FEW_PROTECTED_ELEMENTS_KEY, "proceed");
+
+        private String proportionStragey = setting.get(FairSearchConfig.PROPORTION_STRATEGY_KEY, "fixed");
+        private int lookupProprtionCheck = setting.getAsInt(FairSearchConfig.LOOKUP_MEASURING_PROPORTION_KEY, 100);
 
         FairRescorer() {
             this.fairTopK = new FairTopKImpl();
@@ -210,6 +214,20 @@ public class FairRescoreBuilder extends RescorerBuilder<FairRescoreBuilder> {
                 }
             }
             assert p0.size() + p1.size() == max;
+
+            float proportion = minProportion;
+
+            if ( proportionStragey.equalsIgnoreCase("variable") ) {
+                int count = 0;
+                for(int i=0; i < lookupProprtionCheck; i++) {
+                   ScoreDoc scoreDoc = topDocs.scoreDocs[i];
+                   Document doc = searcher.doc(scoreDoc.doc);
+                   if (isProtected(doc, context)) {
+                      count+=1;
+                   }
+                }
+                proportion = (float)(count / (lookupProprtionCheck*1.0));
+            }
 
             if ( onTooFewElements.equalsIgnoreCase("abort") && p0.size() <  context.protectedElementsCount )
             {
