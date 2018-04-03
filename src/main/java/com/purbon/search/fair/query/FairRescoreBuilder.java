@@ -3,6 +3,7 @@ package com.purbon.search.fair.query;
 import com.purbon.search.fair.FairSearchConfig;
 import com.purbon.search.fair.lib.FairTopKImpl;
 import com.purbon.search.fair.utils.DocumentPriorityQueue;
+import org.apache.logging.log4j.Logger;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Explanation;
@@ -15,6 +16,7 @@ import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.common.ParseField;
 import org.elasticsearch.common.io.stream.StreamInput;
 import org.elasticsearch.common.io.stream.StreamOutput;
+import org.elasticsearch.common.logging.ESLoggerFactory;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.xcontent.ConstructingObjectParser;
 import org.elasticsearch.common.xcontent.XContentBuilder;
@@ -30,6 +32,7 @@ import java.util.Set;
 
 import static java.util.Arrays.asList;
 import static org.elasticsearch.common.xcontent.ConstructingObjectParser.constructorArg;
+import static org.elasticsearch.common.xcontent.ConstructingObjectParser.optionalConstructorArg;
 
 public class FairRescoreBuilder extends RescorerBuilder<FairRescoreBuilder> {
 
@@ -37,12 +40,14 @@ public class FairRescoreBuilder extends RescorerBuilder<FairRescoreBuilder> {
 
     private static final ParseField PROTECTED_KEY   = new ParseField("protected_key");
     private static final ParseField PROTECTED_VALUE = new ParseField("protected_value");
-    private static final ParseField PROTECTED_ELEMENTS_COUNT = new ParseField("protected_elements");
+    private static final ParseField PROTECTED_ELEMENTS_PROPORTION = new ParseField("min_proportion_protected");
+
     private static Settings settings = null;
+    private static Logger logger = ESLoggerFactory.getLogger("fair rescorer");
 
     private String protectedKey;
     private String protectedValue;
-    private int protectedElementsCount;
+    private float protectedElementsProportion;
 
     @Deprecated
     public FairRescoreBuilder() {
@@ -50,18 +55,18 @@ public class FairRescoreBuilder extends RescorerBuilder<FairRescoreBuilder> {
     }
 
     @Deprecated
-    public FairRescoreBuilder(String protectedKey, String protectedValue, int protectedElementsCount) {
-        this(protectedKey, protectedValue, protectedElementsCount, null);
+    public FairRescoreBuilder(String protectedKey, String protectedValue, float protectedElementsProportion) {
+        this(protectedKey, protectedValue, protectedElementsProportion, null);
     }
 
     public FairRescoreBuilder(StreamInput in) throws IOException {
         super(in);
         this.protectedKey = in.readString();
         this.protectedValue = in.readString();
-        this.protectedElementsCount = in.readInt();
+        this.protectedElementsProportion = in.readOptionalFloat();
     }
 
-    public FairRescoreBuilder(String protectedKey, String protectedValue, int protectedElementsCount, Settings settings) {
+    public FairRescoreBuilder(String protectedKey, String protectedValue, float protectedElementsProportion, Settings settings) {
 
         if (protectedKey == null) {
             throw new IllegalArgumentException("[\" + NAME + \"] requires protected_key");
@@ -73,7 +78,7 @@ public class FairRescoreBuilder extends RescorerBuilder<FairRescoreBuilder> {
 
         this.protectedKey = protectedKey;
         this.protectedValue = protectedValue;
-        this.protectedElementsCount = protectedElementsCount;
+        this.protectedElementsProportion = (protectedElementsProportion < 0 ? 0.5f : protectedElementsProportion);
         FairRescoreBuilder.settings = settings;
     }
 
@@ -81,24 +86,30 @@ public class FairRescoreBuilder extends RescorerBuilder<FairRescoreBuilder> {
     protected void doWriteTo(StreamOutput out) throws IOException {
         out.writeString(protectedKey);
         out.writeString(protectedValue);
-        out.writeInt(protectedElementsCount);
+        out.writeFloat(protectedElementsProportion);
     }
 
     @Override
     protected void doXContent(XContentBuilder builder, Params params) throws IOException {
         builder.field(PROTECTED_KEY.getPreferredName(), protectedKey);
         builder.field(PROTECTED_VALUE.getPreferredName(), protectedValue);
-        builder.field(PROTECTED_ELEMENTS_COUNT.getPreferredName(), protectedElementsCount);
+        builder.field(PROTECTED_ELEMENTS_PROPORTION.getPreferredName(), protectedElementsProportion);
     }
 
     private static final ConstructingObjectParser<FairRescoreBuilder, ParserContext> PARSER = new ConstructingObjectParser<>(NAME,
             false,
-            (args, context) -> new FairRescoreBuilder((String)args[0], (String)args[1], (Integer)args[2], context.getSettings()));
+            (args, context) -> {
+                float proportion = -1.0f;
+                if (args[2] != null) {
+                    proportion = (float)args[2];
+                }
+                return new FairRescoreBuilder((String) args[0], (String) args[1], proportion, context.getSettings());
+            });
 
     static {
         PARSER.declareString(constructorArg(), PROTECTED_KEY);
         PARSER.declareString(constructorArg(), PROTECTED_VALUE);
-        PARSER.declareInt(constructorArg(), PROTECTED_ELEMENTS_COUNT);
+        PARSER.declareFloat(optionalConstructorArg(), PROTECTED_ELEMENTS_PROPORTION);
     }
 
     public static FairRescoreBuilder fromXContent(XContentParser parser, Settings settings) throws IOException {
@@ -123,7 +134,7 @@ public class FairRescoreBuilder extends RescorerBuilder<FairRescoreBuilder> {
      */
     @Override
     protected RescoreContext innerBuildContext(int windowSize, QueryShardContext context) throws IOException {
-        return new FairRescoreContext(windowSize, protectedKey, protectedValue, protectedElementsCount, context);
+        return new FairRescoreContext(windowSize, protectedKey, protectedValue, protectedElementsProportion, context);
     }
 
     /**
@@ -150,15 +161,15 @@ public class FairRescoreBuilder extends RescorerBuilder<FairRescoreBuilder> {
         private QueryShardContext context;
         private String protectedKey;
         private String protectedValue;
-        private int protectedElementsCount;
+        private float protectedElementsProportion;
 
         FairRescoreContext(int windowSize, String protectedKey, String protectedValue,
-                           int protectedElementsCount,
+                           float protectedElementsProportion,
                            QueryShardContext context) {
             super(windowSize, FairRescorer.INSTANCE);
             this.protectedKey = protectedKey;
             this.protectedValue = protectedValue;
-            this.protectedElementsCount = protectedElementsCount;
+            this.protectedElementsProportion = protectedElementsProportion;
             this.context = context;
         }
 
@@ -174,13 +185,12 @@ public class FairRescoreBuilder extends RescorerBuilder<FairRescoreBuilder> {
 
         private Settings setting = settings.getAsSettings(FairSearchConfig.KEY);
 
-        private float minProportion = setting.getAsFloat(FairSearchConfig.MIN_PROPORTION_PROTECTED_KEY, 0.5f);
         private float significance = setting.getAsFloat(FairSearchConfig.SIGNIFICANCE_LEVEL_KEY, 0.1f);
 
         private String onTooFewElements = setting.get(FairSearchConfig.ON_FEW_PROTECTED_ELEMENTS_KEY, "proceed");
 
         private String proportionStragey = setting.get(FairSearchConfig.PROPORTION_STRATEGY_KEY, "fixed");
-        private int lookupProprtionCheck = setting.getAsInt(FairSearchConfig.LOOKUP_MEASURING_PROPORTION_KEY, 100);
+        private int lookupProportionCheck = setting.getAsInt(FairSearchConfig.LOOKUP_MEASURING_PROPORTION_KEY, 100);
 
         FairRescorer() {
             this.fairTopK = new FairTopKImpl();
@@ -215,26 +225,39 @@ public class FairRescoreBuilder extends RescorerBuilder<FairRescoreBuilder> {
             }
             assert p0.size() + p1.size() == max;
 
-            float proportion = minProportion;
+            float proportion = context.protectedElementsProportion;
+            int protectedElementsCount = Math.round(proportion * topDocs.scoreDocs.length);
 
             if ( proportionStragey.equalsIgnoreCase("variable") ) {
+                if (abortIfError() && lookupProportionCheck < topDocs.scoreDocs.length) {
+                    throw new ElasticsearchException("Lookup proportion below number of docs returned by the query");
+                }
                 int count = 0;
-                for(int i=0; i < lookupProprtionCheck; i++) {
+                for(int i=0; i < lookupProportionCheck; i++) {
                    ScoreDoc scoreDoc = topDocs.scoreDocs[i];
                    Document doc = searcher.doc(scoreDoc.doc);
                    if (isProtected(doc, context)) {
                       count+=1;
                    }
                 }
-                proportion = (float)(count / (lookupProprtionCheck*1.0));
+                proportion = (float)(count / (lookupProportionCheck*1.0));
+                protectedElementsCount = count;
             }
 
-            if ( onTooFewElements.equalsIgnoreCase("abort") && p0.size() <  context.protectedElementsCount )
-            {
+            if ( abortIfError() && proportionStragey.equalsIgnoreCase("fixed") &&
+                    p0.size() < protectedElementsCount) {
                 throw new ElasticsearchException("Fair rescorer can not proceed, too few protected elements");
             }
 
-            return fairTopK.fairTopK(p0, p1, context.protectedElementsCount, proportion, significance);
+            logger.info("[Fair Rescorer] protectedElementsCount="+protectedElementsCount+" proportion="+proportion);
+            logger.info("[Fair Rescorer] p0.size="+p0.size()+" p1.size="+p1.size());
+            logger.info("[Fair Rescorer] abortIfError="+abortIfError());
+            return fairTopK.fairTopK(p0, p1, protectedElementsCount, proportion, significance);
+        }
+
+        private boolean abortIfError() {
+            // TODO: Implement proper settings handling
+            return true; //onTooFewElements.equalsIgnoreCase("abort");
         }
 
         private boolean isProtected(Document doc, FairRescoreContext context) {

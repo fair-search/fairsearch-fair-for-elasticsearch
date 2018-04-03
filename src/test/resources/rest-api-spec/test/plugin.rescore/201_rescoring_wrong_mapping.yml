@@ -40,4 +40,3 @@ setup:
             fair_rescorer:
               protected_key: gender
               protected_value: Female
-              protected_elements: 5

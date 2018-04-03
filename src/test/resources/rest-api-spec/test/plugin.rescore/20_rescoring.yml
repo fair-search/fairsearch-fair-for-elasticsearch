@@ -94,7 +94,6 @@ setup:
             fair_rescorer:
               protected_key: gender
               protected_value: Female
-              protected_elements: 5
 
   - length: { hits.hits: 10 }
   - match:  { hits.hits.0._score: 5 }
@@ -109,14 +108,13 @@ setup:
   - match:  { hits.hits.4._source: { "name": "Moritz", "city": "Munich", "gender": "Male", "langs": "Ruby, Python" } }
   - match:  { hits.hits.5._score: 0 }
 ---
-"search way too much protected elements":
+"abort rescoring":
   - do:
       cluster.put_settings:
         timeout: "5m"
         body:
-          transient:
+          persistent:
             fairsearch.on_few_protected_elements: "abort"
-
   - do:
       catch: request
       search:
@@ -126,4 +124,4 @@ setup:
             fair_rescorer:
               protected_key: gender
               protected_value: Female
-              protected_elements: 50
+              min_proportion_protected: 0.99
