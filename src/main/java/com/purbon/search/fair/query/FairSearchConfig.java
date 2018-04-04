@@ -152,7 +152,27 @@ public class FairSearchConfig {
     }
 
     public void setProportionStrategy(String proportionStrategy) {
-        this.proportionStrategy = ProportionStrategy.valueOf(proportionStrategy);
+        if (proportionStrategy == null) {
+            setProportionStrategy(DEFAULT_PROPORTION_STRATEGY);
+        } else {
+            try {
+                setProportionStrategy(ProportionStrategy.valueOf(proportionStrategy));
+            } catch (IllegalArgumentException ex){
+                StringBuilder msgBuilder = new StringBuilder().
+                        append("Value [").
+                        append(proportionStrategy).
+                        append("] is not a valid setting for proportion_strategy");
+                throw new ElasticsearchException(msgBuilder.toString());
+            }
+        }
+    }
+
+    public void setProportionStrategy(ProportionStrategy proportionStrategy) {
+        if (proportionStrategy == null) {
+            this.proportionStrategy = DEFAULT_PROPORTION_STRATEGY;
+        } else {
+            this.proportionStrategy = proportionStrategy;
+        }
     }
 
     public boolean hasVariableProportionStrategy() {

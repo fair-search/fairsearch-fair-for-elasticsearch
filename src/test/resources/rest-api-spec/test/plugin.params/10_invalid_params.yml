@@ -42,3 +42,15 @@ setup:
               protected_key: gender
               protected_value: Female
               on_few_protected_elements: "break_the_plugin"
+---
+"invalid proportion_strategy param":
+  - do:
+      catch: bad_request
+      search:
+        index: test
+        body:
+          rescore:
+            fair_rescorer:
+              protected_key: gender
+              protected_value: Female
+              proportion_strategy: "break_the_plugin"
