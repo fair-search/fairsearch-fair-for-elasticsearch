@@ -43,7 +43,7 @@ public class FairRescoreTests extends ESIntegTestCase {
                 .build();
     }
 
-    public void testWrongOnFewProtectedElementsSettings() throws ExecutionException, InterruptedException {
+    public void testWrongOnFewProtectedElementsSettings() {
 
        ClusterAdminClient adminClient = client().admin().cluster();
 
@@ -72,7 +72,9 @@ public class FairRescoreTests extends ESIntegTestCase {
             builder.execute().actionGet();
 
             assertTrue(false);
-        } catch (AssertionError ex) {
+        } catch (Error ex) {
+            assertTrue(true);
+        } catch (Exception e) {
             assertTrue(true);
         }
     }
