@@ -1,13 +1,46 @@
 package com.purbon.search.fair.query;
 
+import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.env.Environment;
 
 public class FairSearchConfig {
 
-    public static String  DEFAULT_PROPORTION_STRATEGY = "fixed";
+
+    public enum ProportionStrategy {
+        fixed ("fixed"),
+        variable ("variable");
+
+        private final String name;
+
+        ProportionStrategy(String name) {
+            this.name = name;
+        }
+
+        public String toString() {
+            return this.name;
+        }
+    }
+
+    public enum OnFewElementsAction {
+        proceed ("proceed"),
+        abort ("abort");
+
+        private final String name;
+
+        OnFewElementsAction(String name) {
+            this.name = name;
+        }
+
+        public String toString() {
+            return this.name;
+        }
+    }
+
+
+    public static ProportionStrategy DEFAULT_PROPORTION_STRATEGY = ProportionStrategy.fixed;
     public static Float   DEFAULT_SIGNIFICANCE_LEVEL = 0.1f;
-    public static String  DEFAULT_ON_FEW_ELEMENTS_ACTION = "proceed";
+    public static OnFewElementsAction DEFAULT_ON_FEW_ELEMENTS_ACTION = OnFewElementsAction.proceed;
     public static Float   DEFAULT_MIN_PROPORTION_PROTECTED = 0.5f;
     public static Integer DEFAULT_LOOKUP_FOR_PROPORTION = 100;
 
@@ -20,8 +53,8 @@ public class FairSearchConfig {
     private float protectedElementsProportion;
     private float significanceLevel;
     private int lookupForProportion;
-    private String onFewElementsAction;
-    private String proportionStrategy;
+    private OnFewElementsAction onFewElementsAction;
+    private ProportionStrategy proportionStrategy;
 
     FairSearchConfig(final Environment env, final Settings settings) {
         this.env = env;
@@ -82,11 +115,27 @@ public class FairSearchConfig {
         this.lookupForProportion = lookupForProportion;
     }
 
-    public String getOnFewElementsAction() {
+    public OnFewElementsAction getOnFewElementsAction() {
         return onFewElementsAction;
     }
 
     public void setOnFewElementsAction(String onFewElementsAction) {
+        if (onFewElementsAction == null) {
+            setOnFewElementsAction(DEFAULT_ON_FEW_ELEMENTS_ACTION);
+        } else {
+            try {
+                setOnFewElementsAction(OnFewElementsAction.valueOf(onFewElementsAction));
+            } catch (IllegalArgumentException ex){
+                StringBuilder msgBuilder = new StringBuilder().
+                        append("Value [").
+                        append(onFewElementsAction).
+                        append("] is not a valid setting for on_few_protected_elements");
+                throw new ElasticsearchException(msgBuilder.toString());
+            }
+        }
+    }
+
+    public void setOnFewElementsAction(OnFewElementsAction onFewElementsAction) {
         if (onFewElementsAction == null) {
             this.onFewElementsAction = DEFAULT_ON_FEW_ELEMENTS_ACTION;
         } else {
@@ -94,23 +143,23 @@ public class FairSearchConfig {
         }
     }
 
-    public String getProportionStrategy() {
+    public ProportionStrategy getProportionStrategy() {
         return proportionStrategy;
     }
 
     public void setProportionStrategy(String proportionStrategy) {
-        this.proportionStrategy = proportionStrategy;
+        this.proportionStrategy = ProportionStrategy.valueOf(proportionStrategy);
     }
 
     public boolean hasVariableProportionStrategy() {
-       return getProportionStrategy().equalsIgnoreCase("variable");
+        return getProportionStrategy().equals(ProportionStrategy.variable);
     }
 
     public boolean hasFixProportionStrategy() {
-        return getProportionStrategy().equalsIgnoreCase("fixed");
+        return getProportionStrategy().equals(ProportionStrategy.fixed);
     }
 
     public boolean abortOnFewElements() {
-        return getOnFewElementsAction().equalsIgnoreCase("abort");
+        return getOnFewElementsAction().equals(OnFewElementsAction.abort);
     }
 }

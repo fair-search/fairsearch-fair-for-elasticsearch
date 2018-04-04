@@ -97,10 +97,10 @@ public class FairRescoreBuilder extends RescorerBuilder<FairRescoreBuilder> {
         out.writeString(config.getProtectedValue());
         out.writeFloat(config.getProtectedElementsProportion());
 
-        if (FairSearchConfig.DEFAULT_ON_FEW_ELEMENTS_ACTION.equalsIgnoreCase(config.getOnFewElementsAction())) {
+        if (FairSearchConfig.DEFAULT_ON_FEW_ELEMENTS_ACTION.equals(config.getOnFewElementsAction())) {
             out.writeOptionalString(null);
         } else {
-            out.writeOptionalString(config.getOnFewElementsAction());
+            out.writeOptionalString(config.getOnFewElementsAction().toString());
         }
 
     }
@@ -110,7 +110,7 @@ public class FairRescoreBuilder extends RescorerBuilder<FairRescoreBuilder> {
         builder.field(PROTECTED_KEY.getPreferredName(), config.getProtectedKey());
         builder.field(PROTECTED_VALUE.getPreferredName(), config.getProtectedValue());
         builder.field(PROTECTED_ELEMENTS_PROPORTION.getPreferredName(), config.getProtectedElementsProportion());
-        builder.field(ON_FEW_ELEMENTS_ACTION.getPreferredName(), config.getOnFewElementsAction());
+        builder.field(ON_FEW_ELEMENTS_ACTION.getPreferredName(), config.getOnFewElementsAction().toString());
     }
 
     private static final ConstructingObjectParser<FairRescoreBuilder, ParserContext> PARSER = new ConstructingObjectParser<>(NAME,
