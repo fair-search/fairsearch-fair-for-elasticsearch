@@ -116,7 +116,11 @@ public class FairSearchConfig {
     }
 
     public void setLookupForProportion(int lookupForProportion) {
-        this.lookupForProportion = lookupForProportion;
+        if (lookupForProportion < 0) {
+            this.lookupForProportion = DEFAULT_LOOKUP_FOR_PROPORTION;
+        } else {
+            this.lookupForProportion = lookupForProportion;
+        }
     }
 
     public OnFewElementsAction getOnFewElementsAction() {
