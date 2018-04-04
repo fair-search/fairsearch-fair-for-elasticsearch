@@ -54,3 +54,15 @@ setup:
               protected_key: gender
               protected_value: Female
               proportion_strategy: "break_the_plugin"
+---
+"invalid combination of params":
+  - do:
+      catch: bad_request
+      search:
+        index: test
+        body:
+          rescore:
+            fair_rescorer:
+              protected_key: gender
+              protected_value: Female
+              lookup_for_measuring_proportion: 300

@@ -1,11 +1,15 @@
 package com.purbon.search.fair.query;
 
+import org.apache.logging.log4j.Logger;
 import org.elasticsearch.ElasticsearchException;
+import org.elasticsearch.common.logging.ESLoggerFactory;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.env.Environment;
 
 public class FairSearchConfig {
 
+
+    private static Logger logger = ESLoggerFactory.getLogger(FairSearchConfig.class);
 
     public enum ProportionStrategy {
         fixed ("fixed"),
@@ -95,6 +99,11 @@ public class FairSearchConfig {
         if (protectedElementsProportion < 0) {
             this.protectedElementsProportion = DEFAULT_MIN_PROPORTION_PROTECTED;
         } else {
+            if (getProportionStrategy().equals(ProportionStrategy.variable)) {
+                String msg = "using min_proportion_protected is not permitted if the proportion strategy is variable";
+                logger.error(msg);
+                throw new ElasticsearchException(msg);
+            }
             this.protectedElementsProportion = protectedElementsProportion;
         }
     }
@@ -119,6 +128,11 @@ public class FairSearchConfig {
         if (lookupForProportion < 0) {
             this.lookupForProportion = DEFAULT_LOOKUP_FOR_PROPORTION;
         } else {
+            if (getProportionStrategy().equals(ProportionStrategy.fixed)) {
+                String msg = "using lookup_for_measuring_proportion is not permitted if the proportion strategy is fix";
+                logger.error(msg);
+                throw new ElasticsearchException(msg);
+            }
             this.lookupForProportion = lookupForProportion;
         }
     }
