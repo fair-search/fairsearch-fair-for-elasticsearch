@@ -107,27 +107,16 @@ setup:
   - match:  { hits.hits.4._score: 1 }
   - match:  { hits.hits.4._source: { "name": "Moritz", "city": "Munich", "gender": "Male", "langs": "Ruby, Python" } }
   - match:  { hits.hits.5._score: 0 }
-#---
-#"abort rescoring":
-#  - do:
-#      cluster.put_settings:
-#       timeout: "5m"
-#        body:
-#          transient:
-#            fairsearch.on_few_protected_elements: "abort"
-#  - do:
-#      catch: request
-#     search:
-#        index: test
-#        body:
-#          rescore:
-#            fair_rescorer:
-#              protected_key: gender
-#              protected_value: Female
-#              min_proportion_protected: 0.99
-#  - do:
-#      cluster.put_settings:
-#        body:
-#          transient:
-#            fairsearch.on_few_protected_elements: null
-#        flat_settings: true
+---
+"abort rescoring":
+  - do:
+     catch: request
+     search:
+        index: test
+        body:
+          rescore:
+            fair_rescorer:
+              protected_key: gender
+              protected_value: Female
+              min_proportion_protected: 0.99
+              on_few_protected_elements: "abort"

@@ -1,8 +1,0 @@
-"Test custom settings":
-
-  - do:
-      cluster.get_settings:
-        include_defaults: true
-
-  - is_false: fairsearch.significance_level"
-  - match: { defaults.fairsearch.significance_level: "0.1" }
