@@ -42,7 +42,7 @@ public class FairRescoreBuilder extends RescorerBuilder<FairRescoreBuilder> {
     private static final ParseField PROTECTED_VALUE = new ParseField("protected_value");
 
     private static final ParseField PROTECTED_ELEMENTS_PROPORTION = new ParseField("min_proportion_protected");
-    private final ParseField SIGNIFICANCE_LEVEL = new ParseField("significance_level");
+    private static final ParseField SIGNIFICANCE_LEVEL = new ParseField("significance_level");
     private final ParseField PROPORTION_STRATEGY = new ParseField("proportion_strategy");
     private final ParseField LOOKUP_FOR_PROPORTION = new ParseField("lookup_for_measuring_proportion");
     private static final ParseField ON_FEW_ELEMENTS_ACTION = new ParseField("on_few_protected_elements");
@@ -59,8 +59,8 @@ public class FairRescoreBuilder extends RescorerBuilder<FairRescoreBuilder> {
 
     @Deprecated
     public FairRescoreBuilder(String protectedKey, String protectedValue,
-                              float protectedElementsProportion, String onFewElementsAction) {
-        this(protectedKey, protectedValue, protectedElementsProportion, onFewElementsAction, null);
+                              float protectedElementsProportion, float significance, String onFewElementsAction) {
+        this(protectedKey, protectedValue, protectedElementsProportion, significance, onFewElementsAction, null);
     }
 
     public FairRescoreBuilder(StreamInput in) throws IOException {
@@ -69,12 +69,13 @@ public class FairRescoreBuilder extends RescorerBuilder<FairRescoreBuilder> {
         config.setProtectedKey(in.readString());
         config.setProtectedValue(in.readString());
         config.setProtectedElementsProportion(in.readFloat());
+        config.setSignificanceLevel(in.readFloat());
         config.setOnFewElementsAction(in.readOptionalString());
     }
 
     public FairRescoreBuilder(String protectedKey, String protectedValue,
-                              float protectedElementsProportion, String onFewElementsAction,
-                              Settings settings) {
+                              float protectedElementsProportion, float significance,
+                              String onFewElementsAction, Settings settings) {
 
         if (protectedKey == null) {
             throw new IllegalArgumentException("[\" + NAME + \"] requires protected_key");
@@ -88,6 +89,7 @@ public class FairRescoreBuilder extends RescorerBuilder<FairRescoreBuilder> {
         config.setProtectedKey(protectedKey);
         config.setProtectedValue(protectedValue);
         config.setProtectedElementsProportion(protectedElementsProportion);
+        config.setSignificanceLevel(significance);
         config.setOnFewElementsAction(onFewElementsAction);
     }
 
@@ -96,6 +98,7 @@ public class FairRescoreBuilder extends RescorerBuilder<FairRescoreBuilder> {
         out.writeString(config.getProtectedKey());
         out.writeString(config.getProtectedValue());
         out.writeFloat(config.getProtectedElementsProportion());
+        out.writeFloat(config.getSignificanceLevel());
 
         if (FairSearchConfig.DEFAULT_ON_FEW_ELEMENTS_ACTION.equals(config.getOnFewElementsAction())) {
             out.writeOptionalString(null);
@@ -110,6 +113,7 @@ public class FairRescoreBuilder extends RescorerBuilder<FairRescoreBuilder> {
         builder.field(PROTECTED_KEY.getPreferredName(), config.getProtectedKey());
         builder.field(PROTECTED_VALUE.getPreferredName(), config.getProtectedValue());
         builder.field(PROTECTED_ELEMENTS_PROPORTION.getPreferredName(), config.getProtectedElementsProportion());
+        builder.field(SIGNIFICANCE_LEVEL.getPreferredName(), config.getSignificanceLevel());
         builder.field(ON_FEW_ELEMENTS_ACTION.getPreferredName(), config.getOnFewElementsAction().toString());
     }
 
@@ -121,19 +125,25 @@ public class FairRescoreBuilder extends RescorerBuilder<FairRescoreBuilder> {
                     proportion = (float)args[2];
                 }
 
+                float significance = -1.0f;
+                if (args[3] != null) {
+                    significance = (float)args[3];
+                }
+
                 String onFewElementsAction = null;
-                if (args.length > 3 && args[3] != null) {
-                    onFewElementsAction = (String)args[3];
+                if (args.length > 4 && args[4] != null) {
+                    onFewElementsAction = (String)args[4];
                 }
 
                 return new FairRescoreBuilder((String) args[0], (String) args[1],
-                                              proportion, onFewElementsAction, context.getConfig());
+                                              proportion, significance, onFewElementsAction, context.getConfig());
             });
 
     static {
         PARSER.declareString(constructorArg(), PROTECTED_KEY);
         PARSER.declareString(constructorArg(), PROTECTED_VALUE);
         PARSER.declareFloat(optionalConstructorArg(), PROTECTED_ELEMENTS_PROPORTION);
+        PARSER.declareFloat(optionalConstructorArg(), SIGNIFICANCE_LEVEL);
         PARSER.declareString(optionalConstructorArg(), ON_FEW_ELEMENTS_ACTION);
     }
 

@@ -104,7 +104,11 @@ public class FairSearchConfig {
     }
 
     public void setSignificanceLevel(float significanceLevel) {
-        this.significanceLevel = significanceLevel;
+        if (significanceLevel < 0) {
+            this.significanceLevel = DEFAULT_SIGNIFICANCE_LEVEL;
+        } else {
+            this.significanceLevel = significanceLevel;
+        }
     }
 
     public int getLookupForProportion() {
