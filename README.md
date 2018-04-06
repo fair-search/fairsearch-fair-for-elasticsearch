@@ -33,11 +33,11 @@ Extra bits at [CONTRIBUTING.md](CONTRIBUTTING.md)
 
 # Installing
 
-See the full list of [prebuilt versions](http://example.com). If you don't see a version available, see the link below for building.
+See the full list of [prebuilt versions](https://fair-search.github.io/). If you don't see a version available, see the link below for building.
 
 To install, you'd run a command such as:
 
-`./bin/elasticsearch-plugin install http://example.com/fairsearch-1.0.0-es6.2.2.zip`
+`./bin/elasticsearch-plugin install https://fair-search.github.io/fair-reranker/fairsearch-1.0-es6.1.2-SNAPSHOT.zip`
 
 (It's expected you'll confirm some security exceptions, you can pass `-b` to `elasticsearch-plugin` to automatically install)
 
