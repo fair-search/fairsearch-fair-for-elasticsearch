@@ -1,8 +1,0 @@
-"Test custom settings":
-
-  - do:
-      cluster.get_settings:
-        include_defaults: true
-
-  - is_false: defaults.custom.simple
-  - match: { defaults.custom.float: "10.0" }
