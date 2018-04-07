@@ -9,6 +9,7 @@ public abstract class FairRestBaseHandler extends BaseRestHandler {
     public FairRestBaseHandler(Settings settings) {
         super(settings);
     }
+
     protected String indexName = ModelStore.STORE_NAME;
 
 }

@@ -4,6 +4,7 @@ import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.client.node.NodeClient;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.MatchAllQueryBuilder;
 import org.elasticsearch.rest.BaseRestHandler;
 import org.elasticsearch.rest.RestController;
 import org.elasticsearch.rest.RestRequest;
@@ -44,15 +45,12 @@ public class RestMTableStore extends FairRestBaseHandler {
 
     private RestChannelConsumer search(NodeClient client, String indexName, RestRequest request) {
 
-        String prefix = request.param("prefix");
         int from = request.paramAsInt("from", 0);
         int size = request.paramAsInt("size", 20);
-        BoolQueryBuilder qb = boolQuery().filter(termQuery("type", type));
-        if (prefix != null && !prefix.isEmpty()) {
-            qb.must(matchQuery("name.prefix", prefix));
-        }
+        MatchAllQueryBuilder qb = new MatchAllQueryBuilder();
+
         return (channel) -> client.prepareSearch(indexName)
-                .setTypes(ES_TYPE)
+                .setTypes(type)
                 .setQuery(qb)
                 .setSize(size)
                 .setFrom(from)

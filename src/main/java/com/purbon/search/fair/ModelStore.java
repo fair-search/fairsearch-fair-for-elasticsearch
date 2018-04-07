@@ -22,11 +22,12 @@ public class ModelStore {
 
         XContentBuilder source = XContentFactory.contentBuilder(Requests.INDEX_CONTENT_TYPE);
         source.startObject();
-        source.field("name", request.getName());
-        source.field("type", "mtable");
-        source.field("proportion", request.getProportion());
-        source.field("alpha", request.getAlpha());
-        source.field("mtable", request.getMtable());
+            source.field("name", request.getName());
+            source.field("type", "mtable");
+            source.field("proportion", request.getProportion());
+            source.field("alpha", request.getAlpha());
+            source.field("k", request.getK());
+            source.field("mtable", request.getMtable());
         source.endObject();
         return source;
     }

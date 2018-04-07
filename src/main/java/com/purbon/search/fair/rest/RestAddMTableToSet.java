@@ -12,6 +12,7 @@ import org.elasticsearch.rest.RestRequest;
 import org.elasticsearch.rest.action.RestStatusToXContentListener;
 
 import java.io.IOException;
+import java.util.List;
 
 public class RestAddMTableToSet extends FairRestBaseHandler {
 
@@ -20,7 +21,7 @@ public class RestAddMTableToSet extends FairRestBaseHandler {
     public RestAddMTableToSet(Settings settings, RestController controller, String type) {
         super(settings);
         this.type = type;
-        controller.registerHandler(RestRequest.Method.POST, "/_fs/_mtable/{name}", this);
+        controller.registerHandler(RestRequest.Method.POST, "/_fs/_mtable/{name}/{proportion}/{alpha}/{k}", this);
     }
 
     @Override
@@ -50,20 +51,23 @@ public class RestAddMTableToSet extends FairRestBaseHandler {
             throw new IllegalArgumentException("Missing content or source param.");
         }
 
-        String name  = request.param("name");
-        float proportion = -1;
-        float alpha = -1;
+        String name      = request.param("name");
+        float proportion = request.paramAsFloat("proportion", 0.5f);
+        float alpha      = request.paramAsFloat("alpha", 0.1f);
+        int k            = request.paramAsInt("k", -1);
 
         MTableParamsParser parser = new MTableParamsParser();
         request.applyContentParser(parser::parse);
-        proportion = parser.getProportion();
-        alpha = parser.getAlpha();
 
         MTableStoreAction.MTableStoreRequestBuilder builder = MTableStoreAction.INSTANCE.newRequestBuilder(client);
+
         builder.request().setStore(indexName);
         builder.request().setName(name);
         builder.request().setProportion(proportion);
         builder.request().setAlpha(alpha);
+        builder.request().setK(k);
+        builder.request().setMtable(parser.getTable());
+
         builder.request().setRouting(routing);
 
         return (channel) -> builder.execute(new RestStatusToXContentListener<>(channel, (r) -> r.getResponse().getLocation(routing)));
@@ -73,36 +77,24 @@ public class RestAddMTableToSet extends FairRestBaseHandler {
     static class MTableParamsParser {
         public static final ObjectParser<MTableParamsParser, Void> PARSER = new ObjectParser<>("params");
 
-        private static final ParseField PROPORTION_FIELD = new ParseField("proportion");
-        private static final ParseField ALPHA_FIELD = new ParseField("alpha");
-
-
-        private float proportion;
-        private float alpha;
+        private static final ParseField TABLE_FIELD = new ParseField("table");
+        private List<Integer> table;
 
         static {
-            PARSER.declareFloat(MTableParamsParser::setProportion, PROPORTION_FIELD);
-            PARSER.declareFloat(MTableParamsParser::setAlpha, ALPHA_FIELD);
+            PARSER.declareIntArray(MTableParamsParser::setTable, TABLE_FIELD);
         }
+
 
         public void parse(XContentParser parser) throws IOException {
             PARSER.parse(parser, this, null);
         }
 
-        public float getProportion() {
-            return proportion;
+        public List<Integer> getTable() {
+            return table;
         }
 
-        public void setProportion(float proportion) {
-            this.proportion = proportion;
-        }
-
-        public float getAlpha() {
-            return alpha;
-        }
-
-        public void setAlpha(float alpha) {
-            this.alpha = alpha;
+        public void setTable(List<Integer> table) {
+            this.table = table;
         }
     }
 

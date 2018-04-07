@@ -14,7 +14,10 @@ import org.elasticsearch.common.xcontent.XContentBuilder;
 import org.elasticsearch.rest.RestStatus;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static org.elasticsearch.action.ValidateActions.addValidationError;
 
@@ -50,6 +53,7 @@ public class MTableStoreAction extends Action<MTableStoreAction.MTableStoreReque
         MTableStoreRequestBuilder(ElasticsearchClient client) {
             this(client, INSTANCE);
         }
+
         MTableStoreRequestBuilder(ElasticsearchClient client, MTableStoreAction action) {
             super(client, action, new MTableStoreRequest());
             this.client = client;
@@ -67,10 +71,16 @@ public class MTableStoreAction extends Action<MTableStoreAction.MTableStoreReque
         private String name;
         private float proportion;
         private float alpha;
-        private String[] mtable;
+        private int k;
+        private List<Integer> mtable;
 
         public String getId() {
-            return "name("+proportion+","+alpha+")";
+            return new StringBuilder()
+                    .append("name(")
+                        .append(proportion).append(",")
+                        .append(alpha).append(",")
+                        .append(k)
+                    .append(")").toString();
         }
 
         public enum Action {
@@ -80,25 +90,16 @@ public class MTableStoreAction extends Action<MTableStoreAction.MTableStoreReque
 
         public MTableStoreRequest() {}
 
-        public MTableStoreRequest(String store, float proportion, float alpha, String[] mtable, Action action) {
+        public MTableStoreRequest(String store, float proportion, float alpha, int k, List<Integer> mtable, Action action) {
             this.store = Objects.requireNonNull(store);
             this.action = Objects.requireNonNull(action);
 
             this.proportion = proportion;
             this.alpha = alpha;
+            this.k = k;
             this.mtable = mtable;
         }
 
-        public MTableStoreRequest(String store, float proportion, float alpha, String[] mtable, long updatedVersion) {
-            this.store = Objects.requireNonNull(store);
-
-            this.proportion = proportion;
-            this.alpha = alpha;
-            this.mtable = mtable;
-
-            this.action = Action.UPDATE;
-            this.updatedVersion = updatedVersion;
-        }
         @Override
         public ActionRequestValidationException validate() {
 
@@ -123,7 +124,8 @@ public class MTableStoreAction extends Action<MTableStoreAction.MTableStoreReque
             name = in.readString();
             proportion = in.readFloat();
             alpha = in.readFloat();
-            mtable = in.readOptionalStringArray();
+            k = in.readInt();
+            mtable = Arrays.stream(in.readIntArray()).boxed().collect(Collectors.toList());
         }
 
         @Override
@@ -136,8 +138,10 @@ public class MTableStoreAction extends Action<MTableStoreAction.MTableStoreReque
             out.writeString(name);
             out.writeFloat(proportion);
             out.writeFloat(alpha);
+            out.writeInt(k);
+
             if (mtable != null) {
-                out.writeStringArray(mtable);
+                out.writeIntArray(mtable.stream().mapToInt(i->i).toArray());
             }
         }
 
@@ -197,12 +201,20 @@ public class MTableStoreAction extends Action<MTableStoreAction.MTableStoreReque
             this.alpha = alpha;
         }
 
-        public String[] getMtable() {
+        public List<Integer> getMtable() {
             return mtable;
         }
 
-        public void setMtable(String[] mtable) {
+        public void setMtable(List<Integer> mtable) {
             this.mtable = mtable;
+        }
+
+        public int getK() {
+            return k;
+        }
+
+        public void setK(int k) {
+            this.k = k;
         }
     }
 
