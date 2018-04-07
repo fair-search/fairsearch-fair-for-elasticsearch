@@ -3,6 +3,7 @@ package com.purbon.search.fair.action;
 import com.purbon.search.fair.ModelStore;
 import com.purbon.search.fair.action.MTableStoreAction.MTableStoreRequest;
 import com.purbon.search.fair.action.MTableStoreAction.MTableStoreResponse;
+import com.purbon.search.fair.utils.MTableGenerator;
 import org.elasticsearch.action.ActionListener;
 import org.elasticsearch.action.index.IndexAction;
 import org.elasticsearch.action.index.IndexRequest;
@@ -19,6 +20,8 @@ import org.elasticsearch.threadpool.ThreadPool;
 import org.elasticsearch.transport.TransportService;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 import static org.elasticsearch.action.ActionListener.wrap;
 
@@ -49,6 +52,11 @@ public class TransportMTableStoreAction extends HandledTransportAction<MTableSto
             // To prevent index auto creation
        //     throw new IllegalArgumentException("Store [" + request.getStore() + "] does not exist, please create it first.");
        // }
+
+        if (request.getMtable() == null) {
+            MTableGenerator gen = new MTableGenerator(10, request.getK(), request.getProportion(), request.getAlpha());
+            request.setMtable(Arrays.stream(gen.getMTable()).boxed().collect(Collectors.toList()));
+        }
         store(request, task, listener);
     }
 
