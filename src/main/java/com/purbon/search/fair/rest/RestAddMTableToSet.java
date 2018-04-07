@@ -21,7 +21,7 @@ public class RestAddMTableToSet extends FairRestBaseHandler {
     public RestAddMTableToSet(Settings settings, RestController controller, String type) {
         super(settings);
         this.type = type;
-        controller.registerHandler(RestRequest.Method.POST, "/_fs/_mtable/{name}/{proportion}/{alpha}/{k}", this);
+        controller.registerHandler(RestRequest.Method.POST, "/_fs/_mtable/{name}/{proportion}/{alpha}/{k}/{size}", this);
     }
 
     @Override
@@ -55,6 +55,7 @@ public class RestAddMTableToSet extends FairRestBaseHandler {
         float proportion = request.paramAsFloat("proportion", 0.5f);
         float alpha      = request.paramAsFloat("alpha", 0.1f);
         int k            = request.paramAsInt("k", -1);
+        int size         = request.paramAsInt("size", -1);
 
         MTableParamsParser parser = new MTableParamsParser();
         request.applyContentParser(parser::parse);
@@ -66,6 +67,7 @@ public class RestAddMTableToSet extends FairRestBaseHandler {
         builder.request().setProportion(proportion);
         builder.request().setAlpha(alpha);
         builder.request().setK(k);
+        builder.request().setSize(size);
         builder.request().setMtable(parser.getTable());
 
         builder.request().setRouting(routing);

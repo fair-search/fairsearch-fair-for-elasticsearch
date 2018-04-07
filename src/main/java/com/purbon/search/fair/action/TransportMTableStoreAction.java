@@ -54,9 +54,10 @@ public class TransportMTableStoreAction extends HandledTransportAction<MTableSto
        // }
 
         if (request.getMtable() == null) {
-            MTableGenerator gen = new MTableGenerator(10, request.getK(), request.getProportion(), request.getAlpha());
+            MTableGenerator gen = new MTableGenerator(request.getSize(), request.getK(), request.getProportion(), request.getAlpha());
             request.setMtable(Arrays.stream(gen.getMTable()).boxed().collect(Collectors.toList()));
         }
+
         store(request, task, listener);
     }
 
