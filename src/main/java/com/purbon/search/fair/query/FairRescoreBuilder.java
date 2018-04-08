@@ -1,5 +1,6 @@
 package com.purbon.search.fair.query;
 
+import com.purbon.search.fair.lib.FairTopK;
 import com.purbon.search.fair.lib.FairTopKImpl;
 import com.purbon.search.fair.utils.DocumentPriorityQueue;
 import org.apache.logging.log4j.Logger;
@@ -221,12 +222,15 @@ public class FairRescoreBuilder extends RescorerBuilder<FairRescoreBuilder> {
     private class FairRescoreContext extends RescoreContext {
 
         private final FairSearchConfig config;
+        private final FairTopK fairTopK;
         private QueryShardContext context;
 
         FairRescoreContext(int windowSize, FairSearchConfig config, QueryShardContext context) {
             super(windowSize, FairRescorer.INSTANCE);
             this.context = context;
             this.config = config;
+
+            this.fairTopK = new FairTopKImpl(context.getClient());
         }
 
         public QueryShardContext getShardContext() {
@@ -241,11 +245,6 @@ public class FairRescoreBuilder extends RescorerBuilder<FairRescoreBuilder> {
     private static class FairRescorer implements Rescorer {
 
         private static final FairRescorer INSTANCE = new FairRescorer();
-        private final FairTopKImpl fairTopK;
-
-        FairRescorer() {
-            this.fairTopK = new FairTopKImpl();
-        }
 
         /**
          * Modifies the result of the previously executed search ({@link TopDocs})
@@ -261,6 +260,7 @@ public class FairRescoreBuilder extends RescorerBuilder<FairRescoreBuilder> {
 
             FairRescoreContext context = (FairRescoreContext)rescoreContext;
             FairSearchConfig config = context.getConfig();
+            FairTopK fairTopK = context.fairTopK;
 
             int max = Math.min(topDocs.scoreDocs.length, rescoreContext.getWindowSize());
 
@@ -303,7 +303,7 @@ public class FairRescoreBuilder extends RescorerBuilder<FairRescoreBuilder> {
                 throw new ElasticsearchException("Fair rescorer can not proceed, too few protected elements");
             }
 
-            return fairTopK.fairTopK(p0, p1, protectedElementsCount, proportion, significance);
+            return fairTopK.fairTopK(p0, p1, protectedElementsCount, proportion, significance, protectedElementsCount);
         }
 
         private boolean isProtected(Document doc, FairSearchConfig config) {

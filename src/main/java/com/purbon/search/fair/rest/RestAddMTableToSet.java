@@ -47,10 +47,6 @@ public class RestAddMTableToSet extends FairRestBaseHandler {
 
         String routing = request.param("routing");
 
-        if (!request.hasContentOrSourceParam()) {
-            throw new IllegalArgumentException("Missing content or source param.");
-        }
-
         String name      = request.param("name");
         float proportion = request.paramAsFloat("proportion", 0.5f);
         float alpha      = request.paramAsFloat("alpha", 0.1f);

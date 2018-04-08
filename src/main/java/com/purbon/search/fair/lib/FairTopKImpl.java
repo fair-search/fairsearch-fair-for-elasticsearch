@@ -1,9 +1,10 @@
 package com.purbon.search.fair.lib;
 
-import com.purbon.search.fair.lib.fairness.BionomialFairnessTableLookup;
+import com.purbon.search.fair.lib.fairness.InternalFairnessTableLookup;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.util.PriorityQueue;
+import org.elasticsearch.client.Client;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,19 +12,17 @@ import java.util.List;
 
 public class FairTopKImpl implements FairTopK {
 
-    private FairnessTableLookup fairnessLookup = new BionomialFairnessTableLookup();
+    private FairnessTableLookup fairnessLookup = null;
 
-    public FairTopKImpl() {
-
+    public FairTopKImpl(Client client) {
+        fairnessLookup = new InternalFairnessTableLookup(client);
     }
-    public TopDocs fairTopK(PriorityQueue<ScoreDoc> p0, PriorityQueue<ScoreDoc> p1, int k, float p, float alpha) {
+
+    public TopDocs fairTopK(PriorityQueue<ScoreDoc> p0, PriorityQueue<ScoreDoc> p1, int k, float p, float alpha, int n) {
 
         FairScorer scorer = new FairScorer(k);
-        float [] m = new float[k];
 
-        for(int i=0; i < k; i++) {
-            m[i] = fairnessLookup.fairness(i, p, alpha);
-        }
+        int [] m = fairnessLookup.fairnessAsTable(k, p, alpha, n);
 
         List<ScoreDoc> t = new ArrayList<ScoreDoc>();
         int tp = 0;

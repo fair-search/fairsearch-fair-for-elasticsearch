@@ -80,7 +80,8 @@ public class MTableStoreAction extends Action<MTableStoreAction.MTableStoreReque
                     .append("name(")
                         .append(proportion).append(",")
                         .append(alpha).append(",")
-                        .append(k)
+                        .append(k).append(",")
+                        .append(size)
                     .append(")").toString();
         }
 

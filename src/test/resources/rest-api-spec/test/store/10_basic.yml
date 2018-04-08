@@ -1,11 +1,25 @@
-"Test that the fair search plugin is loaded in Elasticsearch":
+"Test m table creation and caching":
 
-  # Use the Plain text Plugins API to retrieve the list of plugins
   - do:
-      cat.plugins:
-        local: true
-        h: component
+      fs.create_table:
+        name: "test"
+        proportion: 0.5
+        alpha: 0.1
+        k: 10
+        size: 10
+  - do:
+      fs.create_table:
+        name: "test"
+        proportion: 0.99
+        alpha: 0.1
+        k: 10
+        size: 10
 
-  - match:
-      $body: /^fairsearch\n
-              $/
+  - do:
+      indices.exists:
+        index: .fs_store
+
+  - do:
+      fs.get_table: {}
+
+  - length: { hits.hits: 2 }
