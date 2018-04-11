@@ -73,15 +73,13 @@ public class MTableStoreAction extends Action<MTableStoreAction.MTableStoreReque
         private float alpha;
         private int k;
         private List<Integer> mtable;
-        private int size;
 
         public String getId() {
             return new StringBuilder()
                     .append("name(")
                         .append(proportion).append(",")
                         .append(alpha).append(",")
-                        .append(k).append(",")
-                        .append(size)
+                        .append(k)
                     .append(")").toString();
         }
 
@@ -92,14 +90,13 @@ public class MTableStoreAction extends Action<MTableStoreAction.MTableStoreReque
 
         public MTableStoreRequest() {}
 
-        public MTableStoreRequest(String store, float proportion, float alpha, int k, int size, List<Integer> mtable, Action action) {
+        public MTableStoreRequest(String store, float proportion, float alpha, int k, List<Integer> mtable, Action action) {
             this.store = Objects.requireNonNull(store);
             this.action = Objects.requireNonNull(action);
 
             this.proportion = proportion;
             this.alpha = alpha;
             this.k = k;
-            this.size = size;
             this.mtable = mtable;
         }
 
@@ -128,7 +125,6 @@ public class MTableStoreAction extends Action<MTableStoreAction.MTableStoreReque
             proportion = in.readFloat();
             alpha = in.readFloat();
             k = in.readInt();
-            size = in.readInt();
             mtable = Arrays.stream(in.readIntArray()).boxed().collect(Collectors.toList());
         }
 
@@ -143,7 +139,6 @@ public class MTableStoreAction extends Action<MTableStoreAction.MTableStoreReque
             out.writeFloat(proportion);
             out.writeFloat(alpha);
             out.writeInt(k);
-            out.writeInt(size);
 
             if (mtable != null) {
                 out.writeIntArray(mtable.stream().mapToInt(i->i).toArray());
@@ -220,14 +215,6 @@ public class MTableStoreAction extends Action<MTableStoreAction.MTableStoreReque
 
         public void setK(int k) {
             this.k = k;
-        }
-
-        public int getSize() {
-            return size;
-        }
-
-        public void setSize(int size) {
-            this.size = size;
         }
     }
 

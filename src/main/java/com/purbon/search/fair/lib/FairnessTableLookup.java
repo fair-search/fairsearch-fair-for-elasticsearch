@@ -16,9 +16,8 @@ public interface FairnessTableLookup {
      * @param k k value
      * @param p p value
      * @param a alpha value
-     * @param n n value
      * @return int[]
      */
-    int[] fairnessAsTable(int k, float p, float a, int n);
+    int[] fairnessAsTable(int k, float p, float a);
 
 }

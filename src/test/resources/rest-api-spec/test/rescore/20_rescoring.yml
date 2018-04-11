@@ -86,14 +86,12 @@ setup:
         proportion: 0.5
         alpha: 0.1
         k: 5
-        size: 5
   - do:
       fs.create_table:
         name: "test"
         proportion: 0.99
         alpha: 0.1
         k: 5
-        size: 5
   - do:
       indices.refresh: {}
 

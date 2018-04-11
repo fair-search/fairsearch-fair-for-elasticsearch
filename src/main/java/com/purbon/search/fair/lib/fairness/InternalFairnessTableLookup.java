@@ -17,8 +17,8 @@ public class InternalFairnessTableLookup implements FairnessTableLookup {
     }
 
     @Override
-    public int[] fairnessAsTable(int k, float p, float a, int n) {
-        String docId = "name("+p+","+a+","+k+","+n+")";
+    public int[] fairnessAsTable(int k, float p, float a) {
+        String docId = "name("+p+","+a+","+k+")";
         return cache.get(docId);
     }
 

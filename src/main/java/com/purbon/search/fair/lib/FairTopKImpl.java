@@ -18,11 +18,11 @@ public class FairTopKImpl implements FairTopK {
         fairnessLookup = new InternalFairnessTableLookup(client);
     }
 
-    public TopDocs fairTopK(PriorityQueue<ScoreDoc> p0, PriorityQueue<ScoreDoc> p1, int k, float p, float alpha, int n) {
+    public TopDocs fairTopK(PriorityQueue<ScoreDoc> p0, PriorityQueue<ScoreDoc> p1, int k, float p, float alpha) {
 
         FairScorer scorer = new FairScorer(k);
 
-        int [] m = fairnessLookup.fairnessAsTable(k, p, alpha, n);
+        int [] m = fairnessLookup.fairnessAsTable(k, p, alpha);
 
         List<ScoreDoc> t = new ArrayList<ScoreDoc>();
         int tp = 0;

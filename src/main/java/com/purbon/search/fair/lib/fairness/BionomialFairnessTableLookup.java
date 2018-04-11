@@ -24,7 +24,7 @@ public class BionomialFairnessTableLookup implements FairnessTableLookup {
     }
 
     @Override
-    public int[] fairnessAsTable(int k, float p, float a, int n) {
+    public int[] fairnessAsTable(int k, float p, float a) {
         throw new NotImplementedException();
     }
 }

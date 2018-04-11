@@ -27,7 +27,6 @@ public class ModelStore {
             source.field("proportion", request.getProportion());
             source.field("alpha", request.getAlpha());
             source.field("k", request.getK());
-            source.field("size", request.getSize());
             source.field("mtable", request.getMtable());
         source.endObject();
         return source;
