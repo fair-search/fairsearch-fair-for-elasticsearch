@@ -59,7 +59,7 @@ public class AlphaAdjuster {
                 throw new RuntimeException("Inconsistent mtable");
             }
         }
-        table.removeNullEntries();
+        table.resolveNullEntries();
         return table;
     }
 
@@ -84,8 +84,9 @@ public class AlphaAdjuster {
                 for (int i = 0; i < blockLength + 1; i++) {
                     currentTrial.add(i, binomDist.probability(i));
                 }
-                if (blockLength > pmfCache.size()) {
-                    for (int j = 0; j <= blockLength - pmfCache.size() + 1; j++) {
+                if (blockLength >= pmfCache.size()) {
+                    int entriesToAdd = pmfCache.size();
+                    for (int j = 0; j <= blockLength - entriesToAdd; j++) {
                         pmfCache.add(new ArrayList<Double>());
                     }
                 }
@@ -174,7 +175,8 @@ public class AlphaAdjuster {
 
 
     public static void main(String[] args) {
-
+        AlphaAdjuster alphaAdjuster = new AlphaAdjuster(40,40,0.4,0.1);
+        System.out.println(alphaAdjuster.computeSuccessProbability());
 
     }
 

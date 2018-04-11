@@ -27,12 +27,18 @@ public class DataFrame {
 
     public void put(int position, int col1Value, int col2Value) {
         if (position >= col1.size()) {
-            for (int i = 0; i <= position - col1.size() + 1; i++) {
+            while (position > col1.size() - 1) {
                 col1.add(null);
             }
+            //for (int i = 0; i <= position - col1.size() + 1; i++) {
+            //    col1.add(null);
+            //}
         }
         if (position >= col2.size()) {
-            for (int i = 0; i <= position - col2.size() + 1; i++) {
+            while (position > col2.size() - 1) {
+                //for (int i = 0; i <= position - col2.size() + 1; i++) {
+                //   col2.add(null);
+                //}
                 col2.add(null);
             }
         }
@@ -48,13 +54,20 @@ public class DataFrame {
         }
     }
 
-    public void removeNullEntries() {
+    public void resolveNullEntries() {
+        col1.set(0,0);
+        col2.set(0,0);
+        int conquered =0;
         for (int i = 0; i < col1.size(); i++) {
-            if (col1.get(i) == null) {
-                col1.remove(i);
-            }
-            if (col2.get(i) == null) {
-                col2.remove(i);
+            //if (col1.get(i) != null) {
+            //    for(int j=1;j<col1.get(i); j++){
+            //        col1.set(i-j,col1.get(i));
+            //    }
+           // }
+            if (col2.get(i) != null) {
+                for(int k=1; k<col2.get(i); k++){
+                    col2.set(i-k, col2.get(i));
+                }
             }
         }
     }
