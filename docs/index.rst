@@ -38,6 +38,7 @@ Contents
 
 .. toctree::
    :maxdepth: 2
+
    core-concepts
    fits-in
    :caption: Contents:
