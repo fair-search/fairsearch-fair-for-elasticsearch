@@ -1,5 +1,6 @@
 package com.purbon.search.fair.query;
 
+import com.purbon.search.fair.lib.FairTopK;
 import com.purbon.search.fair.lib.FairTopKImpl;
 import com.purbon.search.fair.utils.DocumentPriorityQueue;
 import org.apache.logging.log4j.Logger;
@@ -11,7 +12,9 @@ import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.util.PriorityQueue;
 import org.elasticsearch.ElasticsearchException;
+import org.elasticsearch.action.admin.indices.settings.get.GetSettingsRequest;
 import org.elasticsearch.action.search.SearchType;
+import org.elasticsearch.client.Client;
 import org.elasticsearch.common.ParseField;
 import org.elasticsearch.common.io.stream.StreamInput;
 import org.elasticsearch.common.io.stream.StreamOutput;
@@ -159,7 +162,6 @@ public class FairRescoreBuilder extends RescorerBuilder<FairRescoreBuilder> {
                 if (args.length > 6 && args[6] != null) {
                     onFewElementsAction = (String)args[6];
                 }
-
                 return new FairRescoreBuilder((String) args[0], (String) args[1], proportion, significance,
                         proportionStrategy, lookupForProportion, onFewElementsAction, context.getConfig());
             });
@@ -221,12 +223,15 @@ public class FairRescoreBuilder extends RescorerBuilder<FairRescoreBuilder> {
     private class FairRescoreContext extends RescoreContext {
 
         private final FairSearchConfig config;
+        private final FairTopK fairTopK;
         private QueryShardContext context;
 
         FairRescoreContext(int windowSize, FairSearchConfig config, QueryShardContext context) {
             super(windowSize, FairRescorer.INSTANCE);
             this.context = context;
             this.config = config;
+
+            this.fairTopK = new FairTopKImpl(context.getClient());
         }
 
         public QueryShardContext getShardContext() {
@@ -241,11 +246,6 @@ public class FairRescoreBuilder extends RescorerBuilder<FairRescoreBuilder> {
     private static class FairRescorer implements Rescorer {
 
         private static final FairRescorer INSTANCE = new FairRescorer();
-        private final FairTopKImpl fairTopK;
-
-        FairRescorer() {
-            this.fairTopK = new FairTopKImpl();
-        }
 
         /**
          * Modifies the result of the previously executed search ({@link TopDocs})
@@ -261,6 +261,16 @@ public class FairRescoreBuilder extends RescorerBuilder<FairRescoreBuilder> {
 
             FairRescoreContext context = (FairRescoreContext)rescoreContext;
             FairSearchConfig config = context.getConfig();
+            FairTopK fairTopK = context.fairTopK;
+
+            // Check if the index where this rescore is happening have the correct setup of shards.
+            int numOfShards   = context.getShardContext().getIndexSettings().getNumberOfShards();
+            int numOfReplicas = context.getShardContext().getIndexSettings().getNumberOfReplicas();
+
+            if (numOfShards > 1 || numOfReplicas > 1) {
+                String message = "Unfortunately this plugin needs your index to have only one shard and one replica";
+                throw new ElasticsearchException(message);
+            }
 
             int max = Math.min(topDocs.scoreDocs.length, rescoreContext.getWindowSize());
 

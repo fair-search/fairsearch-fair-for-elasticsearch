@@ -6,17 +6,22 @@ import org.apache.commons.math3.distribution.BinomialDistribution;
 public class MTableGenerator {
 
     private int[] mTable;
+    @Deprecated
     private int n;
     private int k;
     private double p;
     private double alpha;
 
+    public MTableGenerator(int k, double p, double alpha) {
+        this(k, k, p, alpha);
+    }
     /**
      * @param n     Total number of elements
      * @param k     The size of the ranking
      * @param p     The proportion of protected candidates in the top-k ranking
      * @param alpha the significance level
      */
+    @Deprecated
     public MTableGenerator(int n, int k, double p, double alpha) {
         if (parametersAreValid(n, k, p, alpha)) {
             this.n = n;

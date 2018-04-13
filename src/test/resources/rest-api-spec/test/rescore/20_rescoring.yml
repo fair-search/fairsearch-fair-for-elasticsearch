@@ -80,9 +80,21 @@ setup:
         type:   test
         id:     11
         body:   { "name": "Anna", "city": "Berlin", "gender": "Female", "langs": "Scala, Kotlin, Java" }
-
+  - do:
+      fs.create_table:
+        name: "test"
+        proportion: 0.5
+        alpha: 0.1
+        k: 5
+  - do:
+      fs.create_table:
+        name: "test"
+        proportion: 0.99
+        alpha: 0.1
+        k: 5
   - do:
       indices.refresh: {}
+
 
 ---
 "java developers":

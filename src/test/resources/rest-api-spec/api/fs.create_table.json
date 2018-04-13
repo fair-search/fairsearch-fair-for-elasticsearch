@@ -1,0 +1,41 @@
+{
+  "fs.create_table": {
+    "methods" : ["POST"],
+    "url": {
+      "path": "/_fs/_mtable/{name}/{proportion}/{alpha}/{k}",
+      "paths": ["/_fs/_mtable/{name}/{proportion}/{alpha}/{k}"],
+      "parts": {
+        "name": {
+          "type": "string",
+          "required": true,
+          "description": "The table name"
+        },
+        "proportion": {
+          "type": "float",
+          "required": true,
+          "description": "The table proportion"
+        },
+        "alpha": {
+          "type": "float",
+          "required": true,
+          "description": "The table alpha"
+        },
+        "k": {
+          "type": "int",
+          "required": true,
+          "description": "The table k"
+        }
+      },
+      "params": {
+        "routing": {
+          "type" : "string",
+          "description" : "Specific routing value"
+        }
+      }
+    },
+    "body": {
+      "description" : "The table",
+      "required": "false"
+    }
+  }
+}

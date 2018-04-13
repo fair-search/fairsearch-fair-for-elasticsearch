@@ -1,11 +1,12 @@
 package com.purbon.search.fair.lib.fairness;
 
 import com.purbon.search.fair.lib.FairnessTableLookup;
+import com.purbon.search.fair.lib.NotImplementedException;
 import org.apache.commons.math3.distribution.BinomialDistribution;
 
 public class BionomialFairnessTableLookup implements FairnessTableLookup {
 
-    public float fairness(int trials, float proportion, float significance) {
+    public int fairness(int trials, float proportion, float significance) {
 
         // trials == k , p == p
         BinomialDistribution d = new BinomialDistribution(trials, proportion);
@@ -20,5 +21,10 @@ public class BionomialFairnessTableLookup implements FairnessTableLookup {
         } while (d.cumulativeProbability(x) > significance);
 
         return x;
+    }
+
+    @Override
+    public int[] fairnessAsTable(int k, float p, float a) {
+        throw new NotImplementedException();
     }
 }

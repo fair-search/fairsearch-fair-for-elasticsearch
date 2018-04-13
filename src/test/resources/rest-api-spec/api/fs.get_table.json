@@ -1,0 +1,15 @@
+{
+  "fs.get_table": {
+    "methods" : ["GET"],
+    "url": {
+      "path": "/_fs/_mtable",
+      "paths": ["/_fs/_mtable"],
+      "params": {
+        "routing": {
+          "type" : "string",
+          "description" : "Specific routing value"
+        }
+      }
+    }
+  }
+}
