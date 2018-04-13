@@ -16,3 +16,11 @@ ethnic minorities, or an under-represented gender in a specic industry).
 This plugin is here to help your search produce a fair ranking given one legally-protected attribute, i.e.,
 a ranking in which the representation of the minority group does not fall below a minimum proportion p at any point in the ranking,
 while the utility of the ranking is maintained as high as possible.
+
+
+=======================
+What the plugin is NOT
+=======================
+
+This plugin does not help you select the best proportion and significant parameters for your use case, you will need
+to experiment and find the best correlation of them for your case.
