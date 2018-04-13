@@ -13,6 +13,8 @@ Get started
 
 - Brand new? head to :doc:`core-concepts`.
 - Otherwise, start with :doc:`fits-in`
+- Building an m table, head to :doc:`building_the_mtable`
+
 
 Installing
 -----------
@@ -41,6 +43,7 @@ Contents
 
    core-concepts
    fits-in
+   building_the_mtable
    :caption: Contents:
 
 
