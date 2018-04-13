@@ -44,6 +44,8 @@ for example:
 
     POST /_fs/_mtable/test/0.5/0.1/5
 
+.. code-block:: json
+
     {
         "_index": ".fs_store",
         "_type": "store",
@@ -62,6 +64,7 @@ for example:
 
 this will store a document in elasticsearch that will look like:
 
+.. code-block:: json
 
       {
         "_index": ".fs_store",
