@@ -14,7 +14,7 @@ Get started
 - Brand new? head to :doc:`core-concepts`.
 - Otherwise, start with :doc:`fits-in`
 - Building an m table, head to :doc:`building_the_mtable`
-
+- Doing fair rescoring, head to :doc:`doing_a_fair_rescoring`
 
 Installing
 -----------
@@ -44,6 +44,7 @@ Contents
    core-concepts
    fits-in
    building_the_mtable
+   doing_a_fair_rescoring
    :caption: Contents:
 
 
