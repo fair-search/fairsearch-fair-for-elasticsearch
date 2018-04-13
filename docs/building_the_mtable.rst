@@ -143,3 +143,7 @@ this will give you an answer like:
 =======================
 Delete stored M tables
 =======================
+
+Currently there is no functionality offered to delete an specific mtable, you should probably also never do that yourself.
+However if you want to delete documents, use the standard document api from elastic and refer to the specific table
+document id.
