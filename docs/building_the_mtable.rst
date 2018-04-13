@@ -99,6 +99,7 @@ To list all stored M tables you can use this command:
 this will give you an answer like:
 
 .. code-block:: json
+
 {
   "took": 7,
   "timed_out": false,
