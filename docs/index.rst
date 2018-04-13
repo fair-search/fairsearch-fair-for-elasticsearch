@@ -37,10 +37,10 @@ Contents
 
 
 .. toctree::
-:maxdepth: 2
-core-concepts
-fits-in
-:caption: Contents:
+   :maxdepth: 2
+   core-concepts
+   fits-in
+   :caption: Contents:
 
 
 Indices and tables
