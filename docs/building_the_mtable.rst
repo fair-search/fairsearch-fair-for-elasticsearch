@@ -100,70 +100,44 @@ this will give you an answer like:
 
 .. code-block:: json
 
-{
-  "took": 7,
-  "timed_out": false,
-  "_shards": {
-    "total": 5,
-    "successful": 5,
-    "skipped": 0,
-    "failed": 0
-  },
-  "hits": {
-    "total": 3,
-    "max_score": 1,
-    "hits": [
-      {
-        "_index": ".fs_store",
-        "_type": "store",
-        "_id": "name(0.5,0.1,5)",
-        "_score": 1,
-        "_source": {
-          "name": "test",
-          "type": "mtable",
-          "proportion": 0.5,
-          "alpha": 0.1,
-          "k": 5,
-          "mtable": [
-            0,
-            0,
-            0,
-            0,
-            1,
-            1
-          ]
-        }
-      },
+    {
+        "took": 7,
+        "timed_out": false,
+        "_shards": {
+        "total": 5,
+        "successful": 5,
+        "skipped": 0,
+        "failed": 0
+    },
+    "hits": {
+        "total": 3,
+        "max_score": 1,
+        "hits": [
+        {
+            "_index": ".fs_store",
+            "_type": "store",
+            "_id": "name(0.5,0.1,5)",
+            "_score": 1,
+            "_source": {
+                "name": "test",
+                "type": "mtable",
+                "proportion": 0.5,
+                "alpha": 0.1,
+                "k": 5,
+                "mtable": [
+                 0,
+                 0,
+                 0,
+                 0,
+                 1,
+                 1
+                 ]
+            }
+        },
     ....
-      {
-        "_index": ".fs_store",
-        "_type": "store",
-        "_id": "name(0.6,0.2,10)",
-        "_score": 1,
-        "_source": {
-          "name": "test",
-          "type": "mtable",
-          "proportion": 0.6,
-          "alpha": 0.2,
-          "k": 10,
-          "mtable": [
-            0,
-            0,
-            1,
-            1,
-            2,
-            2,
-            3,
-            3,
-            4,
-            4,
-            5
-          ]
+        ]
         }
-      }
-    ]
-  }
-}
+    }
 
 
 =======================
