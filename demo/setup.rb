@@ -52,16 +52,13 @@ end
 class MTableLoader
 
 
-  def self.run(iterations=100)
+  def self.run(iterations=2)
     client = ESClient.new
     name   = "default_mtables"
     iterations.times do |k|
       10.times do |p_i|
         p = p_i/10.0
-        10.times do |a_i|
-          a = a_i / 10.0
-          puts client.setup(name, p, a, k+1)
-        end
+        puts client.setup(name, p, a, (10*(k+1))
       end
     end
     client.close
@@ -75,7 +72,7 @@ if __FILE__ == $0
     return -1
   end
 
-  iterations = ARGV[0].to_i #num of iterations
+  iterations = ARGV[0].to_i  || 2 #num of iterations
   MTableLoader.run(iterations)
 
 end
