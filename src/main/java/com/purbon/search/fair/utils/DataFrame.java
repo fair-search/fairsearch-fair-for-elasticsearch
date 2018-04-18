@@ -26,24 +26,21 @@ public class DataFrame {
     }
 
     public void put(int position, int col1Value, int col2Value) {
-        if (position >= col1.size()) {
             while (position > col1.size() - 1) {
                 col1.add(null);
             }
             //for (int i = 0; i <= position - col1.size() + 1; i++) {
             //    col1.add(null);
             //}
-        }
-        if (position >= col2.size()) {
             while (position > col2.size() - 1) {
                 //for (int i = 0; i <= position - col2.size() + 1; i++) {
                 //   col2.add(null);
                 //}
                 col2.add(null);
             }
-        }
-        col1.add(position, col1Value);
-        col2.add(position, col2Value);
+
+        col1.set(position, col1Value);
+        col2.set(position, col2Value);
     }
 
     public int getLengthOf(String columnName) {

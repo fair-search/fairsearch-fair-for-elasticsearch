@@ -2,6 +2,8 @@ package com.purbon.search.fair.utils;
 
 import org.apache.commons.math3.distribution.BinomialDistribution;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 
 public class AlphaAdjuster {
@@ -31,7 +33,7 @@ public class AlphaAdjuster {
         if (p <= 0.0 || p >= 1.0) {
             throw new IllegalArgumentException("Parameter p must be in ]0.0, 1.0[");
         }
-        if (alpha <= 0.0 || alpha > 1.0) {
+        if (alpha <= 0.0 || alpha >= 1.0) {
             throw new IllegalArgumentException("Parameter alpha must be in ]0.0, 1.0[");
         }
 
@@ -50,7 +52,7 @@ public class AlphaAdjuster {
         DataFrame table = new DataFrame("inv", "block");
         int lastMSeen = 0;
         int lastPosition = 0;
-        for (int position = 1; position < mTable.length - 1; position++) {
+        for (int position = 1; position < mTable.length; position++) {
             if (mTable[position] == lastMSeen + 1) {
                 lastMSeen += 1;
                 table.put(position, position, (position - lastPosition));
@@ -68,32 +70,34 @@ public class AlphaAdjuster {
         int minProtected = 1;
         double successProbability = 0;
 
-        ArrayList<Double> currentTrial = new ArrayList<>();
+        ArrayList<Double> currentTrial;
 
         double[] successObtainedProb = new double[maxProtected];
         successObtainedProb = fillWithZeros(successObtainedProb);
         successObtainedProb[0] = 1.0;
         ArrayList<ArrayList<Double>> pmfCache = new ArrayList<>();
+
         while (minProtected < maxProtected) {
             int blockLength = auxMTable.at(minProtected, "block");
-            if (blockLength <= pmfCache.size()) {
+            if (blockLength <= pmfCache.size() && pmfCache.get(blockLength) != null) {
                 currentTrial = pmfCache.get(blockLength);
             } else {
-                currentTrial = new ArrayList<>(blockLength + 1);
+                currentTrial = new ArrayList<>();
+                for (int j = 0; j <= blockLength; j++) {
+                    currentTrial.add(null);
+                }
                 BinomialDistribution binomDist = new BinomialDistribution(blockLength, p);
-                for (int i = 0; i < blockLength + 1; i++) {
-                    currentTrial.add(i, binomDist.probability(i));
+                for (int i = 0; i <= blockLength; i++) {
+                    currentTrial.set(i, binomDist.probability(i));
                 }
-                if (blockLength >= pmfCache.size()) {
-                    int entriesToAdd = pmfCache.size();
-                    for (int j = 0; j <= blockLength - entriesToAdd; j++) {
-                        pmfCache.add(new ArrayList<Double>());
-                    }
-                }
-                pmfCache.add(blockLength, currentTrial);
+
+                pmfCache = adjustPmfCache(pmfCache, blockLength);
+                pmfCache.set(blockLength, currentTrial);
             }
+
             double[] newSuccessObtainedProb = fillWithZeros(new double[maxProtected]);
-            for (int i = 0; i < blockLength + 1; i++) {
+            for (int i = 0; i < blockLength; i++) {
+                //System.out.println("call " + i + "currentTrial[i]" + currentTrial.get(i));
                 double[] increase = increase(i, successObtainedProb, currentTrial);
                 newSuccessObtainedProb = addEntryWise(increase, newSuccessObtainedProb);
             }
@@ -101,7 +105,6 @@ public class AlphaAdjuster {
 
             successObtainedProb = newSuccessObtainedProb;
             successProbability = sum(successObtainedProb);
-
             minProtected += 1;
         }
 
@@ -109,13 +112,24 @@ public class AlphaAdjuster {
 
     }
 
+    public ArrayList<ArrayList<Double>> adjustPmfCache(ArrayList<ArrayList<Double>> pmfCache, int blocklength) {
+        if (pmfCache.size() < blocklength) {
+            for (int i = pmfCache.size(); i <= blocklength; i++) {
+                pmfCache.add(null);
+            }
+        }
+        return pmfCache;
+    }
+
     public double[] increase(int i, double[] successObtainedProb, ArrayList<Double> currentTrial) {
         double[] shifted = shiftToRight(successObtainedProb, i);
         for (int j = 0; j < shifted.length; j++) {
+//            System.out.println("|shifted[j]|"+shifted[j]+"|shiftedLength|"+shifted.length+"|currentTrialSize|"+currentTrial.size()+"|i|"+i+"|currentTrial[i]|"+currentTrial.get(i));
             shifted[j] = shifted[j] * currentTrial.get(i);
         }
         return shifted;
     }
+
 
     public double[] addEntryWise(double[] arrayOne, double[] arrayTwo) {
         double[] sum = new double[arrayOne.length];
@@ -147,16 +161,6 @@ public class AlphaAdjuster {
         return shifted;
     }
 
-    private double[] multiplyAndAddComponentwiseProbMass(int i, int b_j, double p, double[] s, double[] s_new) {
-        BinomialDistribution binomDist = new BinomialDistribution(b_j, p);
-        double f = binomDist.probability(i);
-        s = shiftToRight(s, i);
-        for (int j = 0; j < s.length; j++) {
-            s_new[j] = s_new[j] + s[j] * f;
-        }
-        return s_new;
-    }
-
     private double sum(double[] array) {
         double sum = 0;
         for (int i = 0; i < array.length; i++) {
@@ -165,19 +169,19 @@ public class AlphaAdjuster {
         return sum;
     }
 
-    private double[] copy(double[] s_new) {
-        double[] copied = new double[s_new.length];
-        for (int i = 0; i < s_new.length; i++) {
-            copied[i] = s_new[i];
-        }
-        return copied;
-    }
-
-
     public static void main(String[] args) {
-        AlphaAdjuster alphaAdjuster = new AlphaAdjuster(40,40,0.4,0.1);
+        AlphaAdjuster alphaAdjuster = new AlphaAdjuster(1500, 1500, 0.2, 0.0101);
         System.out.println(alphaAdjuster.computeSuccessProbability());
+        BigDecimal count = new BigDecimal(alphaAdjuster.computeSuccessProbability());
+        count = count.setScale(7, RoundingMode.CEILING);
+        //double count = (double)Math.round((alphaAdjuster.computeSuccessProbability()*100000.0)/100000.0);
+        System.out.println(count);
+        System.out.println(count.doubleValue());
+//        BinarySearchAlphaAdjuster adjuster = new BinarySearchAlphaAdjuster(1500,1500,0.2,0.1);
+//        System.out.println(adjuster.adjustAlpha());
 
     }
+
+
 
 }
