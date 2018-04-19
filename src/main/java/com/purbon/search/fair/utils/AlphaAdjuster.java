@@ -66,7 +66,7 @@ public class AlphaAdjuster {
     }
 
     public double computeSuccessProbability() {
-        int maxProtected = auxMTable.getLengthOf("inv")-1;
+        int maxProtected = auxMTable.getLengthOf("inv") - 1;
         int minProtected = 1;
         double successProbability = 0;
 
@@ -96,7 +96,7 @@ public class AlphaAdjuster {
             }
 
             double[] newSuccessObtainedProb = fillWithZeros(new double[maxProtected]);
-            for (int i = 0; i < blockLength; i++) {
+            for (int i = 0; i <= blockLength; i++) {
                 //System.out.println("call " + i + "currentTrial[i]" + currentTrial.get(i));
                 double[] increase = increase(i, successObtainedProb, currentTrial);
                 newSuccessObtainedProb = addEntryWise(increase, newSuccessObtainedProb);
@@ -149,13 +149,14 @@ public class AlphaAdjuster {
 
     private double[] shiftToRight(double[] array, int pos) {
         double[] shifted = new double[array.length];
+        pos = pos % array.length;
         for (int i = 0; i < shifted.length; i++) {
             if (pos == 0) {
                 shifted[i] = array[i];
             } else if (i + pos > shifted.length - 1) {
                 shifted[i % pos] = array[i];
             } else {
-                shifted[i+pos] = array[i];
+                shifted[i + pos] = array[i];
             }
         }
         return shifted;
@@ -170,24 +171,46 @@ public class AlphaAdjuster {
     }
 
     public static void main(String[] args) {
-        AlphaAdjuster alphaAdjuster = new AlphaAdjuster(40, 40, 0.5, 0.1);
-        //for(int i=0; i<alphaAdjuster.mTable.length; i++){
-        //    System.out.println(i+"  "+alphaAdjuster.mTable[i]);
-        //}
 
-        //BinomialDistribution dist = new BinomialDistribution(39,0.5);
-        //System.out.println(dist.inverseCumulativeProbability(0.1));
-        //System.out.println(alphaAdjuster.computeAuxTMTable().toString());
-        //System.out.println(alphaAdjuster.computeSuccessProbability());
-        BigDecimal count = new BigDecimal(alphaAdjuster.computeSuccessProbability());
-        count = count.setScale(7, RoundingMode.CEILING);
-        //double count = (double)Math.round((alphaAdjuster.computeSuccessProbability()*100000.0)/100000.0);
-        System.out.println(count);
-        //System.out.println(count.doubleValue());
-        //BinarySearchAlphaAdjuster adjuster = new BinarySearchAlphaAdjuster(1500, 1500, 0.2, 0.001);
-        //System.out.println(adjuster.adjustAlpha());
 
-    }
+
+//        double a = 0.37500000000000017;
+//        BigDecimal b = new BigDecimal(a).setScale(16,RoundingMode.FLOOR);
+//        System.out.println(b.doubleValue());
+//        double[] arr = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+//        AlphaAdjuster alphaAdjuster = new AlphaAdjuster(1500, 1500, 0.1, 0.01001129150390625);
+//        double[] result = alphaAdjuster.shiftToRight(arr, 12);
+//        String s = "{";
+//        for (int i = 0; i < result.length; i++) {
+//            s += result[i];
+//            s += ", ";
+//        }
+//        s+="}";
+//        System.out.println(s);
+        //        //for(int i=0; i<alphaAdjuster.mTable.length; i++){
+//        //    System.out.println(i+"  "+alphaAdjuster.mTable[i]);
+//        //}
+//
+//        //BinomialDistribution dist = new BinomialDistribution(39,0.5);
+//        //System.out.println(dist.inverseCumulativeProbability(0.1));
+//        //System.out.println(alphaAdjuster.computeAuxTMTable().toString());
+//        System.out.println(1.0-alphaAdjuster.computeSuccessProbability());
+//        BigDecimal count = new BigDecimal(alphaAdjuster.computeSuccessProbability());
+//        count = count.setScale(7, RoundingMode.CEILING);
+//        //double count = (double)Math.round((alphaAdjuster.computeSuccessProbability()*100000.0)/100000.0);
+//        System.out.println(count);
+//        //System.out.println(count.doubleValue());
+        BinarySearchAlphaAdjuster adjuster = new BinarySearchAlphaAdjuster(1500, 1500, 0.2, 0.1);
+        System.out.println(adjuster.adjustAlpha());
+//        0.7474623436573897
+//        0.7474434905743703
+//        0.4563073286084534
+//        0.4563073286084476
+//        0.4388119776370146
+//        0.43881197763702184
+//        0.4921875000000002
+//        0.4687500000000002
+}
 
 
 }

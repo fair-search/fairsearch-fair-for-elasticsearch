@@ -10,7 +10,8 @@ public class BinarySearchAlphaAdjuster {
     private int k;
     private double p;
     private double alpha;
-    private BigDecimal eps = new BigDecimal(0.0001);
+    private static final double EPS = 0.0001;
+//    0.10002629313519074
 
     public BinarySearchAlphaAdjuster(int n, int k, double p, double alpha) {
         this.n = n;
@@ -20,27 +21,36 @@ public class BinarySearchAlphaAdjuster {
     }
 
     public double adjustAlpha() {
-        double step = 0.0001;
-        AlphaAdjuster adjuster = new AlphaAdjuster(n,k,p,alpha);
+        //double step = 0.001;
+        AlphaAdjuster adjuster = new AlphaAdjuster(n, k, p, alpha);
         double oldSuccProb = adjuster.computeSuccessProbability();
         double oldAlpha = this.alpha;
-        double newAlpha = oldAlpha/2.0;
-        return adjust(oldAlpha, newAlpha,oldSuccProb);
+        return adjust(oldAlpha, oldSuccProb, alpha);
 
     }
 
-    private double adjust(double oldAlpha, double newAlpha, double oldSuccProb) {
-        System.out.println(oldSuccProb);
-        if(oldSuccProb<=0.0000000001){
+    private double adjust(double oldAlpha, double oldSuccProb, double startAlpha) {
+        BigDecimal test = new BigDecimal(1-oldSuccProb);
+        test.setScale(4, RoundingMode.FLOOR);
+        BigDecimal a = new BigDecimal(startAlpha);
+        a.setScale(4, RoundingMode.FLOOR);
+        System.out.println(test.setScale(4,RoundingMode.FLOOR).doubleValue());
+        if (test.setScale(4,RoundingMode.FLOOR).doubleValue() == a.setScale(4,RoundingMode.FLOOR).doubleValue()+EPS
+                || test.setScale(4,RoundingMode.FLOOR).doubleValue() == a.setScale(4,RoundingMode.FLOOR).doubleValue() - EPS) {
             return oldAlpha;
-        }else {
-            //System.out.println(oldAlpha);
-            double step = 0.0001;
-            AlphaAdjuster adjuster = new AlphaAdjuster(n, k, p, newAlpha);
-            double newSuccProb = adjuster.computeSuccessProbability();
-            //System.out.println(roundToFourDigits(oldSuccProb));
-            //oldSuccProb.setScale(4,RoundingMode.CEILING);
-            return adjust(newAlpha, newAlpha/2.0, newSuccProb);
+        } else {
+            if(1-oldSuccProb>startAlpha+EPS){
+                oldAlpha = oldAlpha-(oldAlpha/2.0);
+                //System.out.println(oldAlpha);
+                AlphaAdjuster adjuster = new AlphaAdjuster(n, k, p, oldAlpha);
+                oldSuccProb = adjuster.computeSuccessProbability();
+            }else{
+                oldAlpha = oldAlpha+(oldAlpha/2.0);
+                //System.out.println(oldAlpha);
+                AlphaAdjuster adjuster = new AlphaAdjuster(n, k, p, oldAlpha);
+                oldSuccProb = adjuster.computeSuccessProbability();
+            }
+            return adjust(oldAlpha,oldSuccProb,startAlpha);
         }
     }
 
