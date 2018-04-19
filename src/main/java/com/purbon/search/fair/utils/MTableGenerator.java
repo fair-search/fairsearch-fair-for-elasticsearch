@@ -70,7 +70,7 @@ public class MTableGenerator {
 
     private int[] computeMTable() {
         int[] table = new int[this.n + 1];
-        table[0] = 0;
+        //table[0] = 0;
         for (int i = 1; i < this.n + 1; i++) {
             table[i] = m(i);
         }

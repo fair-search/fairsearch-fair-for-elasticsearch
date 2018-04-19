@@ -20,37 +20,28 @@ public class BinarySearchAlphaAdjuster {
     }
 
     public double adjustAlpha() {
-        double step = 0.001;
+        double step = 0.0001;
         AlphaAdjuster adjuster = new AlphaAdjuster(n,k,p,alpha);
-        BigDecimal oldSuccProb = new BigDecimal(adjuster.computeSuccessProbability());
-        oldSuccProb.setScale(4, RoundingMode.CEILING);
-        BigDecimal oldAlpha = new BigDecimal(this.alpha);
-        oldAlpha.setScale(4,RoundingMode.CEILING);
-        BigDecimal newAlpha = oldAlpha.subtract(new BigDecimal(step));
-        return adjust(oldAlpha, newAlpha,oldSuccProb,1);
+        double oldSuccProb = adjuster.computeSuccessProbability();
+        double oldAlpha = this.alpha;
+        double newAlpha = oldAlpha/2.0;
+        return adjust(oldAlpha, newAlpha,oldSuccProb);
 
     }
 
-    private double adjust(BigDecimal oldAlpha, BigDecimal newAlpha, BigDecimal oldSuccProb,int i) {
-        System.out.println(newAlpha);
-        System.out.println(i);
-        double step = 0.001;
-        AlphaAdjuster adjuster = new AlphaAdjuster(n,k,p,newAlpha.doubleValue());
-        BigDecimal newSuccProb = new BigDecimal(adjuster.computeSuccessProbability());
-        //System.out.println(roundToFourDigits(oldSuccProb));
-        oldSuccProb.setScale(4,RoundingMode.CEILING);
-        if(oldSuccProb.equals(0)){
-            return oldAlpha.doubleValue();
-        }else{
-
-            return adjust(newAlpha, newAlpha.subtract(new BigDecimal(step)), newSuccProb, i+1);
+    private double adjust(double oldAlpha, double newAlpha, double oldSuccProb) {
+        System.out.println(oldSuccProb);
+        if(oldSuccProb<=0.0000000001){
+            return oldAlpha;
+        }else {
+            //System.out.println(oldAlpha);
+            double step = 0.0001;
+            AlphaAdjuster adjuster = new AlphaAdjuster(n, k, p, newAlpha);
+            double newSuccProb = adjuster.computeSuccessProbability();
+            //System.out.println(roundToFourDigits(oldSuccProb));
+            //oldSuccProb.setScale(4,RoundingMode.CEILING);
+            return adjust(newAlpha, newAlpha/2.0, newSuccProb);
         }
-
-    }
-
-    private double roundToFourDigits(double alpha){
-        System.out.println(alpha);
-        return (double)Math.round(alpha*100000000000d) / 100000000000d;
     }
 
     public int getN() {

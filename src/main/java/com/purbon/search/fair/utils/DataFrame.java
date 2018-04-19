@@ -54,17 +54,23 @@ public class DataFrame {
     public void resolveNullEntries() {
         col1.set(0,0);
         col2.set(0,0);
-        int conquered =0;
-        for (int i = 0; i < col1.size(); i++) {
-            //if (col1.get(i) != null) {
-            //    for(int j=1;j<col1.get(i); j++){
-            //        col1.set(i-j,col1.get(i));
-            //    }
-           // }
-            if (col2.get(i) != null) {
-                for(int k=1; k<col2.get(i); k++){
-                    col2.set(i-k, col2.get(i));
+        for(int i=0; i<col1.size(); i++){
+            if(col1.get(i)==null){
+                for(int j=i; j<col1.size(); j++){
+                    if(col1.get(j)!= null){
+                        col1.set(i,col1.get(j));
+                        col2.set(i,col2.get(j));
+                        col1.remove(j);
+                        col2.remove(j);
+                        break;
+                    }
                 }
+            }
+        }
+        for(int k=col1.size()-1; k>=0; k--){
+            if(col1.get(k)==null){
+                col1.remove(k);
+                col2.remove(k);
             }
         }
     }
@@ -72,7 +78,7 @@ public class DataFrame {
     @Override
     public String toString() {
         StringBuilder s = new StringBuilder();
-        s.append(column1Name).append("  ").append(column2Name);
+        s.append(column1Name).append("  ").append(column2Name).append('\n');
         for (int i = 0; i < col1.size(); i++) {
             s.append(i).append("  ").append(col1.get(i)).append("  ").append(col2.get(i));
             s.append('\n');

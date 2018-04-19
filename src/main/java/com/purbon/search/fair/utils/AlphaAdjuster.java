@@ -66,7 +66,7 @@ public class AlphaAdjuster {
     }
 
     public double computeSuccessProbability() {
-        int maxProtected = auxMTable.getLengthOf("inv");
+        int maxProtected = auxMTable.getLengthOf("inv")-1;
         int minProtected = 1;
         double successProbability = 0;
 
@@ -153,9 +153,9 @@ public class AlphaAdjuster {
             if (pos == 0) {
                 shifted[i] = array[i];
             } else if (i + pos > shifted.length - 1) {
-                shifted[i] = array[i % pos];
+                shifted[i % pos] = array[i];
             } else {
-                shifted[i] = array[i + (i % pos)];
+                shifted[i+pos] = array[i];
             }
         }
         return shifted;
@@ -170,18 +170,24 @@ public class AlphaAdjuster {
     }
 
     public static void main(String[] args) {
-        AlphaAdjuster alphaAdjuster = new AlphaAdjuster(1500, 1500, 0.2, 0.0101);
-        System.out.println(alphaAdjuster.computeSuccessProbability());
+        AlphaAdjuster alphaAdjuster = new AlphaAdjuster(40, 40, 0.5, 0.1);
+        //for(int i=0; i<alphaAdjuster.mTable.length; i++){
+        //    System.out.println(i+"  "+alphaAdjuster.mTable[i]);
+        //}
+
+        //BinomialDistribution dist = new BinomialDistribution(39,0.5);
+        //System.out.println(dist.inverseCumulativeProbability(0.1));
+        //System.out.println(alphaAdjuster.computeAuxTMTable().toString());
+        //System.out.println(alphaAdjuster.computeSuccessProbability());
         BigDecimal count = new BigDecimal(alphaAdjuster.computeSuccessProbability());
         count = count.setScale(7, RoundingMode.CEILING);
         //double count = (double)Math.round((alphaAdjuster.computeSuccessProbability()*100000.0)/100000.0);
         System.out.println(count);
-        System.out.println(count.doubleValue());
-//        BinarySearchAlphaAdjuster adjuster = new BinarySearchAlphaAdjuster(1500,1500,0.2,0.1);
-//        System.out.println(adjuster.adjustAlpha());
+        //System.out.println(count.doubleValue());
+        //BinarySearchAlphaAdjuster adjuster = new BinarySearchAlphaAdjuster(1500, 1500, 0.2, 0.001);
+        //System.out.println(adjuster.adjustAlpha());
 
     }
-
 
 
 }
