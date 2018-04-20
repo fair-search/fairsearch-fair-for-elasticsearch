@@ -37,7 +37,7 @@ public class FairTopKImpl implements FairTopK {
         int i = 0;
         int countProtected = 0;
         float maxScore = 0.0f;
-        while ( ((tp+tn) < k)) {
+        while ( ((tp+tn) < k) && !(tp >= pSize && tn >= npSize)) {
             ScoreDoc doc;
             if (tp  >= pSize) { // no more protected candidates available, take non protected
                 doc = npQueue.get(tn);
