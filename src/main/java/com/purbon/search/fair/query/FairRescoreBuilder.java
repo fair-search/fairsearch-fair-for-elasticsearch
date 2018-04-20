@@ -31,6 +31,8 @@ import org.elasticsearch.search.rescore.Rescorer;
 import org.elasticsearch.search.rescore.RescorerBuilder;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import static java.util.Arrays.asList;
@@ -274,19 +276,19 @@ public class FairRescoreBuilder extends RescorerBuilder<FairRescoreBuilder> {
 
             int max = Math.min(topDocs.scoreDocs.length, rescoreContext.getWindowSize());
 
-            PriorityQueue<ScoreDoc> p0 = new DocumentPriorityQueue(max);
-            PriorityQueue<ScoreDoc> p1 = new DocumentPriorityQueue(max);
+            List<ScoreDoc> npQueue = new ArrayList<>();
+            List<ScoreDoc> pQueue = new ArrayList<>();
 
             for(int i=0; i < max; i++) {
                 ScoreDoc scoreDoc = topDocs.scoreDocs[i];
                 Document doc = searcher.doc(scoreDoc.doc);
                 if (isProtected(doc, config)) {
-                    p1.add(scoreDoc);
+                    pQueue.add(scoreDoc);
                 } else {
-                    p0.add(scoreDoc);
+                    npQueue.add(scoreDoc);
                 }
             }
-            assert p0.size() + p1.size() == max;
+            assert npQueue.size() + pQueue.size() == max;
 
             float significance         = config.getSignificanceLevel();
             float proportion           = config.getProtectedElementsProportion();
@@ -309,11 +311,11 @@ public class FairRescoreBuilder extends RescorerBuilder<FairRescoreBuilder> {
             }
 
             if ( config.abortOnFewElements() && config.hasFixProportionStrategy() &&
-                    p0.size() < protectedElementsCount) {
+                    npQueue.size() < protectedElementsCount) {
                 throw new ElasticsearchException("Fair rescorer can not proceed, too few protected elements");
             }
 
-            return fairTopK.fairTopK(p0, p1, protectedElementsCount, proportion, significance);
+            return fairTopK.fairTopK(npQueue, pQueue, protectedElementsCount, proportion, significance);
         }
 
         private boolean isProtected(Document doc, FairSearchConfig config) {
