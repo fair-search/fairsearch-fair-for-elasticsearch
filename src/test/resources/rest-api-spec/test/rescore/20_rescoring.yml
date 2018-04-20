@@ -77,7 +77,6 @@ setup:
 
   - do:
       fs.create_table:
-        name: "test"
         proportion: 0.6
         alpha: 0.1
         k: 6
