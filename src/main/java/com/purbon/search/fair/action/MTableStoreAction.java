@@ -68,7 +68,6 @@ public class MTableStoreAction extends Action<MTableStoreAction.MTableStoreReque
         private Long updatedVersion;
         private String routing;
 
-        private String name;
         private float proportion;
         private float alpha;
         private int k;
@@ -104,12 +103,14 @@ public class MTableStoreAction extends Action<MTableStoreAction.MTableStoreReque
         public ActionRequestValidationException validate() {
 
             ActionRequestValidationException ex = null;
-            if (name == null) {
-                ex = addValidationError("Name is a required parameter", ex);
-            } else if (proportion == 0) {
+            if (proportion == 0) {
                 ex = addValidationError("Proportion is a required parameter", ex);
-            } if (alpha == 0) {
+            }
+            if (alpha == 0) {
                 ex = addValidationError("Significance is a required parameter", ex);
+            }
+            if (k == 0) {
+                ex = addValidationError("K is a required parameter", ex);
             }
             return ex;
         }
@@ -121,7 +122,6 @@ public class MTableStoreAction extends Action<MTableStoreAction.MTableStoreReque
             routing = in.readOptionalString();
             action = Action.values()[in.readVInt()];
 
-            name = in.readString();
             proportion = in.readFloat();
             alpha = in.readFloat();
             k = in.readInt();
@@ -135,7 +135,6 @@ public class MTableStoreAction extends Action<MTableStoreAction.MTableStoreReque
             out.writeOptionalString(routing);
             out.writeVInt(action.ordinal());
 
-            out.writeString(name);
             out.writeFloat(proportion);
             out.writeFloat(alpha);
             out.writeInt(k);
@@ -175,14 +174,6 @@ public class MTableStoreAction extends Action<MTableStoreAction.MTableStoreReque
 
         public void setRouting(String routing) {
             this.routing = routing;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public void setName(String name) {
-            this.name = name;
         }
 
         public float getProportion() {

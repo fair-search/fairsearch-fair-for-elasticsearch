@@ -30,11 +30,10 @@ Create a new M table
 
 To create a new M table you can issue the next command:
 
-    POST _fs/_mtable/{name}/{proportion}/{alpha}/{k}
+    POST _fs/_mtable/{proportion}/{alpha}/{k}
 
 where the parameters are:
 
-* name: A name to attach to this given collection of fairness tables.
 * proportion: The proportion of protected elements.
 * alpha: The significance parameter (α) corresponding to the probability of rejecting a fair ranking.
 * k: The expected size of returned documents in the search.
@@ -42,7 +41,7 @@ where the parameters are:
 
 for example:
 
-    POST /_fs/_mtable/test/0.5/0.1/5
+    POST /_fs/_mtable/0.5/0.1/5
 
 .. code-block:: json
 
@@ -72,7 +71,6 @@ this will store a document in elasticsearch that will look like:
         "_id": "name(0.5,0.1,5)",
         "_score": 1,
         "_source": {
-          "name": "test",
           "type": "mtable",
           "proportion": 0.5,
           "alpha": 0.1,
@@ -119,7 +117,6 @@ this will give you an answer like:
             "_id": "name(0.5,0.1,5)",
             "_score": 1,
             "_source": {
-                "name": "test",
                 "type": "mtable",
                 "proportion": 0.5,
                 "alpha": 0.1,
