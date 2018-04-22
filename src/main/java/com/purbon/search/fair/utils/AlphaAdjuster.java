@@ -178,7 +178,7 @@ public class AlphaAdjuster {
 //        BigDecimal b = new BigDecimal(a).setScale(16,RoundingMode.FLOOR);
 //        System.out.println(b.doubleValue());
 //        double[] arr = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
-//        AlphaAdjuster alphaAdjuster = new AlphaAdjuster(1500, 1500, 0.1, 0.01001129150390625);
+        AlphaAdjuster alphaAdjuster = new AlphaAdjuster(10000, 10000, 0.5, 0.1);
 //        double[] result = alphaAdjuster.shiftToRight(arr, 12);
 //        String s = "{";
 //        for (int i = 0; i < result.length; i++) {
@@ -194,22 +194,15 @@ public class AlphaAdjuster {
 //        //BinomialDistribution dist = new BinomialDistribution(39,0.5);
 //        //System.out.println(dist.inverseCumulativeProbability(0.1));
 //        //System.out.println(alphaAdjuster.computeAuxTMTable().toString());
-//        System.out.println(1.0-alphaAdjuster.computeSuccessProbability());
+        System.out.println(1.0-alphaAdjuster.computeSuccessProbability());
 //        BigDecimal count = new BigDecimal(alphaAdjuster.computeSuccessProbability());
 //        count = count.setScale(7, RoundingMode.CEILING);
 //        //double count = (double)Math.round((alphaAdjuster.computeSuccessProbability()*100000.0)/100000.0);
 //        System.out.println(count);
 //        //System.out.println(count.doubleValue());
-        BinarySearchAlphaAdjuster adjuster = new BinarySearchAlphaAdjuster(1500, 1500, 0.2, 0.1);
-        System.out.println(adjuster.adjustAlpha());
-//        0.7474623436573897
-//        0.7474434905743703
-//        0.4563073286084534
-//        0.4563073286084476
-//        0.4388119776370146
-//        0.43881197763702184
-//        0.4921875000000002
-//        0.4687500000000002
+//        BinarySearchAlphaAdjuster adjuster = new BinarySearchAlphaAdjuster(1500, 1500, 0.2, 0.1);
+//        System.out.println(adjuster.adjustAlpha());
+
 }
 
 
