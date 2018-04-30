@@ -14,7 +14,7 @@ public class BinarySearchAlphaAdjuster {
         this.n = n;
         this.k = k;
         this.p = p;
-        if(alpha < 0.001){
+        if (alpha < 0.001) {
             throw new IllegalArgumentException("Alpha has to be greater than or equal to 0.001 for an adjustment.");
         }
         this.alpha = alpha;
@@ -25,34 +25,34 @@ public class BinarySearchAlphaAdjuster {
     }
 
 
-    private double adjustIterative(double alpha){
+    private double adjustIterative(double alpha) {
         double adjustedAlpha;
         double left = Double.MIN_VALUE;
         double right = alpha;
-        AlphaAdjuster adj = new AlphaAdjuster(n,k,p,alpha);
+        AlphaAdjuster adj = new AlphaAdjuster(n, k, p, alpha);
         double min = adj.computeSuccessProbability();
         double secondMin = 0;
         double minOptAlpha = alpha;
         double secondMinOptAlpha = 0;
-        ArrayList<SuccessProbAlphaPair> succProbs=new ArrayList<>();
+        ArrayList<SuccessProbAlphaPair> succProbs = new ArrayList<>();
 
-        while(left<=right){
-            adjustedAlpha = (left+right)/2.0;
-            AlphaAdjuster adjuster = new AlphaAdjuster(n,k,p,adjustedAlpha);
+        while (left <= right) {
+            adjustedAlpha = (left + right) / 2.0;
+            AlphaAdjuster adjuster = new AlphaAdjuster(n, k, p, adjustedAlpha);
             double succProb = adjuster.computeSuccessProbability();
             succProbs.add(new SuccessProbAlphaPair(succProb, adjustedAlpha));
-            if(succProb <=0.00001 && succProb >0){
+            if (succProb <= 0.00001 && succProb > 0) {
                 return adjustedAlpha;
             }
-            if(0.00001<succProb){
-                right=adjustedAlpha-STEP;
-            }else{
-                left=adjustedAlpha+STEP;
+            if (0.00001 < succProb) {
+                right = adjustedAlpha - STEP;
+            } else {
+                left = adjustedAlpha + STEP;
             }
-            if(succProb<min){
+            if (succProb < min) {
                 secondMin = min;
-                secondMinOptAlpha =minOptAlpha;
-                min=succProb;
+                secondMinOptAlpha = minOptAlpha;
+                min = succProb;
                 minOptAlpha = adjustedAlpha;
 
             }
@@ -61,29 +61,29 @@ public class BinarySearchAlphaAdjuster {
         return secondSearch(minOptAlpha, secondMinOptAlpha);
     }
 
-    private double secondSearch(double left, double right){
+    private double secondSearch(double left, double right) {
         double step = 0.00000001;
-        AlphaAdjuster adj = new AlphaAdjuster(n,k,p,left);
-        double oldSuccProb = 1-adj.computeSuccessProbability();
+        AlphaAdjuster adj = new AlphaAdjuster(n, k, p, left);
+        double oldSuccProb = 1 - adj.computeSuccessProbability();
         ArrayList<SuccessProbAlphaPair> values = new ArrayList<>();
-        while(left<right){
-            left=left+step;
-            AlphaAdjuster adjuster = new AlphaAdjuster(n,k,p,left);
-            double succProb = 1-adjuster.computeSuccessProbability();
-            if(oldSuccProb<succProb){
+        while (left < right) {
+            left = left + step;
+            AlphaAdjuster adjuster = new AlphaAdjuster(n, k, p, left);
+            double succProb = 1 - adjuster.computeSuccessProbability();
+            if (oldSuccProb < succProb) {
                 break;
             }
             oldSuccProb = succProb;
-            values.add(new SuccessProbAlphaPair(succProb,left));
+            values.add(new SuccessProbAlphaPair(succProb, left));
         }
-        return values.size()>1 ? getMinAlpha(values): left;
+        return values.size() > 1 ? getMinAlpha(values) : left;
     }
 
-    private double getMinAlpha(ArrayList<SuccessProbAlphaPair> list){
+    private double getMinAlpha(ArrayList<SuccessProbAlphaPair> list) {
         double min = list.get(0).getSuccProb();
         double alpha = list.get(0).getAlpha();
-        for(SuccessProbAlphaPair p : list){
-            if(p.getSuccProb()<min){
+        for (SuccessProbAlphaPair p : list) {
+            if (p.getSuccProb() < min) {
                 min = p.getSuccProb();
                 alpha = p.getAlpha();
             }
@@ -123,20 +123,20 @@ public class BinarySearchAlphaAdjuster {
         this.alpha = alpha;
     }
 
-    private class SuccessProbAlphaPair{
+    private class SuccessProbAlphaPair {
         double succProb;
         double alpha;
 
-        public SuccessProbAlphaPair(double succProb, double alpha){
+        private SuccessProbAlphaPair(double succProb, double alpha) {
             this.succProb = succProb;
             this.alpha = alpha;
         }
 
-        public double getSuccProb() {
+        private double getSuccProb() {
             return succProb;
         }
 
-        public double getAlpha() {
+        private double getAlpha() {
             return alpha;
         }
     }
