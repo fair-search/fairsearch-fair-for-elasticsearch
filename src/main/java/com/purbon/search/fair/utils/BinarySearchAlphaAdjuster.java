@@ -1,7 +1,5 @@
 package com.purbon.search.fair.utils;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.ArrayList;
 
 public class BinarySearchAlphaAdjuster {
@@ -16,6 +14,9 @@ public class BinarySearchAlphaAdjuster {
         this.n = n;
         this.k = k;
         this.p = p;
+        if(alpha < 0.001){
+            throw new IllegalArgumentException("Alpha has to be greater than or equal to 0.001 for an adjustment.");
+        }
         this.alpha = alpha;
     }
 
@@ -79,7 +80,6 @@ public class BinarySearchAlphaAdjuster {
     }
 
     private double getMinAlpha(ArrayList<SuccessProbAlphaPair> list){
-        System.out.println("Looking for minimum");
         double min = list.get(0).getSuccProb();
         double alpha = list.get(0).getAlpha();
         for(SuccessProbAlphaPair p : list){
