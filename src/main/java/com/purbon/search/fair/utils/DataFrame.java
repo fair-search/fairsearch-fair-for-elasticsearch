@@ -29,13 +29,7 @@ public class DataFrame {
             while (position > col1.size() - 1) {
                 col1.add(null);
             }
-            //for (int i = 0; i <= position - col1.size() + 1; i++) {
-            //    col1.add(null);
-            //}
             while (position > col2.size() - 1) {
-                //for (int i = 0; i <= position - col2.size() + 1; i++) {
-                //   col2.add(null);
-                //}
                 col2.add(null);
             }
 

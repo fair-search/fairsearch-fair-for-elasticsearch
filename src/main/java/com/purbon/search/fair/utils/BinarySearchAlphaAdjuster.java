@@ -2,7 +2,6 @@ package com.purbon.search.fair.utils;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 public class BinarySearchAlphaAdjuster {
@@ -11,8 +10,7 @@ public class BinarySearchAlphaAdjuster {
     private int k;
     private double p;
     private double alpha;
-    private static final double EPS = 0.0001;
-//    0.10002629313519074
+    private static final double STEP = 0.0000000000000001;
 
     public BinarySearchAlphaAdjuster(int n, int k, double p, double alpha) {
         this.n = n;
@@ -22,45 +20,16 @@ public class BinarySearchAlphaAdjuster {
     }
 
     public double adjustAlpha() {
-        //double step = 0.001;
-        //AlphaAdjuster adjuster = new AlphaAdjuster(n, k, p, alpha);
-        //double oldSuccProb = adjuster.computeSuccessProbability();
-        //double oldAlpha = this.alpha;
-        //return adjustRecursive(oldAlpha, oldSuccProb, alpha);
         return adjustIterative(alpha);
     }
 
-    private double adjustRecursive(double oldAlpha, double oldSuccProb, double startAlpha) {
-        BigDecimal test = new BigDecimal(1-oldSuccProb);
-        test.setScale(4, RoundingMode.FLOOR);
-        BigDecimal a = new BigDecimal(startAlpha);
-        a.setScale(4, RoundingMode.FLOOR);
-        System.out.println(test.setScale(4,RoundingMode.FLOOR).doubleValue());
-        if (test.setScale(4,RoundingMode.FLOOR).doubleValue() == a.setScale(4,RoundingMode.FLOOR).doubleValue()+EPS
-                || test.setScale(4,RoundingMode.FLOOR).doubleValue() == a.setScale(4,RoundingMode.FLOOR).doubleValue() - EPS) {
-            return oldAlpha;
-        } else {
-            if(1-oldSuccProb>startAlpha+EPS){
-                oldAlpha = oldAlpha-(oldAlpha/2.0);
-                //System.out.println(oldAlpha);
-                AlphaAdjuster adjuster = new AlphaAdjuster(n, k, p, oldAlpha);
-                oldSuccProb = adjuster.computeSuccessProbability();
-            }else{
-                oldAlpha = oldAlpha+(oldAlpha/2.0);
-                //System.out.println(oldAlpha);
-                AlphaAdjuster adjuster = new AlphaAdjuster(n, k, p, oldAlpha);
-                oldSuccProb = adjuster.computeSuccessProbability();
-            }
-            return adjustRecursive(oldAlpha,oldSuccProb,startAlpha);
-        }
-    }
 
     private double adjustIterative(double alpha){
         double adjustedAlpha;
         double left = Double.MIN_VALUE;
         double right = alpha;
         AlphaAdjuster adj = new AlphaAdjuster(n,k,p,alpha);
-        double min = 1-adj.computeSuccessProbability();
+        double min = adj.computeSuccessProbability();
         double secondMin = 0;
         double minOptAlpha = alpha;
         double secondMinOptAlpha = 0;
@@ -69,21 +38,15 @@ public class BinarySearchAlphaAdjuster {
         while(left<=right){
             adjustedAlpha = (left+right)/2.0;
             AlphaAdjuster adjuster = new AlphaAdjuster(n,k,p,adjustedAlpha);
-            double succProb = 1-adjuster.computeSuccessProbability();
+            double succProb = adjuster.computeSuccessProbability();
             succProbs.add(new SuccessProbAlphaPair(succProb, adjustedAlpha));
             if(succProb <=0.00001 && succProb >0){
                 return adjustedAlpha;
             }
             if(0.00001<succProb){
-                //System.out.println(String.format("%.25f",adjustedAlpha));
-                System.out.println(succProb);
-                right=adjustedAlpha-0.0000000000000001;
-                //oldSuccProb = succProb;
+                right=adjustedAlpha-STEP;
             }else{
-                left=adjustedAlpha+0.0000000000000001;
-                //System.out.println(String.format("%.25f",adjustedAlpha));
-                System.out.println(succProb);
-                //oldSuccProb = succProb;
+                left=adjustedAlpha+STEP;
             }
             if(succProb<min){
                 secondMin = min;
@@ -98,7 +61,6 @@ public class BinarySearchAlphaAdjuster {
     }
 
     private double secondSearch(double left, double right){
-        System.out.println("secondSearchStarted");
         double step = 0.00000001;
         AlphaAdjuster adj = new AlphaAdjuster(n,k,p,left);
         double oldSuccProb = 1-adj.computeSuccessProbability();
@@ -107,7 +69,6 @@ public class BinarySearchAlphaAdjuster {
             left=left+step;
             AlphaAdjuster adjuster = new AlphaAdjuster(n,k,p,left);
             double succProb = 1-adjuster.computeSuccessProbability();
-            System.out.println(succProb);
             if(oldSuccProb<succProb){
                 break;
             }
