@@ -1,0 +1,19 @@
+GET xing/_search
+{
+  "_source": ["sex", "_id"],
+  "size": 50, 
+  "query": {
+     "match": {
+       "category": "assistant"
+     }
+  }, 
+  "rescore": {
+    "window_size" : 200,
+    "fair_rescorer": {
+      "protected_key": "sex",
+      "protected_value": "f",
+      "significance_level": 0.2,
+      "min_proportion_protected": 0.4
+    }
+  }
+}

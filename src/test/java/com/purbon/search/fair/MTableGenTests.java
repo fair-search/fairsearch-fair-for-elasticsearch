@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.core.util.FileUtils;
+import org.apache.lucene.util.LuceneTestCase;
 import org.elasticsearch.common.io.FileTestUtils;
 import org.elasticsearch.common.io.PathUtils;
 import org.elasticsearch.indices.recovery.RecoveryState;
@@ -28,7 +29,7 @@ import org.junit.rules.ExpectedException;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public class MTableGeneratorTest {
+public class MTableGenTests extends LuceneTestCase {
 
     private int[] mtable1;
     private int[] mtable2;
@@ -110,11 +111,11 @@ public class MTableGeneratorTest {
 
     private int[] loadMTableFixture(String filename) throws IOException, URISyntaxException {
 
-        URL file = getClass().getResource("mtable_fixtures/"+filename);
+        URL file = getClass().getResource("/mtable_fixtures/"+filename);
         String text = new String(Files.readAllBytes(PathUtils.get(file.toURI())), StandardCharsets.UTF_8);
 
         List<String> list = Arrays.asList(text.split(","));
-        return list.stream().mapToInt(i-> Integer.parseInt(i)).toArray();
+        return list.stream().mapToInt(i-> Integer.parseInt(i.trim())).toArray();
     }
 
 

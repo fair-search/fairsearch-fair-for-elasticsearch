@@ -1,0 +1,23 @@
+"Test m table creation and caching":
+
+  - do:
+      fs.create_table:
+        proportion: 0.5
+        alpha: 0.1
+        k: 10
+  - do:
+      fs.create_table:
+        proportion: 0.99
+        alpha: 0.1
+        k: 10
+
+  - do:
+      indices.exists:
+        index: .fs_store
+
+  - do:
+      fs.get_table: {}
+
+  - length: { hits.hits: 2 }
+  - match:  { hits.hits.0._source: { "alpha": 0.1, "k": 10, "proportion": 0.5, "mtable": [0, 0, 0, 0, 1, 1, 1, 2, 2, 3, 3], "type": "mtable" }}
+  - match:  { hits.hits.1._source: { "alpha": 0.1, "k": 10, "proportion": 0.99, "mtable": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], "type": "mtable" }}
