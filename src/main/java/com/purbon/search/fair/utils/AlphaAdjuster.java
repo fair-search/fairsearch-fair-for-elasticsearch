@@ -7,7 +7,6 @@ public class AlphaAdjuster {
 
 
     private int n;
-    private int k;
     private double p;
     private double alpha;
     private int[] mTable;
@@ -23,7 +22,7 @@ public class AlphaAdjuster {
         @return the probability of rejecting a fair ranking
      */
 
-    public AlphaAdjuster(int n, int k, double p, double alpha) {
+    public AlphaAdjuster(int n, double p, double alpha) {
         if (n < 1) {
             throw new IllegalArgumentException("Parameter n must be at least 1");
         }
@@ -35,12 +34,11 @@ public class AlphaAdjuster {
         }
 
         this.n = n;
-        this.k = k;
         this.p = p;
         this.alpha = alpha;
         this.currentHigh = 0;
 
-        this.mTableGenerator = new MTableGenerator(n, k, p, alpha);
+        this.mTableGenerator = new MTableGenerator(n, p, alpha);
         this.mTable = this.mTableGenerator.getMTable();
         this.auxMTable = this.computeAuxTMTable();
     }
@@ -108,7 +106,7 @@ public class AlphaAdjuster {
 
     }
 
-    public ArrayList<ArrayList<Double>> adjustPmfCache(ArrayList<ArrayList<Double>> pmfCache, int blocklength) {
+    private ArrayList<ArrayList<Double>> adjustPmfCache(ArrayList<ArrayList<Double>> pmfCache, int blocklength) {
         if (pmfCache.size() < blocklength) {
             for (int i = pmfCache.size(); i <= blocklength; i++) {
                 pmfCache.add(null);
@@ -117,7 +115,7 @@ public class AlphaAdjuster {
         return pmfCache;
     }
 
-    public double[] increase(int i, double[] successObtainedProb, ArrayList<Double> currentTrial) {
+    private double[] increase(int i, double[] successObtainedProb, ArrayList<Double> currentTrial) {
         double[] shifted = shiftToRight(successObtainedProb, i);
         for (int j = 0; j < shifted.length; j++) {
             shifted[j] = shifted[j] * currentTrial.get(i);
@@ -126,7 +124,7 @@ public class AlphaAdjuster {
     }
 
 
-    public double[] addEntryWise(double[] arrayOne, double[] arrayTwo) {
+    private double[] addEntryWise(double[] arrayOne, double[] arrayTwo) {
         double[] sum = new double[arrayOne.length];
         for (int i = 0; i < arrayOne.length; i++) {
             sum[i] = arrayOne[i] + arrayTwo[i];
@@ -159,8 +157,8 @@ public class AlphaAdjuster {
 
     private double sum(double[] array) {
         double sum = 0;
-        for (int i = 0; i < array.length; i++) {
-            sum += array[i];
+        for (double anArray : array) {
+            sum += anArray;
         }
         return sum;
     }

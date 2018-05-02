@@ -7,20 +7,17 @@ public class MTableGenerator {
 
     private int[] mTable;
     private int n;
-    private int k;
     private double p;
     private double alpha;
 
     /**
      * @param n     Total number of elements
-     * @param k     The size of the ranking
      * @param p     The proportion of protected candidates in the top-k ranking
      * @param alpha the significance level
      */
-    public MTableGenerator(int n, int k, double p, double alpha) {
-        if (parametersAreValid(n, k, p, alpha)) {
+    public MTableGenerator(int n, double p, double alpha) {
+        if (parametersAreValid(n, p, alpha)) {
             this.n = n;
-            this.k = k;
             this.p = p;
             this.alpha = alpha;
         } else {
@@ -28,25 +25,13 @@ public class MTableGenerator {
         }
     }
 
-    private boolean parametersAreValid(int n, int k, double p, double alpha) {
-        boolean alphaIsValid = false;
-
-        return nIsValid(n) && kIsValid(k, n) && pIsValid(p) && alphaIsValid(alpha);
+    private boolean parametersAreValid(int n, double p, double alpha) {
+        return nIsValid(n) && pIsValid(p) && alphaIsValid(alpha);
     }
 
     private boolean nIsValid(int n) {
         if (n < 1) {
             throw new IllegalArgumentException("Parameter n must be at least 1");
-        } else {
-            return true;
-        }
-    }
-
-    private boolean kIsValid(int k, int n) {
-        if (k < 1)
-            throw new IllegalArgumentException("Parameter k must be at least 1");
-        else if (k > n) {
-            throw new IllegalArgumentException("Parameter k must be at most n");
         } else {
             return true;
         }
@@ -70,7 +55,6 @@ public class MTableGenerator {
 
     private int[] computeMTable() {
         int[] table = new int[this.n + 1];
-        //table[0] = 0;
         for (int i = 1; i < this.n + 1; i++) {
             table[i] = m(i);
         }
@@ -88,10 +72,6 @@ public class MTableGenerator {
             this.mTable = computeMTable();
         }
         return mTable;
-    }
-
-    public int getK() {
-        return k;
     }
 
     public int getN() {
