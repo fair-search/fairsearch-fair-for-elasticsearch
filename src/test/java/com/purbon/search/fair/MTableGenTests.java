@@ -66,17 +66,9 @@ public class MTableGenTests extends LuceneTestCase {
         assertTrue(gen1MatchesMTable1 && gen2MatchesMTable2 && gen3MatchesMTable3);
     }
 
-    public void testInitializeWithInvalidKValueTest() {
-        try {
-            MTableGenerator gen = new MTableGenerator( 81, 0.5, 0.1);
-            fail("Should throw IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-        }
-    }
-
     public void testInitializeWithInvalidNValueTest() {
         try {
-            MTableGenerator gen = new MTableGenerator( 1, 0.5, 0.1);
+            MTableGenerator gen = new MTableGenerator( 0, 0.5, 0.1);
             fail("Should throw IllegalArgumentException");
         } catch (IllegalArgumentException e) {
         }
