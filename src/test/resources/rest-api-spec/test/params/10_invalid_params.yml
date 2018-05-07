@@ -1,0 +1,68 @@
+---
+setup:
+  - do:
+      indices.create:
+        index:  test
+        body:
+          settings:
+            number_of_shards: 1
+            number_of_replicas: 1
+          mappings:
+            test:
+              properties:
+                gender:
+                  type: text
+                  store: true
+
+  - do:
+      index:
+        index:  test
+        type:   test
+        id:     1
+        body:   { "name": "Pere", "city": "Berlin", "gender": "Male", "langs": "Java, Scala, Ruby" }
+  - do:
+      index:
+        index:  test
+        type:   test
+        id:     2
+        body:   { "name": "Maria", "city": "Barcelona", "gender": "Female", "langs": "Scala, Ruby, Python" }
+
+  - do:
+      indices.refresh: {}
+
+---
+"invalid on_few_protected_elements param":
+  - do:
+      catch: bad_request
+      search:
+        index: test
+        body:
+          rescore:
+            fair_rescorer:
+              protected_key: gender
+              protected_value: Female
+              on_few_protected_elements: "break_the_plugin"
+---
+"invalid proportion_strategy param":
+  - do:
+      catch: bad_request
+      search:
+        index: test
+        body:
+          rescore:
+            fair_rescorer:
+              protected_key: gender
+              protected_value: Female
+              proportion_strategy: "break_the_plugin"
+---
+"invalid combination of params":
+  - do:
+      catch: bad_request
+      search:
+        index: test
+        body:
+          rescore:
+            fair_rescorer:
+              protected_key: gender
+              protected_value: Female
+              lookup_for_measuring_proportion: 300

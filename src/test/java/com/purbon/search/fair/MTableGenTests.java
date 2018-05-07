@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.logging.log4j.core.util.FileUtils;
+import org.apache.lucene.util.LuceneTestCase;
 import org.elasticsearch.common.io.FileTestUtils;
 import org.elasticsearch.common.io.PathUtils;
 import org.elasticsearch.indices.recovery.RecoveryState;
@@ -28,7 +29,7 @@ import org.junit.rules.ExpectedException;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-public class MTableGeneratorTest {
+public class MTableGenTests extends LuceneTestCase {
 
     private int[] mtable1;
     private int[] mtable2;
@@ -46,9 +47,9 @@ public class MTableGeneratorTest {
     }
 
     public void testComputeMTableWithValidParametersTest() {
-        MTableGenerator gen1 = new MTableGenerator(80, 40, 0.6, 0.1);
-        MTableGenerator gen2 = new MTableGenerator(100, 50, 0.5, 0.3);
-        MTableGenerator gen3 = new MTableGenerator(1000, 500, 0.5, 0.01);
+        MTableGenerator gen1 = new MTableGenerator( 40, 0.6, 0.1);
+        MTableGenerator gen2 = new MTableGenerator( 50, 0.5, 0.3);
+        MTableGenerator gen3 = new MTableGenerator( 500, 0.5, 0.01);
 
         boolean gen1MatchesMTable1 = false;
         boolean gen2MatchesMTable2 = false;
@@ -65,17 +66,9 @@ public class MTableGeneratorTest {
         assertTrue(gen1MatchesMTable1 && gen2MatchesMTable2 && gen3MatchesMTable3);
     }
 
-    public void testInitializeWithInvalidKValueTest() {
-        try {
-            MTableGenerator gen = new MTableGenerator(80, 81, 0.5, 0.1);
-            fail("Should throw IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-        }
-    }
-
     public void testInitializeWithInvalidNValueTest() {
         try {
-            MTableGenerator gen = new MTableGenerator(0, 1, 0.5, 0.1);
+            MTableGenerator gen = new MTableGenerator( 0, 0.5, 0.1);
             fail("Should throw IllegalArgumentException");
         } catch (IllegalArgumentException e) {
         }
@@ -83,7 +76,7 @@ public class MTableGeneratorTest {
 
     public void testInitializeWithInvalidPValueTest() {
         try {
-            MTableGenerator gen = new MTableGenerator(80, 40, 1.1, 0.1);
+            MTableGenerator gen = new MTableGenerator( 40, 1.1, 0.1);
             fail("Should throw IllegalArgumentException");
         } catch (IllegalArgumentException e) {
         }
@@ -91,7 +84,7 @@ public class MTableGeneratorTest {
 
     public void testInitializeWithInvalidAlphaValueTest() {
         try {
-            MTableGenerator gen = new MTableGenerator(80, 40, 0.5, 1);
+            MTableGenerator gen = new MTableGenerator( 40, 0.5, 1);
             fail("Should throw IllegalArgumentException");
         } catch (IllegalArgumentException e) {
         }
@@ -110,11 +103,11 @@ public class MTableGeneratorTest {
 
     private int[] loadMTableFixture(String filename) throws IOException, URISyntaxException {
 
-        URL file = getClass().getResource("mtable_fixtures/"+filename);
+        URL file = getClass().getResource("/mtable_fixtures/"+filename);
         String text = new String(Files.readAllBytes(PathUtils.get(file.toURI())), StandardCharsets.UTF_8);
 
         List<String> list = Arrays.asList(text.split(","));
-        return list.stream().mapToInt(i-> Integer.parseInt(i)).toArray();
+        return list.stream().mapToInt(i-> Integer.parseInt(i.trim())).toArray();
     }
 
 
