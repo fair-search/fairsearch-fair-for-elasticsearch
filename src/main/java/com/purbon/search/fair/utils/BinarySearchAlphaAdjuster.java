@@ -29,7 +29,7 @@ public class BinarySearchAlphaAdjuster {
         double adjustedAlpha;
         double left = Double.MIN_VALUE;
         double right = alpha;
-        AlphaAdjuster adj = new AlphaAdjuster(n, k, p, alpha);
+        AlphaAdjuster adj = new AlphaAdjuster(k, p, alpha);
         double min = adj.computeSuccessProbability();
         double secondMin = 0;
         double minOptAlpha = alpha;
@@ -38,7 +38,7 @@ public class BinarySearchAlphaAdjuster {
 
         while (left <= right) {
             adjustedAlpha = (left + right) / 2.0;
-            AlphaAdjuster adjuster = new AlphaAdjuster(n, k, p, adjustedAlpha);
+            AlphaAdjuster adjuster = new AlphaAdjuster(k, p, adjustedAlpha);
             double succProb = adjuster.computeSuccessProbability();
             succProbs.add(new SuccessProbAlphaPair(succProb, adjustedAlpha));
             if (succProb <= 0.00001 && succProb > 0) {
@@ -63,12 +63,12 @@ public class BinarySearchAlphaAdjuster {
 
     private double secondSearch(double left, double right) {
         double step = 0.00000001;
-        AlphaAdjuster adj = new AlphaAdjuster(n, k, p, left);
+        AlphaAdjuster adj = new AlphaAdjuster(k, p, left);
         double oldSuccProb = 1 - adj.computeSuccessProbability();
         ArrayList<SuccessProbAlphaPair> values = new ArrayList<>();
         while (left < right) {
             left = left + step;
-            AlphaAdjuster adjuster = new AlphaAdjuster(n, k, p, left);
+            AlphaAdjuster adjuster = new AlphaAdjuster(k, p, left);
             double succProb = 1 - adjuster.computeSuccessProbability();
             if (oldSuccProb < succProb) {
                 break;
