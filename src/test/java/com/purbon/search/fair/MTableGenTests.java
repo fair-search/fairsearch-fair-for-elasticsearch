@@ -47,9 +47,9 @@ public class MTableGenTests extends LuceneTestCase {
     }
 
     public void testComputeMTableWithValidParametersTest() {
-        MTableGenerator gen1 = new MTableGenerator(80, 40, 0.6, 0.1);
-        MTableGenerator gen2 = new MTableGenerator(100, 50, 0.5, 0.3);
-        MTableGenerator gen3 = new MTableGenerator(1000, 500, 0.5, 0.01);
+        MTableGenerator gen1 = new MTableGenerator( 40, 0.6, 0.1);
+        MTableGenerator gen2 = new MTableGenerator( 50, 0.5, 0.3);
+        MTableGenerator gen3 = new MTableGenerator( 500, 0.5, 0.01);
 
         boolean gen1MatchesMTable1 = false;
         boolean gen2MatchesMTable2 = false;
@@ -68,7 +68,7 @@ public class MTableGenTests extends LuceneTestCase {
 
     public void testInitializeWithInvalidKValueTest() {
         try {
-            MTableGenerator gen = new MTableGenerator(80, 81, 0.5, 0.1);
+            MTableGenerator gen = new MTableGenerator( 81, 0.5, 0.1);
             fail("Should throw IllegalArgumentException");
         } catch (IllegalArgumentException e) {
         }
@@ -76,7 +76,7 @@ public class MTableGenTests extends LuceneTestCase {
 
     public void testInitializeWithInvalidNValueTest() {
         try {
-            MTableGenerator gen = new MTableGenerator(0, 1, 0.5, 0.1);
+            MTableGenerator gen = new MTableGenerator( 1, 0.5, 0.1);
             fail("Should throw IllegalArgumentException");
         } catch (IllegalArgumentException e) {
         }
@@ -84,7 +84,7 @@ public class MTableGenTests extends LuceneTestCase {
 
     public void testInitializeWithInvalidPValueTest() {
         try {
-            MTableGenerator gen = new MTableGenerator(80, 40, 1.1, 0.1);
+            MTableGenerator gen = new MTableGenerator( 40, 1.1, 0.1);
             fail("Should throw IllegalArgumentException");
         } catch (IllegalArgumentException e) {
         }
@@ -92,7 +92,7 @@ public class MTableGenTests extends LuceneTestCase {
 
     public void testInitializeWithInvalidAlphaValueTest() {
         try {
-            MTableGenerator gen = new MTableGenerator(80, 40, 0.5, 1);
+            MTableGenerator gen = new MTableGenerator( 40, 0.5, 1);
             fail("Should throw IllegalArgumentException");
         } catch (IllegalArgumentException e) {
         }
