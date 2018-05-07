@@ -43,6 +43,10 @@ public class AlphaAdjuster {
         this.auxMTable = this.computeAuxTMTable();
     }
 
+    /**
+     * Stores the inverse of an mTable entry and the size of the block with respect to the inverse
+     * @return A Dataframe with the columns "inv" and "block" for the values of the inverse mTable and blocksize
+     */
     public DataFrame computeAuxTMTable() {
         DataFrame table = new DataFrame("inv", "block");
         int lastMSeen = 0;
@@ -60,6 +64,10 @@ public class AlphaAdjuster {
         return table;
     }
 
+    /**
+     * Computes the probability of rejecting a fair ranking with the given parameters n, p and alpha
+     * @return The probability of rejecting a fair ranking
+     */
     public double computeSuccessProbability() {
         int maxProtected = auxMTable.getLengthOf("inv") - 1;
         int minProtected = 1;
@@ -70,29 +78,40 @@ public class AlphaAdjuster {
         double[] successObtainedProb = new double[maxProtected];
         successObtainedProb = fillWithZeros(successObtainedProb);
         successObtainedProb[0] = 1.0;
+        //Cache for the probability Mass Function for every trial
+        //a trial is a block and every list in pmfCache is the pmf of a block of
+        //a certain size (pmfCache.get(2) is a list of the probability mass function values
+        // of a block of the size 2)
         ArrayList<ArrayList<Double>> pmfCache = new ArrayList<>();
 
         while (minProtected < maxProtected) {
+            //get the current blockLength from auxMTable
             int blockLength = auxMTable.at(minProtected, "block");
             if (blockLength <= pmfCache.size() && pmfCache.get(blockLength) != null) {
                 currentTrial = pmfCache.get(blockLength);
             } else {
                 currentTrial = new ArrayList<>();
+                //this has to be done to simulate an arrayList of the blocklength-size
                 for (int j = 0; j <= blockLength; j++) {
                     currentTrial.add(null);
                 }
                 BinomialDistribution binomDist = new BinomialDistribution(blockLength, p);
                 for (int i = 0; i <= blockLength; i++) {
+                    //enter the pmf value for position i in a block of blockLength size
                     currentTrial.set(i, binomDist.probability(i));
                 }
 
+                //insert empty lists so that we have the current trial inserted on the right position
                 pmfCache = adjustPmfCache(pmfCache, blockLength);
                 pmfCache.set(blockLength, currentTrial);
             }
-
+            //initialize with zeroes
             double[] newSuccessObtainedProb = fillWithZeros(new double[maxProtected]);
             for (int i = 0; i <= blockLength; i++) {
+                //shifts all values to the right for i positions (like python.roll)
+                //multiplies the current value with the currentTrial of the right position
                 double[] increase = increase(i, successObtainedProb, currentTrial);
+                //store the result
                 newSuccessObtainedProb = addEntryWise(increase, newSuccessObtainedProb);
             }
             newSuccessObtainedProb[minProtected - 1] = 0;
@@ -140,6 +159,13 @@ public class AlphaAdjuster {
         return array;
     }
 
+    /**
+     * Shifts all entries of an array to the right for pos positions
+     * Example: shiftToRight('1,2,3,4',2) ---> 3,4,1,2
+     * @param array the array that should be shifted
+     * @param pos positions to shift to the right
+     * @return the shifted array
+     */
     private double[] shiftToRight(double[] array, int pos) {
         double[] shifted = new double[array.length];
         pos = pos % array.length;
@@ -162,5 +188,6 @@ public class AlphaAdjuster {
         }
         return sum;
     }
+    
 
 }
