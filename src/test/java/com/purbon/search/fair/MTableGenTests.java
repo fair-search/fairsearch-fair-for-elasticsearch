@@ -3,27 +3,17 @@ package com.purbon.search.fair;
 import com.purbon.search.fair.utils.MTableGenerator;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.lang.IllegalArgumentException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
-import org.apache.logging.log4j.core.util.FileUtils;
 import org.apache.lucene.util.LuceneTestCase;
-import org.elasticsearch.common.io.FileTestUtils;
 import org.elasticsearch.common.io.PathUtils;
-import org.elasticsearch.indices.recovery.RecoveryState;
 import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 
 import static org.junit.Assert.assertTrue;
@@ -31,52 +21,167 @@ import static org.junit.Assert.fail;
 
 public class MTableGenTests extends LuceneTestCase {
 
-    private int[] mtable1;
-    private int[] mtable2;
-    private int[] mtable3;
-
+    private int[] mtable40_06_01;
+    private int[] mtable50_03_03;
+    private int[] mtable500_05_001;
+    private int[] mtable50_04_01;
+    private int[] mtable50_04_02;
+    private int[] mtable50_05_01;
+    private int[] mtable50_05_02;
+    private int[] mtable50_06_01;
+    private int[] mtable50_06_02;
+    private int[] mtable100_04_01;
+    private int[] mtable100_04_02;
+    private int[] mtable100_05_01;
+    private int[] mtable100_05_02;
+    private int[] mtable100_06_01;
+    private int[] mtable100_06_02;
+    private int[] mtable200_04_01;
+    private int[] mtable200_04_02;
+    private int[] mtable200_05_01;
+    private int[] mtable200_05_02;
+    private int[] mtable200_06_01;
+    private int[] mtable200_06_02;
 
     @Before
     public void setup() throws IOException, URISyntaxException {
-        //n=80,k=40,p=0.6,a=0.1
-        this.mtable1 = loadMTableFixture("mtable1.dat");
-        //n=100, k=50, p=0.5, a=0.3
-        this.mtable2 = loadMTableFixture("mtable2.dat");
-        //n=1000, k=500, p=0.5, a=0.01
-        this.mtable3 = loadMTableFixture("mtable3.dat");
+        //k=40,p=0.6,a=0.1
+        this.mtable40_06_01 = loadMTableFixture("mtable40_06_01.dat");
+        //k=50, p=0.5, a=0.3
+        this.mtable50_03_03 = loadMTableFixture("mtable50_05_03.dat");
+        //k=500, p=0.5, a=0.01
+        this.mtable500_05_001 = loadMTableFixture("mtable500_05_001.dat");
+
+        this.mtable50_04_01 = loadMTableFixture("mtable50_04_01.dat");
+        this.mtable50_04_02 = loadMTableFixture("mtable50_04_02.dat");
+        this.mtable50_05_01 = loadMTableFixture("mtable50_05_01.dat");
+        this.mtable50_05_02 = loadMTableFixture("mtable50_05_02.dat");
+        this.mtable50_06_01 = loadMTableFixture("mtable50_06_01.dat");
+        this.mtable50_06_02 = loadMTableFixture("mtable50_06_02.dat");
+
+        this.mtable100_04_01 = loadMTableFixture("mtable100_04_01.dat");
+        this.mtable100_04_02 = loadMTableFixture("mtable100_04_02.dat");
+        this.mtable100_05_01 = loadMTableFixture("mtable100_05_01.dat");
+        this.mtable100_05_02 = loadMTableFixture("mtable100_05_02.dat");
+        this.mtable100_06_01 = loadMTableFixture("mtable100_06_01.dat");
+        this.mtable100_06_02 = loadMTableFixture("mtable100_06_02.dat");
+
+        this.mtable200_04_01 = loadMTableFixture("mtable200_04_01.dat");
+        this.mtable200_04_02 = loadMTableFixture("mtable200_04_02.dat");
+        this.mtable200_05_01 = loadMTableFixture("mtable200_05_01.dat");
+        this.mtable200_05_02 = loadMTableFixture("mtable200_05_02.dat");
+        this.mtable200_06_01 = loadMTableFixture("mtable200_06_01.dat");
+        this.mtable200_06_02 = loadMTableFixture("mtable200_06_02.dat");
     }
 
     public void testComputeMTableWithValidParametersTest() {
-        MTableGenerator gen1 = new MTableGenerator(80, 40, 0.6, 0.1);
-        MTableGenerator gen2 = new MTableGenerator(100, 50, 0.5, 0.3);
-        MTableGenerator gen3 = new MTableGenerator(1000, 500, 0.5, 0.01);
 
-        boolean gen1MatchesMTable1 = false;
-        boolean gen2MatchesMTable2 = false;
-        boolean gen3MatchesMTable3 = false;
+        MTableGenerator gen1 = new MTableGenerator(40, 0.6, 0.1);
+        MTableGenerator gen2 = new MTableGenerator(50, 0.5, 0.3);
+        MTableGenerator gen3 = new MTableGenerator(500, 0.5, 0.01);
+
+        MTableGenerator gen4 = new MTableGenerator(50, 0.4, 0.1);
+        MTableGenerator gen5 = new MTableGenerator(50, 0.4, 0.2);
+        MTableGenerator gen6 = new MTableGenerator(50, 0.5, 0.1);
+        MTableGenerator gen7 = new MTableGenerator(50, 0.5, 0.2);
+        MTableGenerator gen8 = new MTableGenerator(50, 0.6, 0.1);
+        MTableGenerator gen9 = new MTableGenerator(50, 0.6, 0.2);
+
+        MTableGenerator gen10 = new MTableGenerator(100, 0.4, 0.1);
+        MTableGenerator gen11 = new MTableGenerator(100, 0.4, 0.2);
+        MTableGenerator gen12 = new MTableGenerator(100, 0.5, 0.1);
+        MTableGenerator gen13 = new MTableGenerator(100, 0.5, 0.2);
+        MTableGenerator gen14 = new MTableGenerator(100, 0.6, 0.1);
+        MTableGenerator gen15 = new MTableGenerator(100, 0.6, 0.2);
+
+        MTableGenerator gen16 = new MTableGenerator(200, 0.4, 0.1);
+        MTableGenerator gen17 = new MTableGenerator(200, 0.4, 0.2);
+        MTableGenerator gen18 = new MTableGenerator(200, 0.5, 0.1);
+        MTableGenerator gen19 = new MTableGenerator(200, 0.5, 0.2);
+        MTableGenerator gen20 = new MTableGenerator(200, 0.6, 0.1);
+        MTableGenerator gen21 = new MTableGenerator(200, 0.6, 0.2);
+
+        boolean gen1MatchesMTable40_06_01 = false;
+        boolean gen2MatchesMTable50_03_03 = false;
+        boolean gen3MatchesMTable500_05_001 = false;
+
+        boolean gen4MatchesMtable50_04_01 = false;
+        boolean gen5MatchesMtable50_04_02 = false;
+        boolean gen6MatchesMtable50_05_01 = false;
+        boolean gen7MatchesMtable50_05_02 = false;
+        boolean gen8MatchesMtable50_06_01 = false;
+        boolean gen9MatchesMtable50_06_02 = false;
+
+        boolean gen10MatchesMtable100_04_01 = false;
+        boolean gen11MatchesMtable100_04_02 = false;
+        boolean gen12MatchesMtable100_05_01 = false;
+        boolean gen13MatchesMtable100_05_02 = false;
+        boolean gen14MatchesMtable100_06_01 = false;
+        boolean gen15MatchesMtable100_06_02 = false;
+
+        boolean gen16MatchesMtable200_04_01 = false;
+        boolean gen17MatchesMtable200_04_02 = false;
+        boolean gen18MatchesMtable200_05_01 = false;
+        boolean gen19MatchesMtable200_05_02 = false;
+        boolean gen20MatchesMtable200_06_01 = false;
+        boolean gen21MatchesMtable200_06_02 = false;
 
         int[] gen1MTable = gen1.getMTable();
         int[] gen2MTable = gen2.getMTable();
         int[] gen3MTable = gen3.getMTable();
+        int[] gen4MTable = gen4.getMTable();
+        int[] gen5MTable = gen5.getMTable();
+        int[] gen6MTable = gen6.getMTable();
+        int[] gen7MTable = gen7.getMTable();
+        int[] gen8MTable = gen8.getMTable();
+        int[] gen9MTable = gen9.getMTable();
+        int[] gen10MTable = gen10.getMTable();
+        int[] gen11MTable = gen11.getMTable();
+        int[] gen12MTable = gen12.getMTable();
+        int[] gen13MTable = gen13.getMTable();
+        int[] gen14MTable = gen14.getMTable();
+        int[] gen15MTable = gen15.getMTable();
+        int[] gen16MTable = gen16.getMTable();
+        int[] gen17MTable = gen17.getMTable();
+        int[] gen18MTable = gen18.getMTable();
+        int[] gen19MTable = gen19.getMTable();
+        int[] gen20MTable = gen20.getMTable();
+        int[] gen21MTable = gen21.getMTable();
 
-        gen1MatchesMTable1 = arraysAreEqual(gen1MTable, mtable1);
-        gen2MatchesMTable2 = arraysAreEqual(gen2MTable, mtable2);
-        gen3MatchesMTable3 = arraysAreEqual(gen3MTable, mtable3);
+        gen1MatchesMTable40_06_01 = arraysAreEqual(gen1MTable, mtable40_06_01);
+        gen2MatchesMTable50_03_03 = arraysAreEqual(gen2MTable, mtable50_03_03);
+        gen3MatchesMTable500_05_001 = arraysAreEqual(gen3MTable, mtable500_05_001);
 
-        assertTrue(gen1MatchesMTable1 && gen2MatchesMTable2 && gen3MatchesMTable3);
-    }
+        gen4MatchesMtable50_04_01 = arraysAreEqual(gen4MTable, mtable50_04_01);
+        gen5MatchesMtable50_04_02 = arraysAreEqual(gen5MTable, mtable50_04_02);
+        gen6MatchesMtable50_05_01 = arraysAreEqual(gen6MTable, mtable50_05_01);
+        gen7MatchesMtable50_05_02 = arraysAreEqual(gen7MTable, mtable50_05_02);
+        gen8MatchesMtable50_06_01 = arraysAreEqual(gen8MTable, mtable50_06_01);
+        gen9MatchesMtable50_06_02 = arraysAreEqual(gen9MTable, mtable50_06_02);
 
-    public void testInitializeWithInvalidKValueTest() {
-        try {
-            MTableGenerator gen = new MTableGenerator(80, 81, 0.5, 0.1);
-            fail("Should throw IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-        }
+        gen10MatchesMtable100_04_01 = arraysAreEqual(gen10MTable, mtable100_04_01);
+        gen11MatchesMtable100_04_02 = arraysAreEqual(gen11MTable, mtable100_04_02);
+        gen12MatchesMtable100_05_01 = arraysAreEqual(gen12MTable, mtable100_05_01);
+        gen13MatchesMtable100_05_02 = arraysAreEqual(gen13MTable, mtable100_05_02);
+        gen14MatchesMtable100_06_01 = arraysAreEqual(gen14MTable, mtable100_06_01);
+        gen15MatchesMtable100_06_02 = arraysAreEqual(gen15MTable, mtable100_06_02);
+
+        gen16MatchesMtable200_04_01 = arraysAreEqual(gen16MTable, mtable200_04_01);
+        gen17MatchesMtable200_04_02 = arraysAreEqual(gen17MTable, mtable200_04_02);
+        gen18MatchesMtable200_05_01 = arraysAreEqual(gen18MTable, mtable200_05_01);
+        gen19MatchesMtable200_05_02 = arraysAreEqual(gen19MTable, mtable200_05_02);
+        gen20MatchesMtable200_06_01 = arraysAreEqual(gen20MTable, mtable200_06_01);
+        gen21MatchesMtable200_06_02 = arraysAreEqual(gen21MTable, mtable200_06_02);
+
+        assertTrue(gen1MatchesMTable40_06_01 && gen2MatchesMTable50_03_03 && gen3MatchesMTable500_05_001 && gen4MatchesMtable50_04_01 && gen5MatchesMtable50_04_02 && gen6MatchesMtable50_05_01 && gen7MatchesMtable50_05_02 && gen8MatchesMtable50_06_01 && gen9MatchesMtable50_06_02
+                && gen10MatchesMtable100_04_01 && gen11MatchesMtable100_04_02 && gen12MatchesMtable100_05_01 && gen13MatchesMtable100_05_02 && gen14MatchesMtable100_06_01
+                && gen15MatchesMtable100_06_02 && gen16MatchesMtable200_04_01 && gen17MatchesMtable200_04_02 && gen18MatchesMtable200_05_01 && gen19MatchesMtable200_05_02
+                && gen20MatchesMtable200_06_01 && gen21MatchesMtable200_06_02);
     }
 
     public void testInitializeWithInvalidNValueTest() {
         try {
-            MTableGenerator gen = new MTableGenerator(0, 1, 0.5, 0.1);
+            MTableGenerator gen = new MTableGenerator(0, 0.5, 0.1);
             fail("Should throw IllegalArgumentException");
         } catch (IllegalArgumentException e) {
         }
@@ -84,7 +189,7 @@ public class MTableGenTests extends LuceneTestCase {
 
     public void testInitializeWithInvalidPValueTest() {
         try {
-            MTableGenerator gen = new MTableGenerator(80, 40, 1.1, 0.1);
+            MTableGenerator gen = new MTableGenerator(40, 1.1, 0.1);
             fail("Should throw IllegalArgumentException");
         } catch (IllegalArgumentException e) {
         }
@@ -92,7 +197,7 @@ public class MTableGenTests extends LuceneTestCase {
 
     public void testInitializeWithInvalidAlphaValueTest() {
         try {
-            MTableGenerator gen = new MTableGenerator(80, 40, 0.5, 1);
+            MTableGenerator gen = new MTableGenerator(40, 0.5, 1);
             fail("Should throw IllegalArgumentException");
         } catch (IllegalArgumentException e) {
         }
@@ -111,11 +216,11 @@ public class MTableGenTests extends LuceneTestCase {
 
     private int[] loadMTableFixture(String filename) throws IOException, URISyntaxException {
 
-        URL file = getClass().getResource("/mtable_fixtures/"+filename);
+        URL file = getClass().getResource("/mtable_fixtures/" + filename);
         String text = new String(Files.readAllBytes(PathUtils.get(file.toURI())), StandardCharsets.UTF_8);
 
         List<String> list = Arrays.asList(text.split(","));
-        return list.stream().mapToInt(i-> Integer.parseInt(i.trim())).toArray();
+        return list.stream().mapToInt(i -> Integer.parseInt(i.trim())).toArray();
     }
 
 
