@@ -152,12 +152,16 @@ public class MTableGenTests extends LuceneTestCase {
         gen2MatchesMTable50_03_03 = arraysAreEqual(gen2MTable, mtable50_03_03);
         gen3MatchesMTable500_05_001 = arraysAreEqual(gen3MTable, mtable500_05_001);
 
+        boolean b1 = gen1MatchesMTable40_06_01 && gen2MatchesMTable50_03_03 && gen3MatchesMTable500_05_001;
+
         gen4MatchesMtable50_04_01 = arraysAreEqual(gen4MTable, mtable50_04_01);
         gen5MatchesMtable50_04_02 = arraysAreEqual(gen5MTable, mtable50_04_02);
         gen6MatchesMtable50_05_01 = arraysAreEqual(gen6MTable, mtable50_05_01);
         gen7MatchesMtable50_05_02 = arraysAreEqual(gen7MTable, mtable50_05_02);
         gen8MatchesMtable50_06_01 = arraysAreEqual(gen8MTable, mtable50_06_01);
         gen9MatchesMtable50_06_02 = arraysAreEqual(gen9MTable, mtable50_06_02);
+
+        boolean b2 = gen4MatchesMtable50_04_01 && gen5MatchesMtable50_04_02 && gen6MatchesMtable50_05_01 && gen7MatchesMtable50_05_02 && gen8MatchesMtable50_06_01 && gen9MatchesMtable50_06_02;
 
         gen10MatchesMtable100_04_01 = arraysAreEqual(gen10MTable, mtable100_04_01);
         gen11MatchesMtable100_04_02 = arraysAreEqual(gen11MTable, mtable100_04_02);
@@ -166,6 +170,8 @@ public class MTableGenTests extends LuceneTestCase {
         gen14MatchesMtable100_06_01 = arraysAreEqual(gen14MTable, mtable100_06_01);
         gen15MatchesMtable100_06_02 = arraysAreEqual(gen15MTable, mtable100_06_02);
 
+        boolean b3 = gen10MatchesMtable100_04_01 && gen11MatchesMtable100_04_02 && gen12MatchesMtable100_05_01 && gen13MatchesMtable100_05_02 && gen14MatchesMtable100_06_01 && gen15MatchesMtable100_06_02;
+
         gen16MatchesMtable200_04_01 = arraysAreEqual(gen16MTable, mtable200_04_01);
         gen17MatchesMtable200_04_02 = arraysAreEqual(gen17MTable, mtable200_04_02);
         gen18MatchesMtable200_05_01 = arraysAreEqual(gen18MTable, mtable200_05_01);
@@ -173,10 +179,9 @@ public class MTableGenTests extends LuceneTestCase {
         gen20MatchesMtable200_06_01 = arraysAreEqual(gen20MTable, mtable200_06_01);
         gen21MatchesMtable200_06_02 = arraysAreEqual(gen21MTable, mtable200_06_02);
 
-        assertTrue(gen1MatchesMTable40_06_01 && gen2MatchesMTable50_03_03 && gen3MatchesMTable500_05_001 && gen4MatchesMtable50_04_01 && gen5MatchesMtable50_04_02 && gen6MatchesMtable50_05_01 && gen7MatchesMtable50_05_02 && gen8MatchesMtable50_06_01 && gen9MatchesMtable50_06_02
-                && gen10MatchesMtable100_04_01 && gen11MatchesMtable100_04_02 && gen12MatchesMtable100_05_01 && gen13MatchesMtable100_05_02 && gen14MatchesMtable100_06_01
-                && gen15MatchesMtable100_06_02 && gen16MatchesMtable200_04_01 && gen17MatchesMtable200_04_02 && gen18MatchesMtable200_05_01 && gen19MatchesMtable200_05_02
-                && gen20MatchesMtable200_06_01 && gen21MatchesMtable200_06_02);
+        boolean b4 = gen16MatchesMtable200_04_01 && gen17MatchesMtable200_04_02 && gen18MatchesMtable200_05_01 && gen19MatchesMtable200_05_02 && gen20MatchesMtable200_06_01 && gen21MatchesMtable200_06_02;
+
+        assertTrue(b1 && b2 && b3 && b4);
     }
 
     public void testInitializeWithInvalidNValueTest() {
