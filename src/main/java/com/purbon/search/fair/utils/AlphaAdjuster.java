@@ -29,7 +29,7 @@ public class AlphaAdjuster {
         if (p <= 0.0 || p >= 1.0) {
             throw new IllegalArgumentException("Parameter p must be in ]0.0, 1.0[");
         }
-        if (alpha <= 0.0 || alpha >= 1.0) {
+        if (alpha < 0.001 || alpha >= 1.0) {
             throw new IllegalArgumentException("Parameter alpha must be in ]0.0, 1.0[");
         }
 

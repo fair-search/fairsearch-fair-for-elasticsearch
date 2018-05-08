@@ -46,7 +46,7 @@ public class MTableGenerator {
     }
 
     private boolean alphaIsValid(double alpha) {
-        if (alpha <= 0d || alpha >= 1d) {
+        if (alpha < 0.001 || alpha >= 1d) {
             throw new IllegalArgumentException("Parameter alpha must be in ]0.0, 1.0[");
         } else {
             return true;
