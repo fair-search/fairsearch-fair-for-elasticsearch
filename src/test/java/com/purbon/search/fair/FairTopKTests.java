@@ -2,11 +2,9 @@ package com.purbon.search.fair;
 
 import com.purbon.search.fair.lib.FairTopKImpl;
 import com.purbon.search.fair.lib.FairnessTableLookup;
-import com.purbon.search.fair.utils.DocumentPriorityQueue;
 import com.purbon.search.fair.utils.MTableGenerator;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
-import org.apache.lucene.util.PriorityQueue;
 import org.elasticsearch.test.ESTestCase;
 
 import java.util.ArrayList;
@@ -24,7 +22,7 @@ public class FairTopKTests  extends ESTestCase {
         @Override
         public int[] fairnessAsTable(int k, float p, float a) {
 
-            MTableGenerator tableGenerator = new MTableGenerator(k, p, a);
+            MTableGenerator tableGenerator = new MTableGenerator(k, p, a, true);
             return tableGenerator.getMTable();
         }
     }

@@ -76,30 +76,30 @@ public class MTableGenTests extends LuceneTestCase {
 
     public void testComputeMTableWithValidParametersTest() {
 
-        MTableGenerator gen1 = new MTableGenerator(40, 0.6, 0.1);
-        MTableGenerator gen2 = new MTableGenerator(50, 0.5, 0.3);
-        MTableGenerator gen3 = new MTableGenerator(500, 0.5, 0.01);
+        MTableGenerator gen1 = new MTableGenerator(40, 0.6, 0.1, true);
+        MTableGenerator gen2 = new MTableGenerator(50, 0.5, 0.3, true);
+        MTableGenerator gen3 = new MTableGenerator(500, 0.5, 0.01, true);
 
-        MTableGenerator gen4 = new MTableGenerator(50, 0.4, 0.1);
-        MTableGenerator gen5 = new MTableGenerator(50, 0.4, 0.2);
-        MTableGenerator gen6 = new MTableGenerator(50, 0.5, 0.1);
-        MTableGenerator gen7 = new MTableGenerator(50, 0.5, 0.2);
-        MTableGenerator gen8 = new MTableGenerator(50, 0.6, 0.1);
-        MTableGenerator gen9 = new MTableGenerator(50, 0.6, 0.2);
+        MTableGenerator gen4 = new MTableGenerator(50, 0.4, 0.1, true);
+        MTableGenerator gen5 = new MTableGenerator(50, 0.4, 0.2, true);
+        MTableGenerator gen6 = new MTableGenerator(50, 0.5, 0.1, true);
+        MTableGenerator gen7 = new MTableGenerator(50, 0.5, 0.2, true);
+        MTableGenerator gen8 = new MTableGenerator(50, 0.6, 0.1, true);
+        MTableGenerator gen9 = new MTableGenerator(50, 0.6, 0.2, true);
 
-        MTableGenerator gen10 = new MTableGenerator(100, 0.4, 0.1);
-        MTableGenerator gen11 = new MTableGenerator(100, 0.4, 0.2);
-        MTableGenerator gen12 = new MTableGenerator(100, 0.5, 0.1);
-        MTableGenerator gen13 = new MTableGenerator(100, 0.5, 0.2);
-        MTableGenerator gen14 = new MTableGenerator(100, 0.6, 0.1);
-        MTableGenerator gen15 = new MTableGenerator(100, 0.6, 0.2);
+        MTableGenerator gen10 = new MTableGenerator(100, 0.4, 0.1, true);
+        MTableGenerator gen11 = new MTableGenerator(100, 0.4, 0.2, true);
+        MTableGenerator gen12 = new MTableGenerator(100, 0.5, 0.1, true);
+        MTableGenerator gen13 = new MTableGenerator(100, 0.5, 0.2, true);
+        MTableGenerator gen14 = new MTableGenerator(100, 0.6, 0.1, true);
+        MTableGenerator gen15 = new MTableGenerator(100, 0.6, 0.2, true);
 
-        MTableGenerator gen16 = new MTableGenerator(200, 0.4, 0.1);
-        MTableGenerator gen17 = new MTableGenerator(200, 0.4, 0.2);
-        MTableGenerator gen18 = new MTableGenerator(200, 0.5, 0.1);
-        MTableGenerator gen19 = new MTableGenerator(200, 0.5, 0.2);
-        MTableGenerator gen20 = new MTableGenerator(200, 0.6, 0.1);
-        MTableGenerator gen21 = new MTableGenerator(200, 0.6, 0.2);
+        MTableGenerator gen16 = new MTableGenerator(200, 0.4, 0.1, true);
+        MTableGenerator gen17 = new MTableGenerator(200, 0.4, 0.2, true);
+        MTableGenerator gen18 = new MTableGenerator(200, 0.5, 0.1, true);
+        MTableGenerator gen19 = new MTableGenerator(200, 0.5, 0.2, true);
+        MTableGenerator gen20 = new MTableGenerator(200, 0.6, 0.1, true);
+        MTableGenerator gen21 = new MTableGenerator(200, 0.6, 0.2, true);
 
         boolean gen1MatchesMTable40_06_01 = false;
         boolean gen2MatchesMTable50_03_03 = false;
@@ -186,7 +186,7 @@ public class MTableGenTests extends LuceneTestCase {
 
     public void testInitializeWithToSmallAlphaTest(){
         try{
-            MTableGenerator gen = new MTableGenerator(50,0.5,0.0001);
+            MTableGenerator gen = new MTableGenerator(50,0.5,0.0001, true);
             fail("Should throw IllegalArgumentException");
         } catch (IllegalArgumentException e) {
         }
@@ -194,7 +194,7 @@ public class MTableGenTests extends LuceneTestCase {
 
     public void testInitializeWithInvalidNValueTest() {
         try {
-            MTableGenerator gen = new MTableGenerator(0, 0.5, 0.1);
+            MTableGenerator gen = new MTableGenerator(0, 0.5, 0.1, true);
             fail("Should throw IllegalArgumentException");
         } catch (IllegalArgumentException e) {
         }
@@ -202,7 +202,7 @@ public class MTableGenTests extends LuceneTestCase {
 
     public void testInitializeWithInvalidPValueTest() {
         try {
-            MTableGenerator gen = new MTableGenerator(40, 1.1, 0.1);
+            MTableGenerator gen = new MTableGenerator(40, 1.1, 0.1, true);
             fail("Should throw IllegalArgumentException");
         } catch (IllegalArgumentException e) {
         }
@@ -210,7 +210,7 @@ public class MTableGenTests extends LuceneTestCase {
 
     public void testInitializeWithInvalidAlphaValueTest() {
         try {
-            MTableGenerator gen = new MTableGenerator(40, 0.5, 1);
+            MTableGenerator gen = new MTableGenerator(40, 0.5, 1, true);
             fail("Should throw IllegalArgumentException");
         } catch (IllegalArgumentException e) {
         }

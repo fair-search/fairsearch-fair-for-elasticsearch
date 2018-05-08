@@ -29,7 +29,7 @@ public class AlphaAdjuster {
         if (p <= 0.0 || p >= 1.0) {
             throw new IllegalArgumentException("Parameter p must be in ]0.0, 1.0[");
         }
-        if (alpha < 0.001 || alpha >= 1.0) {
+        if (alpha <=0d || alpha >= 1.0) {
             throw new IllegalArgumentException("Parameter alpha must be in ]0.0, 1.0[");
         }
 
@@ -38,7 +38,7 @@ public class AlphaAdjuster {
         this.alpha = alpha;
         this.currentHigh = 0;
 
-        this.mTableGenerator = new MTableGenerator(n, p, alpha);
+        this.mTableGenerator = new MTableGenerator(n, p, alpha, false);
         this.mTable = this.mTableGenerator.getMTable();
         this.auxMTable = this.computeAuxTMTable();
     }
@@ -87,7 +87,7 @@ public class AlphaAdjuster {
         while (minProtected < maxProtected) {
             //get the current blockLength from auxMTable
             int blockLength = auxMTable.at(minProtected, "block");
-            if (blockLength <= pmfCache.size() && pmfCache.get(blockLength) != null) {
+            if (blockLength < pmfCache.size() && pmfCache.get(blockLength) != null) {
                 currentTrial = pmfCache.get(blockLength);
             } else {
                 currentTrial = new ArrayList<>();

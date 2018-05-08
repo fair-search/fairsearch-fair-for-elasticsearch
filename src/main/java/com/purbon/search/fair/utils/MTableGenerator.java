@@ -14,12 +14,17 @@ public class MTableGenerator {
      * @param n     Total number of elements
      * @param p     The proportion of protected candidates in the top-k ranking
      * @param alpha the significance level
+     * @param adjustAlpha
      */
-    public MTableGenerator(int n, double p, double alpha) {
+    public MTableGenerator(int n, double p, double alpha, boolean adjustAlpha) {
         if (parametersAreValid(n, p, alpha)) {
             this.n = n;
             this.p = p;
-            this.alpha = alpha;
+            if(adjustAlpha) {
+                this.alpha = new BinarySearchAlphaAdjuster(n, p, alpha).adjustAlpha();
+            }else{
+                this.alpha = alpha;
+            }
         } else {
             throw new IllegalArgumentException("Invalid Input Parameters for MTable calculation.");
         }
@@ -46,7 +51,7 @@ public class MTableGenerator {
     }
 
     private boolean alphaIsValid(double alpha) {
-        if (alpha < 0.001 || alpha >= 1d) {
+        if (alpha <= 0d || alpha >= 1d) {
             throw new IllegalArgumentException("Parameter alpha must be in ]0.0, 1.0[");
         } else {
             return true;
