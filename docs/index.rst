@@ -3,18 +3,20 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Elasticsearch Fair search: the documentation
-==========================================================
+Fairsearch Plugin for Elasticsearch
+===================================
 
-The Elasticsearch fair search plugin apply innovative fair topk ranking algorithms to retrieve a fair set of candidates from your search. This plugin has been develop in collaboration between the TU Berlin, the Pompeu Fabra University and Pere Urbón.
+The *Fairsearch* plug-in for Elasticsearch is an implementation of the `FA*IR algorithm <https://arxiv.org/abs/1706.06368>`_. It enables you to apply a *positive action* policy in which elements are re-ranked to ensure a fair representation of minorities or disadvantaged people.
+
+This plugin has been developed by Pere Urbón in collaboration with researchers at TU Berlin and Pompeu Fabra University, with  support from a grant by the `Data Transparency Lab <http://datatransparencylab.org/dtl2017_program_fair/>`_.
 
 Get started
 -------------------------------
 
-- Brand new? head to :doc:`core-concepts`.
-- Otherwise, start with :doc:`fits-in`
-- Building an m table, head to :doc:`building_the_mtable`
-- Doing fair rescoring, head to :doc:`doing_a_fair_rescoring`
+- Check whether this plug-in is for you: :doc:`motivation`
+- Understand the fairness criterion applied: :doc:`fairness_criterion`.
+- Build an M table to apply the criterion: :doc:`building_the_mtable`
+- Use the plug-in to perform a re-ranking: :doc:`reranking_using_fair`
 
 Installing
 -----------
@@ -27,12 +29,10 @@ Pre-built versions can be found `here <https://fair-search.github.io/>`_. Want a
 (It's expected you'll confirm some security exceptions, you can pass -b to elasticsearch-plugin to automatically install)
 
 
-HEEELP!
-------------------------------
+Heeelp!
+-------
 
-The plugin and guide was built by the search and data consultant  `Pere Urbon <http://purbon.com>`_ in partnership with the TU Berlin and the Pompeu Fabra University. Please `contact Pere Urbon <mailto:name.surname@acm.org>`_ or `create an issue <https://github.com/fair-search/fairsearch-elasticsearch-plugin/issues>`_ if you have any questions or feedback.
-
-
+- If you have questions or feedback, see :doc:`contact`
 
 Contents
 -------------------------------
@@ -41,10 +41,11 @@ Contents
 .. toctree::
    :maxdepth: 2
 
-   core-concepts
-   fits-in
+   motivation
+   fairness_criterion
    building_the_mtable
-   doing_a_fair_rescoring
+   reranking_using_fair
+   contact
    :caption: Contents:
 
 
