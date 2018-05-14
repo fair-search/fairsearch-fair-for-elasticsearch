@@ -43,7 +43,6 @@ Contents
 
    theory
    plugin
-   fairness_criterion
    building_the_mtable
    reranking_using_fair
    contact
