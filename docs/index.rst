@@ -39,9 +39,9 @@ Contents
 
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
 
-   motivation
+   theory
    fairness_criterion
    building_the_mtable
    reranking_using_fair
