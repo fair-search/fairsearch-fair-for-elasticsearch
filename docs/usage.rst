@@ -1,4 +1,4 @@
-Re-ranking using fairsearch
+How to use the fair-search plugin
 ***************************
 
 Now it is time to finally perform a fair re-scoring. 
