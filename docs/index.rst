@@ -16,7 +16,7 @@ Get started
 - Check whether this plug-in is for you: :doc:`theory`, :doc:`plugin`
 - Understand the fairness criterion applied: :doc:`theory`
 - Use the plug-in to perform a re-ranking: :doc:`usage`
-- Build an M table to apply the criterion: :doc:`building_the_mtable`
+- Advance usage, like build an M table: :doc:`advance`
 
 Installing
 -----------
@@ -43,8 +43,8 @@ Contents
 
    theory
    plugin
-   building_the_mtable
    usage
+   advance
    contact
    :caption: Contents:
 
