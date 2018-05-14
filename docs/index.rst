@@ -42,6 +42,7 @@ Contents
    :maxdepth: 3
 
    theory
+   plugin
    fairness_criterion
    building_the_mtable
    reranking_using_fair
