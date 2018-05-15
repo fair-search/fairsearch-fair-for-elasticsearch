@@ -92,7 +92,7 @@ public class BinarySearchAlphaAdjuster {
         }
         return alpha;
     }
-    
+
 
     public int getK() {
         return k;
