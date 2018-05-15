@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 public class BinarySearchAlphaAdjuster {
 
+
     private int k;
     private double p;
     private double alpha;
@@ -28,20 +29,18 @@ public class BinarySearchAlphaAdjuster {
         double left = Double.MIN_VALUE;
         double right = alpha;
         AlphaAdjuster adj = new AlphaAdjuster(k, p, alpha);
-        System.out.println(k+","+p+","+alpha);
         double min = adj.computeSuccessProbability();
         double secondMin = 0;
         double minOptAlpha = alpha;
         double secondMinOptAlpha = 0;
         ArrayList<SuccessProbAlphaPair> succProbs = new ArrayList<>();
 
-        while ((left <= right)) {
+        while (left <= right) {
             adjustedAlpha = (left + right) / 2.0;
             if(adjustedAlpha<=0.0000000001){
                 break;
             }
             AlphaAdjuster adjuster = new AlphaAdjuster(k, p, adjustedAlpha);
-            System.out.println(adjustedAlpha);
             double succProb = adjuster.computeSuccessProbability();
             succProbs.add(new SuccessProbAlphaPair(succProb, adjustedAlpha));
             if (succProb <= 0.00001 && succProb > 0) {
@@ -93,7 +92,7 @@ public class BinarySearchAlphaAdjuster {
         }
         return alpha;
     }
-
+    
 
     public int getK() {
         return k;

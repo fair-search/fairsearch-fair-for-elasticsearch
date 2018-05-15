@@ -68,7 +68,7 @@ public class AlphaAdjuster {
      * Computes the probability of rejecting a fair ranking with the given parameters n, p and alpha
      * @return The probability of rejecting a fair ranking
      */
-    public double computeSuccessProbability() {
+    public double computeSuccessProbability(){
         int maxProtected = auxMTable.getLengthOf("inv") - 1;
         int minProtected = 1;
         double successProbability = 0;

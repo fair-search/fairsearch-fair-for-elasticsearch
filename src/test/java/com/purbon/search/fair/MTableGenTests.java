@@ -184,6 +184,7 @@ public class MTableGenTests extends LuceneTestCase {
         assertTrue(b1 && b2 && b3 && b4);
     }
 
+
     public void testInitializeWithToSmallAlphaTest(){
         try{
             MTableGenerator gen = new MTableGenerator(50,0.5,0.0001, true);
@@ -202,6 +203,7 @@ public class MTableGenTests extends LuceneTestCase {
 
     public void testInitializeWithInvalidPValueTest() {
         try {
+
             MTableGenerator gen = new MTableGenerator(40, 1.1, 0.1, true);
             fail("Should throw IllegalArgumentException");
         } catch (IllegalArgumentException e) {

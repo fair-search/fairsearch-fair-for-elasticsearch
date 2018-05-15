@@ -46,7 +46,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = 'Elasticsearch Fair search plugin'
+project = 'Fairsearch Plugin for Elasticsearch'
 copyright = '2017, Pere Urbon Bayes'
 author = 'Pere Urbon'
 
@@ -163,8 +163,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'ElasticsearchFairSearch', 'Elasticsearch Fair Search Documentation',
-     author, 'ElasticsearchFairSearch', 'One line description of project.',
+    (master_doc, 'ElasticsearchFairSearch', 'Fairsearch plug-in Documentation',
+     author, 'ElasticsearchFairSearch', 'Re-ranker of search results based on the FA*IR algorithm.',
      'Miscellaneous'),
 ]
 

@@ -2,7 +2,7 @@ buildscript {
 
     ext {
         // ES version we depend upon/ compile against.
-        version_es = '6.1.2'
+        version_es = '6.2.4'
     }
 
     repositories {
@@ -17,7 +17,7 @@ buildscript {
 }
 
 group 'com.purbon.search'
-version '1.0-es6.1.2-SNAPSHOT'
+version '1.0-es6.2.4-snapshot'
 
 apply plugin: 'java'
 apply plugin: 'elasticsearch.esplugin'
