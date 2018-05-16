@@ -8,7 +8,7 @@ public class BinarySearchAlphaAdjuster {
     private int k;
     private double p;
     private double alpha;
-    private static final double STEP = 0.0000000000000001;
+    private static final double STEP = 0.000001;
 
     public BinarySearchAlphaAdjuster(int k, double p, double alpha) {
         this.k = k;
@@ -28,111 +28,38 @@ public class BinarySearchAlphaAdjuster {
         double adjustedAlpha;
         double left = Double.MIN_VALUE;
         double right = alpha;
-        AlphaAdjuster adj = new AlphaAdjuster(k, p, alpha);
-        double min = adj.computeSuccessProbability();
-        double secondMin = 0;
-        double minOptAlpha = alpha;
-        double secondMinOptAlpha = 0;
-        ArrayList<SuccessProbAlphaPair> succProbs = new ArrayList<>();
+        double minOptAlpha = (left + right) / 2.0;
 
         while (left <= right) {
             adjustedAlpha = (left + right) / 2.0;
-            if(adjustedAlpha<=0.0000000001){
-                break;
-            }
             AlphaAdjuster adjuster = new AlphaAdjuster(k, p, adjustedAlpha);
             double succProb = adjuster.computeSuccessProbability();
-            succProbs.add(new SuccessProbAlphaPair(succProb, adjustedAlpha));
-            if (succProb <= 0.00001 && succProb > 0) {
+            //succProbs.add(new SuccessProbAlphaPair(succProb, adjustedAlpha));
+            if (Math.abs(succProb - alpha) <= 0.0001) {
                 return adjustedAlpha;
+            } else if (Math.abs(succProb - alpha) < Math.abs(succProb - minOptAlpha)) {
+                minOptAlpha = adjustedAlpha;
             }
-            if (0.00001 < succProb) {
+            if (alpha < succProb) {
                 right = adjustedAlpha - STEP;
             } else {
                 left = adjustedAlpha + STEP;
             }
-            if (succProb < min) {
-                secondMin = min;
-                secondMinOptAlpha = minOptAlpha;
-                min = succProb;
-                minOptAlpha = adjustedAlpha;
-
-            }
 
         }
-        return secondSearch(minOptAlpha, secondMinOptAlpha);
+        return minOptAlpha;
     }
-
-    private double secondSearch(double left, double right) {
-        double step = 0.00000001;
-        AlphaAdjuster adj = new AlphaAdjuster(k, p, left);
-        double oldSuccProb = 1 - adj.computeSuccessProbability();
-        ArrayList<SuccessProbAlphaPair> values = new ArrayList<>();
-        while (left < right) {
-            left = left + step;
-            AlphaAdjuster adjuster = new AlphaAdjuster(k, p, left);
-            double succProb = 1 - adjuster.computeSuccessProbability();
-            if (oldSuccProb < succProb) {
-                break;
-            }
-            oldSuccProb = succProb;
-            values.add(new SuccessProbAlphaPair(succProb, left));
-        }
-        return values.size() > 1 ? getMinAlpha(values) : left;
-    }
-
-    private double getMinAlpha(ArrayList<SuccessProbAlphaPair> list) {
-        double min = list.get(0).getSuccProb();
-        double alpha = list.get(0).getAlpha();
-        for (SuccessProbAlphaPair p : list) {
-            if (p.getSuccProb() < min) {
-                min = p.getSuccProb();
-                alpha = p.getAlpha();
-            }
-        }
-        return alpha;
-    }
-
 
     public int getK() {
         return k;
-    }
-
-    public void setK(int k) {
-        this.k = k;
     }
 
     public double getP() {
         return p;
     }
 
-    public void setP(double p) {
-        this.p = p;
-    }
-
     public double getAlpha() {
         return alpha;
     }
 
-    public void setAlpha(double alpha) {
-        this.alpha = alpha;
-    }
-
-    private class SuccessProbAlphaPair {
-        double succProb;
-        double alpha;
-
-        private SuccessProbAlphaPair(double succProb, double alpha) {
-            this.succProb = succProb;
-            this.alpha = alpha;
-        }
-
-        private double getSuccProb() {
-            return succProb;
-        }
-
-        private double getAlpha() {
-            return alpha;
-        }
-    }
 }
