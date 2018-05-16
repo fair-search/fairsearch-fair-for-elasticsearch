@@ -20,11 +20,32 @@ public class BinarySearchAlphaAdjuster {
     }
 
     public double adjustAlpha() {
-        return adjustIterative(alpha);
+        if(this.k<40){
+            return adjustFlatSearch();
+        }else {
+            return adjustIterative();
+        }
+    }
+
+    private double adjustFlatSearch(){
+        AlphaAdjuster minAdjuster = new AlphaAdjuster(k,p,alpha);
+        double min = minAdjuster.computeSuccessProbability();
+        double minAlpha = alpha;
+        //TODO Tom: calculate a reasonable search size
+        for(int i=0; i<100; i++){
+            double adjustedAlpha = alpha-(i*0.001);
+            AlphaAdjuster adjuster = new AlphaAdjuster(k,p,adjustedAlpha);
+            double currentSuccessProb = adjuster.computeSuccessProbability();
+            if(Math.abs(currentSuccessProb-alpha)<Math.abs(min-alpha)){
+                min = currentSuccessProb;
+                minAlpha = adjustedAlpha;
+            }
+        }
+        return minAlpha;
     }
 
 
-    private double adjustIterative(double alpha) {
+    private double adjustIterative() {
         double adjustedAlpha;
         double left = Double.MIN_VALUE;
         double right = alpha;
