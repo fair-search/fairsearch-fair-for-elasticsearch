@@ -77,6 +77,9 @@ public class AlphaAdjuster {
      */
     public double computeSuccessProbability() {
         int maxProtected = auxMTable.getLengthOf("inv") - 1;
+        if(maxProtected == -1){
+            return alpha;
+        }
         int minProtected = 1;
         double successProbability = 0;
 
