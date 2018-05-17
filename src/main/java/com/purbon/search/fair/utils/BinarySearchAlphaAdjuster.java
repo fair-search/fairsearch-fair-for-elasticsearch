@@ -11,6 +11,15 @@ public class BinarySearchAlphaAdjuster {
 
 
     public BinarySearchAlphaAdjuster(int k, double p, double alpha) {
+        if (k < 1) {
+            throw new IllegalArgumentException("Parameter k must be at least 1");
+        }
+        if (p <= 0.0 || p >= 1.0) {
+            throw new IllegalArgumentException("Parameter p must be in ]0.0, 1.0[");
+        }
+        if (alpha <= 0d || alpha >= 1.0) {
+            throw new IllegalArgumentException("Parameter alpha must be in ]0.0, 1.0[");
+        }
         this.k = k;
         this.p = p;
         if (alpha < 0.001) {
@@ -86,9 +95,9 @@ public class BinarySearchAlphaAdjuster {
     }
 
     public double getAdjustedAlpha() {
-        if(adjustedAlpha == 0.0){
+        if (adjustedAlpha == 0.0) {
             return adjustAlpha();
-        }else {
+        } else {
             return adjustedAlpha;
         }
     }
