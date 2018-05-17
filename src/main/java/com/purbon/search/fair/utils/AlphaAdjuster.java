@@ -41,7 +41,11 @@ public class AlphaAdjuster {
 
         this.mTableGenerator = new MTableGenerator(n, p, alpha, false);
         this.mTable = this.mTableGenerator.getMTable();
-        this.auxMTable = this.computeAuxTMTable();
+        if(this.mTable.length<=1){
+            throw new IllegalStateException("n must be at least 1");
+        }else{
+            this.auxMTable = this.computeAuxTMTable();
+        }
     }
 
     /**
