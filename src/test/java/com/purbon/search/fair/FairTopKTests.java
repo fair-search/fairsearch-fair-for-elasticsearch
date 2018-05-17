@@ -146,10 +146,10 @@ public class FairTopKTests  extends ESTestCase {
         assertEquals(1, topDocs.scoreDocs[0].doc);
         assertEquals(3, topDocs.scoreDocs[1].doc);
         assertEquals(5, topDocs.scoreDocs[2].doc);
-        assertEquals(2, topDocs.scoreDocs[3].doc);
-        assertEquals(7, topDocs.scoreDocs[4].doc);
-        assertEquals(4, topDocs.scoreDocs[5].doc);
-        assertEquals(9, topDocs.scoreDocs[6].doc);
+        assertEquals(7, topDocs.scoreDocs[3].doc);
+        assertEquals(2, topDocs.scoreDocs[4].doc);
+        assertEquals(9, topDocs.scoreDocs[5].doc);
+        assertEquals(4, topDocs.scoreDocs[6].doc);
         assertEquals(6, topDocs.scoreDocs[7].doc);
         assertEquals(8, topDocs.scoreDocs[8].doc);
         assertEquals(10, topDocs.scoreDocs[9].doc);

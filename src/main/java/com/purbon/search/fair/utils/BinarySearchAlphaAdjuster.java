@@ -1,14 +1,14 @@
 package com.purbon.search.fair.utils;
 
-import java.util.ArrayList;
-
 public class BinarySearchAlphaAdjuster {
 
 
     private int k;
     private double p;
     private double alpha;
+    private double adjustedAlpha;
     private static final double STEP = 0.000001;
+
 
     public BinarySearchAlphaAdjuster(int k, double p, double alpha) {
         this.k = k;
@@ -20,23 +20,26 @@ public class BinarySearchAlphaAdjuster {
     }
 
     public double adjustAlpha() {
-        if(this.k<40){
-            return adjustFlatSearch();
-        }else {
-            return adjustIterative();
+        if (this.k < 40) {
+            this.adjustedAlpha = adjustFlatSearch();
+            return adjustedAlpha;
+        } else {
+            this.adjustedAlpha = adjustIterative();
+            return adjustedAlpha;
         }
     }
 
-    private double adjustFlatSearch(){
-        AlphaAdjuster minAdjuster = new AlphaAdjuster(k,p,alpha);
+    private double adjustFlatSearch() {
+        AlphaAdjuster minAdjuster = new AlphaAdjuster(k, p, alpha);
         double min = minAdjuster.computeSuccessProbability();
         double minAlpha = alpha;
-        //TODO Tom: calculate a reasonable search size
-        for(int i=0; i<100; i++){
-            double adjustedAlpha = alpha-(i*0.001);
-            AlphaAdjuster adjuster = new AlphaAdjuster(k,p,adjustedAlpha);
+        int steps = 500;
+        double stepSize = alpha / steps;
+        for (int i = 0; i < steps; i++) {
+            double adjustedAlpha = alpha - (i * stepSize);
+            AlphaAdjuster adjuster = new AlphaAdjuster(k, p, adjustedAlpha);
             double currentSuccessProb = adjuster.computeSuccessProbability();
-            if(Math.abs(currentSuccessProb-alpha)<Math.abs(min-alpha)){
+            if (Math.abs(currentSuccessProb - alpha) < Math.abs(min - alpha)) {
                 min = currentSuccessProb;
                 minAlpha = adjustedAlpha;
             }
@@ -55,7 +58,6 @@ public class BinarySearchAlphaAdjuster {
             adjustedAlpha = (left + right) / 2.0;
             AlphaAdjuster adjuster = new AlphaAdjuster(k, p, adjustedAlpha);
             double succProb = adjuster.computeSuccessProbability();
-            //succProbs.add(new SuccessProbAlphaPair(succProb, adjustedAlpha));
             if (Math.abs(succProb - alpha) <= 0.0001) {
                 return adjustedAlpha;
             } else if (Math.abs(succProb - alpha) < Math.abs(succProb - minOptAlpha)) {
@@ -83,4 +85,11 @@ public class BinarySearchAlphaAdjuster {
         return alpha;
     }
 
+    public double getAdjustedAlpha() {
+        if(adjustedAlpha == 0.0){
+            return adjustAlpha();
+        }else {
+            return adjustedAlpha;
+        }
+    }
 }
