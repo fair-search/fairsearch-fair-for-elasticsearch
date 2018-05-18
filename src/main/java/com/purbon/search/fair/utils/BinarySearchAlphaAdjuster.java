@@ -11,8 +11,8 @@ public class BinarySearchAlphaAdjuster {
 
 
     public BinarySearchAlphaAdjuster(int k, double p, double alpha) {
-        if (k < 1) {
-            throw new IllegalArgumentException("Parameter k must be at least 1");
+        if (k < 20) {
+            throw new IllegalArgumentException("Parameter k must be at least 20 to be adjusted");
         }
         if (p <= 0.0 || p >= 1.0) {
             throw new IllegalArgumentException("Parameter p must be in ]0.0, 1.0[");
@@ -29,7 +29,7 @@ public class BinarySearchAlphaAdjuster {
     }
 
     public double adjustAlpha() {
-        if (this.k < 40) {
+        if (this.k <= 40 && this.k>=20) {
             this.adjustedAlpha = adjustFlatSearch();
             return adjustedAlpha;
         } else {

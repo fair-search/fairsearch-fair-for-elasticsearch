@@ -23,7 +23,7 @@ public class MTableGenerator {
             this.n = n;
             this.p = p;
             this.adjustAlpha = adjustAlpha;
-            if (adjustAlpha) {
+            if (adjustAlpha && n >= 20) {
                 this.adjustedAlpha = new BinarySearchAlphaAdjuster(n, p, alpha).adjustAlpha();
                 this.alpha = alpha;
             } else {
