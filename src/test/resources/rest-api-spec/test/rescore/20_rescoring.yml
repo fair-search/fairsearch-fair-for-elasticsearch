@@ -189,7 +189,7 @@ setup:
               significance_level: 0.1
               min_proportion_protected: 0.6
 
-  - length: { hits.hits: 10 }
+  - length: { hits.hits: 20 }
   - match:  { hits.hits.0._source: { "body": "hello hello hello hello hello hello hello hello hello hello", "gender": "m" } }
   - match:  { hits.hits.1._source: { "body": "hello hello hello hello hello hello hello hello hello bye", "gender": "m"} }
   - match:  { hits.hits.2._source: { "body": "hello hello hello hello hello hello hello hello bye bye", "gender": "m"} }
