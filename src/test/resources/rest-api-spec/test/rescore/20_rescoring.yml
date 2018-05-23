@@ -158,21 +158,12 @@ setup:
   - match:  { hits.hits.2._source: { "body": "hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello bye bye", "gender": "m"} }
   - match:  { hits.hits.3._source: { "body": "hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello bye bye bye", "gender": "m"} }
   - match:  { hits.hits.4._source: { "body": "hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello bye bye bye bye", "gender": "m"} }
-  - match:  { hits.hits.5._source: { "body": "hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello bye bye bye bye bye", "gender": "m"} }
-  - match:  { hits.hits.6._source: { "body": "hello hello hello hello hello hello hello hello hello hello hello hello hello hello bye bye bye bye bye bye", "gender": "m"} }
-  - match:  { hits.hits.7._source: { "body": "hello hello hello hello hello hello hello hello hello hello hello hello hello bye bye bye bye bye bye bye", "gender": "m"} }
-  - match:  { hits.hits.8._source: { "body": "hello hello hello hello hello hello hello hello hello hello hello hello bye bye bye bye bye bye bye bye", "gender": "m"} }
-  - match:  { hits.hits.9._source: { "body": "hello hello hello hello hello hello hello hello hello hello hello bye bye bye bye bye bye bye bye bye", "gender": "m"} }
-  - match:  { hits.hits.10._source: { "body": "hello hello hello hello hello hello hello hello hello hello bye bye bye bye bye bye bye bye bye bye", "gender": "f"} }
-  - match:  { hits.hits.11._source: { "body": "hello hello hello hello hello hello hello hello hello bye bye bye bye bye bye bye bye bye bye bye", "gender": "f"} }
-  - match:  { hits.hits.12._source: { "body": "hello hello hello hello hello hello hello hello bye bye bye bye bye bye bye bye bye bye bye bye", "gender": "f"} }
-  - match:  { hits.hits.13._source: { "body": "hello hello hello hello hello hello hello bye bye bye bye bye bye bye bye bye bye bye bye bye", "gender": "f"} }
-  - match:  { hits.hits.14._source: { "body": "hello hello hello hello hello hello bye bye bye bye bye bye bye bye bye bye bye bye bye bye", "gender": "f"} }
-  - match:  { hits.hits.15._source: { "body": "hello hello hello hello hello bye bye bye bye bye bye bye bye bye bye bye bye bye bye bye", "gender": "f"} }
-  - match:  { hits.hits.16._source: { "body": "hello hello hello hello bye bye bye bye bye bye bye bye bye bye bye bye bye bye bye bye", "gender": "f"} }
-  - match:  { hits.hits.17._source: { "body": "hello hello hello bye bye bye bye bye bye bye bye bye bye bye bye bye bye bye bye bye", "gender": "f"} }
-  - match:  { hits.hits.18._source: { "body": "hello hello bye bye bye bye bye bye bye bye bye bye bye bye bye bye bye bye bye bye", "gender": "f"} }
-  - match:  { hits.hits.19._source: { "body": "hello bye bye bye bye bye bye bye bye bye bye bye bye bye bye bye bye bye bye bye", "gender": "f"} }
+  - match:  { hits.hits.5._source: { "body": "hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello bye bye bye bye bye", "gender": "f"} }
+  - match:  { hits.hits.6._source: { "body": "hello hello hello hello hello hello hello hello hello hello hello hello hello hello bye bye bye bye bye bye", "gender": "f"} }
+  - match:  { hits.hits.7._source: { "body": "hello hello hello hello hello hello hello hello hello hello hello hello hello bye bye bye bye bye bye bye", "gender": "f"} }
+  - match:  { hits.hits.8._source: { "body": "hello hello hello hello hello hello hello hello hello hello hello hello bye bye bye bye bye bye bye bye", "gender": "f"} }
+  - match:  { hits.hits.9._source: { "body": "hello hello hello hello hello hello hello hello hello hello hello bye bye bye bye bye bye bye bye bye", "gender": "f"} }
+
 ---
 "hello search with a fair rescore":
   - do:
@@ -191,10 +182,10 @@ setup:
 
   - length: { hits.hits: 10 }
   - match:  { hits.hits.0._source: { "body": "hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello", "gender": "m" } }
-  - match:  { hits.hits.1._source: { "body": "hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello bye bye", "gender": "m"} }
-  - match:  { hits.hits.2._source: { "body": "hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello bye bye bye bye", "gender": "m"} }
-  - match:  { hits.hits.3._source: { "body": "hello hello hello hello hello hello hello hello hello hello bye bye bye bye bye bye bye bye bye bye", "gender": "f"} }
-  - match:  { hits.hits.4._source: { "body": "hello hello hello hello hello hello hello hello hello hello hello hello hello hello bye bye bye bye bye bye", "gender": "m"} }
+  - match:  { hits.hits.1._source: { "body": "hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello bye", "gender": "m"} }
+  - match:  { hits.hits.2._source: { "body": "hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello bye bye", "gender": "m"} }
+  - match:  { hits.hits.3._source: { "body": "hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello bye bye bye bye bye", "gender": "f"} }
+  - match:  { hits.hits.4._source: { "body": "hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello hello bye bye bye", "gender": "m"} }
 ---
 "abort rescoring":
   - do:
