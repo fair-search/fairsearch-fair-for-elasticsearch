@@ -57,7 +57,7 @@ setup:
 ---
 "invalid combination of params":
   - do:
-      catch: bad_request
+      catch: request
       search:
         index: test
         body:

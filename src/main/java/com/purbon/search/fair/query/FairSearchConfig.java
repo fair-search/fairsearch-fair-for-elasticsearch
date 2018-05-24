@@ -128,8 +128,8 @@ public class FairSearchConfig {
         if (lookupForProportion < 0) {
             this.lookupForProportion = DEFAULT_LOOKUP_FOR_PROPORTION;
         } else {
-            if (getProportionStrategy().equals(ProportionStrategy.fixed)) {
-                String msg = "using lookup_for_measuring_proportion is not permitted if the proportion strategy is fix";
+            if (getProportionStrategy().equals(ProportionStrategy.variable)) {
+                String msg = "using lookup_for_measuring_proportion is not permitted if the proportion strategy is variable";
                 logger.error(msg);
                 throw new ElasticsearchException(msg);
             }

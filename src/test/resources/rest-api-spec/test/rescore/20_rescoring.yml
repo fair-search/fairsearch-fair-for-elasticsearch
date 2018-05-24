@@ -127,6 +127,23 @@ setup:
   - match:  { hits.hits.3._source: { "body": "hello hello hello hello hello bye bye bye bye bye", "gender": "f"} }
   - match:  { hits.hits.4._source: { "body": "hello hello hello hello hello hello hello bye bye bye", "gender": "m"} }
 ---
+"abort for wrong k setup during rescoring":
+  - do:
+      catch: request
+      search:
+        index: test
+        body:
+          query:
+            match:
+             body: "hello"
+          rescore:
+            fair_rescorer:
+              protected_key: gender
+              protected_value: f
+              significance_level: 0.1
+              proportion_strategy: fixed
+              lookup_for_measuring_proportion: 100
+---
 "abort rescoring":
   - do:
      catch: request

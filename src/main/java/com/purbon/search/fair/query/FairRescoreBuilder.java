@@ -294,6 +294,12 @@ public class FairRescoreBuilder extends RescorerBuilder<FairRescoreBuilder> {
             float proportion           = config.getProtectedElementsProportion();
             int protectedElementsCount = Math.round(proportion * topDocs.scoreDocs.length);
 
+            if (protectedElementsCount > max) {
+                String message = "The protected elements count (k) can not be bigger than";
+                       message += "the number of elements to be processed in the rescore phase.";
+                throw new ElasticsearchException(message);
+            }
+
             if ( config.hasVariableProportionStrategy() ) {
                 if (config.abortOnFewElements() && config.getLookupForProportion() < topDocs.scoreDocs.length) {
                     throw new ElasticsearchException("Lookup proportion below number of docs returned by the query");
