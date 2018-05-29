@@ -38,6 +38,10 @@ public class BinarySearchAlphaAdjuster {
         }
     }
 
+    /**
+     * Searches iterative a better alpha bye trying smaller alphas step by step. The step size equals 1/500 of the initial alpha.
+     * @return the alpha with the least distance from the desired failure probability found by the steps
+     */
     private double adjustFlatSearch() {
         AlphaAdjuster minAdjuster = new AlphaAdjuster(k, p, alpha);
         double min = minAdjuster.computeSuccessProbability();
@@ -57,6 +61,10 @@ public class BinarySearchAlphaAdjuster {
     }
 
 
+    /**
+     * Searches binary and iterative for the right failure probability
+     * @return the adjusted alpha
+     */
     private double adjustIterative() {
         double adjustedAlpha;
         double left = Double.MIN_VALUE;
@@ -95,10 +103,6 @@ public class BinarySearchAlphaAdjuster {
     }
 
     public double getAdjustedAlpha() {
-        if (adjustedAlpha == 0.0) {
-            return adjustAlpha();
-        } else {
             return adjustedAlpha;
-        }
     }
 }

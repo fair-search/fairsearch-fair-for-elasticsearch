@@ -23,12 +23,11 @@ public class MTableGenerator {
             this.n = n;
             this.p = p;
             this.adjustAlpha = adjustAlpha;
+            this.alpha = alpha;
             if (adjustAlpha && n >= 20) {
                 this.adjustedAlpha = new BinarySearchAlphaAdjuster(n, p, alpha).adjustAlpha();
-                this.alpha = alpha;
             } else {
                 this.adjustedAlpha = alpha;
-                this.alpha = alpha;
             }
         } else {
             throw new IllegalArgumentException("Invalid Input Parameters for MTable calculation.");
@@ -96,7 +95,7 @@ public class MTableGenerator {
         return p;
     }
 
-    public double getOldAlpha() {
+    public double getOriginalAlpha() {
         return alpha;
     }
 
