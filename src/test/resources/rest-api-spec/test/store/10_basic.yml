@@ -2,14 +2,14 @@
 
   - do:
       fs.create_table:
-        proportion: 0.5
+        proportion: 0.8
         alpha: 0.1
-        k: 20
+        k: 10
   - do:
       fs.create_table:
         proportion: 0.99
         alpha: 0.1
-        k: 20
+        k: 10
 
   - do:
       indices.exists:
@@ -19,6 +19,6 @@
       fs.get_table: {}
 
   - length: { hits.hits: 2 }
-  - match:  { hits.hits.0._source: { "alpha": 0.1, "k": 20, "proportion": 0.99, "mtable": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19], "type": "mtable" }}
-  - match:  { hits.hits.1._source: { "alpha": 0.1, "k": 20, "proportion": 0.5, "mtable": [0, 0, 0, 0, 0, 1, 1, 1, 2, 2, 3, 3, 3, 4, 4, 5, 5, 5, 6, 6, 7], "type": "mtable" }}
+  - match:  { hits.hits.0._source: { "alpha": 0.1, "k": 10, "proportion": 0.99, "mtable": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], "type": "mtable" }}
+  - match:  { hits.hits.1._source: { "alpha": 0.1, "k": 10, "proportion": 0.8, "mtable": [0, 0, 1, 1, 2, 3, 4, 4, 5, 6, 6], "type": "mtable" }}
 

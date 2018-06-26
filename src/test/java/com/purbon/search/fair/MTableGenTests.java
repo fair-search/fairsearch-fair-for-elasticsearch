@@ -21,6 +21,8 @@ import static org.junit.Assert.fail;
 
 public class MTableGenTests extends LuceneTestCase {
 
+    //junit parallel tests
+
     private int[] mtable40_06_01;
     private int[] mtable50_03_03;
     private int[] mtable500_05_001;

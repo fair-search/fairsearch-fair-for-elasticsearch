@@ -2,6 +2,9 @@ package com.purbon.search.fair.utils;
 
 import org.apache.commons.math3.distribution.BinomialDistribution;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 
 public class AlphaAdjuster {
@@ -41,9 +44,9 @@ public class AlphaAdjuster {
 
         this.mTableGenerator = new MTableGenerator(n, p, alpha, false);
         this.mTable = this.mTableGenerator.getMTable();
-        if(this.mTable.length<=1){
+        if (this.mTable.length <= 1) {
             throw new IllegalStateException("n must be at least 1");
-        }else{
+        } else {
             this.auxMTable = this.computeAuxTMTable();
         }
     }
@@ -77,7 +80,7 @@ public class AlphaAdjuster {
      */
     public double computeSuccessProbability() {
         int maxProtected = auxMTable.getLengthOf("inv") - 1;
-        if(maxProtected == -1){
+        if (maxProtected == -1) {
             return alpha;
         }
         int minProtected = 1;

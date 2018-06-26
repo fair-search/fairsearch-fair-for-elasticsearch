@@ -315,7 +315,7 @@ public class FairRescoreBuilder extends RescorerBuilder<FairRescoreBuilder> {
                 throw new ElasticsearchException("Fair rescorer can not proceed, too few protected elements");
             }
 
-            return fairTopK.fairTopK(npQueue, pQueue, protectedElementsCount, proportion, significance);
+            return fairTopK.fairTopK(npQueue, pQueue, topDocs.scoreDocs.length, proportion, significance);
         }
 
         private boolean isProtected(Document doc, FairSearchConfig config) {
