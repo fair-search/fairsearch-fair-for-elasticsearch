@@ -2,9 +2,6 @@ package com.purbon.search.fair.utils;
 
 import org.apache.commons.math3.distribution.BinomialDistribution;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 
 public class AlphaAdjuster {
@@ -78,10 +75,10 @@ public class AlphaAdjuster {
      *
      * @return The probability of rejecting a fair ranking
      */
-    public double computeSuccessProbability() {
+    public double computeFailureProbability() {
         int maxProtected = auxMTable.getLengthOf("inv") - 1;
         if (maxProtected == -1) {
-            return alpha;
+            return 0;
         }
         int minProtected = 1;
         double successProbability = 0;

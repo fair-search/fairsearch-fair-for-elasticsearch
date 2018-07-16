@@ -44,14 +44,14 @@ public class BinarySearchAlphaAdjuster {
      */
     private double adjustFlatSearch() {
         AlphaAdjuster minAdjuster = new AlphaAdjuster(k, p, alpha);
-        double min = minAdjuster.computeSuccessProbability();
+        double min = minAdjuster.computeFailureProbability();
         double minAlpha = alpha;
         int steps = 500;
         double stepSize = alpha / steps;
         for (int i = 0; i < steps; i++) {
             double adjustedAlpha = alpha - (i * stepSize);
             AlphaAdjuster adjuster = new AlphaAdjuster(k, p, adjustedAlpha);
-            double currentSuccessProb = adjuster.computeSuccessProbability();
+            double currentSuccessProb = adjuster.computeFailureProbability();
             if (Math.abs(currentSuccessProb - alpha) < Math.abs(min - alpha)) {
                 min = currentSuccessProb;
                 minAlpha = adjustedAlpha;
@@ -74,7 +74,7 @@ public class BinarySearchAlphaAdjuster {
         while (left <= right) {
             adjustedAlpha = (left + right) / 2.0;
             AlphaAdjuster adjuster = new AlphaAdjuster(k, p, adjustedAlpha);
-            double succProb = adjuster.computeSuccessProbability();
+            double succProb = adjuster.computeFailureProbability();
             if (Math.abs(succProb - alpha) <= 0.0001) {
                 return adjustedAlpha;
             } else if (Math.abs(succProb - alpha) < Math.abs(succProb - minOptAlpha)) {
