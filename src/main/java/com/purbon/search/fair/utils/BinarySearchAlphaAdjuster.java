@@ -1,17 +1,25 @@
 package com.purbon.search.fair.utils;
 
-import java.util.ArrayList;
-
 public class BinarySearchAlphaAdjuster {
 
-    private int n;
+
     private int k;
     private double p;
     private double alpha;
-    private static final double STEP = 0.0000000000000001;
+    private double adjustedAlpha;
+    private static final double STEP = 0.000001;
 
-    public BinarySearchAlphaAdjuster(int n, int k, double p, double alpha) {
-        this.n = n;
+
+    public BinarySearchAlphaAdjuster(int k, double p, double alpha) {
+        if (k < 20) {
+            throw new IllegalArgumentException("Parameter k must be at least 20 to be adjusted");
+        }
+        if (p <= 0.0 || p >= 1.0) {
+            throw new IllegalArgumentException("Parameter p must be in ]0.0, 1.0[");
+        }
+        if (alpha <= 0d || alpha >= 1.0) {
+            throw new IllegalArgumentException("Parameter alpha must be in ]0.0, 1.0[");
+        }
         this.k = k;
         this.p = p;
         if (alpha < 0.001) {
@@ -21,123 +29,80 @@ public class BinarySearchAlphaAdjuster {
     }
 
     public double adjustAlpha() {
-        return adjustIterative(alpha);
+        if (this.k <= 40 && this.k>=20) {
+            this.adjustedAlpha = adjustFlatSearch();
+            return adjustedAlpha;
+        } else {
+            this.adjustedAlpha = adjustIterative();
+            return adjustedAlpha;
+        }
+    }
+
+    /**
+     * Searches iterative a better alpha bye trying smaller alphas step by step. The step size equals 1/500 of the initial alpha.
+     * @return the alpha with the least distance from the desired failure probability found by the steps
+     */
+    private double adjustFlatSearch() {
+        AlphaAdjuster minAdjuster = new AlphaAdjuster(k, p, alpha);
+        double min = minAdjuster.computeFailureProbability();
+        double minAlpha = alpha;
+        int steps = 500;
+        double stepSize = alpha / steps;
+        for (int i = 0; i < steps; i++) {
+            double adjustedAlpha = alpha - (i * stepSize);
+            AlphaAdjuster adjuster = new AlphaAdjuster(k, p, adjustedAlpha);
+            double currentSuccessProb = adjuster.computeFailureProbability();
+            if (Math.abs(currentSuccessProb - alpha) < Math.abs(min - alpha)) {
+                min = currentSuccessProb;
+                minAlpha = adjustedAlpha;
+            }
+        }
+        return minAlpha;
     }
 
 
-    private double adjustIterative(double alpha) {
+    /**
+     * Searches binary and iterative for the right failure probability
+     * @return the adjusted alpha
+     */
+    private double adjustIterative() {
         double adjustedAlpha;
         double left = Double.MIN_VALUE;
         double right = alpha;
-        AlphaAdjuster adj = new AlphaAdjuster(k, p, alpha);
-        double min = adj.computeSuccessProbability();
-        double secondMin = 0;
-        double minOptAlpha = alpha;
-        double secondMinOptAlpha = 0;
-        ArrayList<SuccessProbAlphaPair> succProbs = new ArrayList<>();
+        double minOptAlpha = (left + right) / 2.0;
 
         while (left <= right) {
             adjustedAlpha = (left + right) / 2.0;
             AlphaAdjuster adjuster = new AlphaAdjuster(k, p, adjustedAlpha);
-            double succProb = adjuster.computeSuccessProbability();
-            succProbs.add(new SuccessProbAlphaPair(succProb, adjustedAlpha));
-            if (succProb <= 0.00001 && succProb > 0) {
+            double succProb = adjuster.computeFailureProbability();
+            if (Math.abs(succProb - alpha) <= 0.0001) {
                 return adjustedAlpha;
+            } else if (Math.abs(succProb - alpha) < Math.abs(succProb - minOptAlpha)) {
+                minOptAlpha = adjustedAlpha;
             }
-            if (0.00001 < succProb) {
+            if (alpha < succProb) {
                 right = adjustedAlpha - STEP;
             } else {
                 left = adjustedAlpha + STEP;
             }
-            if (succProb < min) {
-                secondMin = min;
-                secondMinOptAlpha = minOptAlpha;
-                min = succProb;
-                minOptAlpha = adjustedAlpha;
-
-            }
 
         }
-        return secondSearch(minOptAlpha, secondMinOptAlpha);
-    }
-
-    private double secondSearch(double left, double right) {
-        double step = 0.00000001;
-        AlphaAdjuster adj = new AlphaAdjuster(k, p, left);
-        double oldSuccProb = 1 - adj.computeSuccessProbability();
-        ArrayList<SuccessProbAlphaPair> values = new ArrayList<>();
-        while (left < right) {
-            left = left + step;
-            AlphaAdjuster adjuster = new AlphaAdjuster(k, p, left);
-            double succProb = 1 - adjuster.computeSuccessProbability();
-            if (oldSuccProb < succProb) {
-                break;
-            }
-            oldSuccProb = succProb;
-            values.add(new SuccessProbAlphaPair(succProb, left));
-        }
-        return values.size() > 1 ? getMinAlpha(values) : left;
-    }
-
-    private double getMinAlpha(ArrayList<SuccessProbAlphaPair> list) {
-        double min = list.get(0).getSuccProb();
-        double alpha = list.get(0).getAlpha();
-        for (SuccessProbAlphaPair p : list) {
-            if (p.getSuccProb() < min) {
-                min = p.getSuccProb();
-                alpha = p.getAlpha();
-            }
-        }
-        return alpha;
-    }
-
-    public int getN() {
-        return n;
-    }
-
-    public void setN(int n) {
-        this.n = n;
+        return minOptAlpha;
     }
 
     public int getK() {
         return k;
     }
 
-    public void setK(int k) {
-        this.k = k;
-    }
-
     public double getP() {
         return p;
-    }
-
-    public void setP(double p) {
-        this.p = p;
     }
 
     public double getAlpha() {
         return alpha;
     }
 
-    public void setAlpha(double alpha) {
-        this.alpha = alpha;
-    }
-
-    private class SuccessProbAlphaPair {
-        double succProb;
-        double alpha;
-
-        private SuccessProbAlphaPair(double succProb, double alpha) {
-            this.succProb = succProb;
-            this.alpha = alpha;
-        }
-
-        private double getSuccProb() {
-            return succProb;
-        }
-
-        private double getAlpha() {
-            return alpha;
-        }
+    public double getAdjustedAlpha() {
+            return adjustedAlpha;
     }
 }

@@ -9,17 +9,26 @@ public class MTableGenerator {
     private int n;
     private double p;
     private double alpha;
+    private double adjustedAlpha;
+    private boolean adjustAlpha;
 
     /**
-     * @param n     Total number of elements
-     * @param p     The proportion of protected candidates in the top-k ranking
-     * @param alpha the significance level
+     * @param n           Total number of elements
+     * @param p           The proportion of protected candidates in the top-k ranking
+     * @param alpha       the significance level
+     * @param adjustAlpha should the alpha be adjusted
      */
-    public MTableGenerator(int n, double p, double alpha) {
+    public MTableGenerator(int n, double p, double alpha, boolean adjustAlpha) {
         if (parametersAreValid(n, p, alpha)) {
             this.n = n;
             this.p = p;
+            this.adjustAlpha = adjustAlpha;
             this.alpha = alpha;
+            if (adjustAlpha && n >= 20) {
+                this.adjustedAlpha = new BinarySearchAlphaAdjuster(n, p, alpha).adjustAlpha();
+            } else {
+                this.adjustedAlpha = alpha;
+            }
         } else {
             throw new IllegalArgumentException("Invalid Input Parameters for MTable calculation.");
         }
@@ -64,7 +73,11 @@ public class MTableGenerator {
     private Integer m(int k) {
 
         BinomialDistribution dist = new BinomialDistribution(k, p);
-        return dist.inverseCumulativeProbability(alpha);
+        if (adjustAlpha) {
+            return dist.inverseCumulativeProbability(adjustedAlpha);
+        } else {
+            return dist.inverseCumulativeProbability(alpha);
+        }
     }
 
     public int[] getMTable() {
@@ -82,8 +95,12 @@ public class MTableGenerator {
         return p;
     }
 
-    public double getAlpha() {
+    public double getOriginalAlpha() {
         return alpha;
+    }
+
+    public double getAdjustedAlpha() {
+        return adjustedAlpha;
     }
 
 }

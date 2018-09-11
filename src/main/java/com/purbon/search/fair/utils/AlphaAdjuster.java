@@ -1,6 +1,7 @@
 package com.purbon.search.fair.utils;
 
 import org.apache.commons.math3.distribution.BinomialDistribution;
+
 import java.util.ArrayList;
 
 public class AlphaAdjuster {
@@ -29,7 +30,7 @@ public class AlphaAdjuster {
         if (p <= 0.0 || p >= 1.0) {
             throw new IllegalArgumentException("Parameter p must be in ]0.0, 1.0[");
         }
-        if (alpha <= 0.0 || alpha >= 1.0) {
+        if (alpha <= 0d || alpha >= 1.0) {
             throw new IllegalArgumentException("Parameter alpha must be in ]0.0, 1.0[");
         }
 
@@ -38,13 +39,18 @@ public class AlphaAdjuster {
         this.alpha = alpha;
         this.currentHigh = 0;
 
-        this.mTableGenerator = new MTableGenerator(n, p, alpha);
+        this.mTableGenerator = new MTableGenerator(n, p, alpha, false);
         this.mTable = this.mTableGenerator.getMTable();
-        this.auxMTable = this.computeAuxTMTable();
+        if (this.mTable.length <= 1) {
+            throw new IllegalStateException("n must be at least 1");
+        } else {
+            this.auxMTable = this.computeAuxTMTable();
+        }
     }
 
     /**
      * Stores the inverse of an mTable entry and the size of the block with respect to the inverse
+     *
      * @return A Dataframe with the columns "inv" and "block" for the values of the inverse mTable and blocksize
      */
     public DataFrame computeAuxTMTable() {
@@ -66,10 +72,14 @@ public class AlphaAdjuster {
 
     /**
      * Computes the probability of rejecting a fair ranking with the given parameters n, p and alpha
+     *
      * @return The probability of rejecting a fair ranking
      */
-    public double computeSuccessProbability() {
+    public double computeFailureProbability() {
         int maxProtected = auxMTable.getLengthOf("inv") - 1;
+        if (maxProtected == -1) {
+            return 0;
+        }
         int minProtected = 1;
         double successProbability = 0;
 
@@ -87,7 +97,7 @@ public class AlphaAdjuster {
         while (minProtected < maxProtected) {
             //get the current blockLength from auxMTable
             int blockLength = auxMTable.at(minProtected, "block");
-            if (blockLength <= pmfCache.size() && pmfCache.get(blockLength) != null) {
+            if (blockLength < pmfCache.size() && pmfCache.get(blockLength) != null) {
                 currentTrial = pmfCache.get(blockLength);
             } else {
                 currentTrial = new ArrayList<>();
@@ -121,12 +131,12 @@ public class AlphaAdjuster {
             minProtected += 1;
         }
 
-        return 1-successProbability;
+        return 1 - successProbability;
 
     }
 
     private ArrayList<ArrayList<Double>> adjustPmfCache(ArrayList<ArrayList<Double>> pmfCache, int blocklength) {
-        if (pmfCache.size() < blocklength) {
+        if (pmfCache.size() <= blocklength) {
             for (int i = pmfCache.size(); i <= blocklength; i++) {
                 pmfCache.add(null);
             }
@@ -162,8 +172,9 @@ public class AlphaAdjuster {
     /**
      * Shifts all entries of an array to the right for pos positions
      * Example: shiftToRight('1,2,3,4',2) ---> 3,4,1,2
+     *
      * @param array the array that should be shifted
-     * @param pos positions to shift to the right
+     * @param pos   positions to shift to the right
      * @return the shifted array
      */
     private double[] shiftToRight(double[] array, int pos) {
@@ -188,6 +199,5 @@ public class AlphaAdjuster {
         }
         return sum;
     }
-    
 
 }
