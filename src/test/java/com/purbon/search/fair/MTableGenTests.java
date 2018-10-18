@@ -194,21 +194,21 @@ public class MTableGenTests extends LuceneTestCase {
     public void testComputeMTableOtherValuesAndNoAdjustmentTest(){
         MTableGenerator gen1 = new MTableGenerator(40, 0.6, 0.1, false);
         MTableGenerator gen2 = new MTableGenerator(50, 0.5, 0.3, false);
-        MTableGenerator gen3 = new MTableGenerator(500, 0.5, 0.01, false);
+
 
         boolean gen1MatchesMTable40_06_01 = false;
         boolean gen2MatchesMTable50_03_03 = false;
-        boolean gen3MatchesMTable500_05_001 = false;
+
 
         int[] gen1MTable = gen1.getMTable();
         int[] gen2MTable = gen2.getMTable();
-        int[] gen3MTable = gen3.getMTable();
+
 
         gen1MatchesMTable40_06_01 = arraysAreEqual(gen1MTable, mtable40_06_01);
         gen2MatchesMTable50_03_03 = arraysAreEqual(gen2MTable, mtable50_03_03);
-        gen3MatchesMTable500_05_001 = arraysAreEqual(gen3MTable, mtable500_05_001);
 
-        assertTrue(gen1MatchesMTable40_06_01 && gen2MatchesMTable50_03_03 && gen3MatchesMTable500_05_001);
+
+        assertTrue(gen1MatchesMTable40_06_01 && gen2MatchesMTable50_03_03);
     }
 
     public void testComputeMTable200AndNoAdjustmentTest() {
@@ -312,7 +312,6 @@ public class MTableGenTests extends LuceneTestCase {
     public void testComputeMTableOtherValuesAndAdjustmentTest() {
         MTableGenerator gen1 = new MTableGenerator(40, 0.6, 0.1, true);
         MTableGenerator gen2 = new MTableGenerator(50, 0.5, 0.3, true);
-        MTableGenerator gen3 = new MTableGenerator(500, 0.5, 0.01, true);
 
         boolean gen1MatchesMTable40_06_01 = false;
         boolean gen2MatchesMTable50_03_03 = false;
@@ -320,13 +319,11 @@ public class MTableGenTests extends LuceneTestCase {
 
         int[] gen1MTable = gen1.getMTable();
         int[] gen2MTable = gen2.getMTable();
-        int[] gen3MTable = gen3.getMTable();
 
         gen1MatchesMTable40_06_01 = arraysAreEqual(gen1MTable, mtable40_06_01_adj);
         gen2MatchesMTable50_03_03 = arraysAreEqual(gen2MTable, mtable50_03_03_adj);
-        gen3MatchesMTable500_05_001 = arraysAreEqual(gen3MTable, mtable500_05_001_adj);
 
-        assertTrue(gen1MatchesMTable40_06_01 && gen2MatchesMTable50_03_03 && gen3MatchesMTable500_05_001);
+        assertTrue(gen1MatchesMTable40_06_01 && gen2MatchesMTable50_03_03);
     }
 
     public void testComputeMTableWithValidParametersAndAdjustmentTest() {
@@ -361,14 +358,6 @@ public class MTableGenTests extends LuceneTestCase {
         assertTrue(gen16MatchesMtable200_04_01 && gen17MatchesMtable200_04_02 && gen18MatchesMtable200_05_01 && gen19MatchesMtable200_05_02 && gen20MatchesMtable200_06_01 && gen21MatchesMtable200_06_02);
     }
 
-
-    public void testInitializeWithToSmallAlphaTest() {
-        try {
-            MTableGenerator gen = new MTableGenerator(50, 0.5, 0.0001, true);
-            fail("Should throw IllegalArgumentException");
-        } catch (IllegalArgumentException e) {
-        }
-    }
 
     public void testInitializeWithInvalidNValueTest() {
         try {

@@ -25,6 +25,34 @@ public class DataFrame {
         }
     }
 
+    public ArrayList<Integer> getColumn(String columnName){
+        if(columnName.equals(column1Name)){
+            return col1;
+        }else if(columnName.equals(column2Name)){
+            return col2;
+        }else{
+            throw new IllegalArgumentException("Invalid Column Name");
+        }
+    }
+
+    public Integer getSumOf(String columnName) {
+        Integer sum = 0;
+        if (column1Name.equals(columnName)) {
+            for (Integer i : col1) {
+                sum += i;
+            }
+            return sum;
+        }else if(column2Name.equals(columnName)){
+            for (Integer i : col2) {
+                sum += i;
+            }
+            return sum;
+        }else{
+            throw new IllegalArgumentException("Invalid Column Name");
+        }
+
+    }
+
     public void put(int position, int col1Value, int col2Value) {
         while (position > col1.size() - 1) {
             col1.add(null);

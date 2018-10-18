@@ -24,39 +24,66 @@ public class MTableGenerator {
             this.p = p;
             this.adjustAlpha = adjustAlpha;
             this.alpha = alpha;
-            if (adjustAlpha && n >= 20) {
-                this.adjustedAlpha = new BinarySearchAlphaAdjuster(n, p, alpha).adjustAlpha();
+            if (adjustAlpha) {
+                RecursiveNumericFailprobabilityCalculator adjuster = new RecursiveNumericFailprobabilityCalculator(n, p, alpha);
+                MTableFailProbPair failProbPair = adjuster.adjustAlpha();
+                this.adjustedAlpha = failProbPair.getAlpha();
+                this.mTable = failProbPair.getmTable();
             } else {
                 this.adjustedAlpha = alpha;
+                this.mTable = computeMTable();
             }
         } else {
             throw new IllegalArgumentException("Invalid Input Parameters for MTable calculation.");
         }
     }
 
+    /**
+     * Stores the inverse of an mTable entry and the size of the block with respect to the inverse
+     *
+     * @return A Dataframe with the columns "inv" and "block" for the values of the inverse mTable and blocksize
+     */
+    public DataFrame computeAuxTMTable() {
+        DataFrame table = new DataFrame("inv", "block");
+        int lastMSeen = 0;
+        int lastPosition = 0;
+        for (int position = 1; position < mTable.length; position++) {
+            if (mTable[position] == lastMSeen + 1) {
+                lastMSeen += 1;
+                table.put(position, position, (position - lastPosition));
+                lastPosition = position;
+            } else if (mTable[position] != lastMSeen) {
+                throw new RuntimeException("Inconsistent mtable");
+            }
+        }
+        table.resolveNullEntries();
+        return table;
+    }
+
     private boolean parametersAreValid(int n, double p, double alpha) {
         return nIsValid(n) && pIsValid(p) && alphaIsValid(alpha);
     }
 
+    private boolean alphaIsValid(double alpha) {
+        if (alpha < 0 || alpha >=1) {
+            throw new IllegalArgumentException("Parameter alpha must be at in [0, 1[");
+        } else {
+            return true;
+        }
+
+    }
+
     private boolean nIsValid(int n) {
-        if (n < 1) {
-            throw new IllegalArgumentException("Parameter n must be at least 1");
+        if (n < 10 || n > 400) {
+            throw new IllegalArgumentException("Parameter n must be at in [10, 400]");
         } else {
             return true;
         }
     }
 
     private boolean pIsValid(double p) {
-        if (p >= 1d || p <= 0d) {
-            throw new IllegalArgumentException("Parameter p must be in ]0.0, 1.0[");
-        } else {
-            return true;
-        }
-    }
-
-    private boolean alphaIsValid(double alpha) {
-        if (alpha <= 0d || alpha >= 1d) {
-            throw new IllegalArgumentException("Parameter alpha must be in ]0.0, 1.0[");
+        if (p >= 1d || p <= 0.05d) {
+            throw new IllegalArgumentException("Parameter p must be in [0.05, 0.95]");
         } else {
             return true;
         }
