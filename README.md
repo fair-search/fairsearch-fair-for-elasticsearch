@@ -4,10 +4,10 @@
 [![Build Status](https://travis-ci.org/fair-search/fairsearch-elasticsearch-plugin.svg?branch=master)](https://travis-ci.org/fair-search/fairsearch-elasticsearch-plugin)
 [![Maintainability](https://api.codeclimate.com/v1/badges/d1782dfbff41827f33f9/maintainability)](https://codeclimate.com/github/fair-search/fairsearch-elasticsearch-plugin/maintainability)
 
-
-
 The Fair Search Elasticsearch plugin uses machine learning to provide a fair search result with relevant protected 
 and non protected classes. 
+
+:warning: This is a work in progress, will be launched officially end of November 2018.
 
 # What this plugin does...
 
