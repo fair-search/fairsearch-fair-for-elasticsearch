@@ -57,6 +57,56 @@ See the full list of [prebuilt versions](https://fair-search.github.io/). If you
 
 Notes if you want to dig into the code or build for a version there's no build for.
 
+# How to use the Plugin
+Once you have a running Elasticsearch node with the fairsearch plugin installed you can perform search queries and get the results in a fair ordering according to the [FA*IR: A Fair Top-k Ranking Algorithm](https://arxiv.org/abs/1706.06368).
+
+### Create a MTable
+
+A MTable is a representation for a fair ranking. Before we can perform a fair query we have to create and store one mtable in our Elasticsearch node. Before we create the mtable we have to think about some parameters:
+```
+k=25 "The length of the Ranking"
+p=0.5 "The desired proportion of candidates with an protected attribute"
+alpha = 0.1 "The significance level"
+```
+We recommend to read [FA*IR: A Fair Top-k Ranking Algorithm](https://arxiv.org/abs/1706.06368) in order to understand why we need these parameters.
+
+For this description of a fair ranking we can now create the mtable with the following query:
+
+```
+POST http://yourESNodeAdress/_fs/_mtable/0.5/0.1/25
+```
+The Mtable is now stored in your Elasticsearch node.
+To get a list of all mtables in your node you can make the following request:
+
+```
+GET http://yourESNodeAdress/_fs/_mtable
+```
+
+### Get a Fair Ranking
+After you have created the mtable for your Ranking we can make a fair search query as follows:
+
+```
+POST http://yourESNodeAdress/indexName/_search
+
+{
+	"from" : 0, "size" : 25,
+	"query" : {
+		"match" : {
+			"body" : "hello"
+			}
+		},
+	"rescore" : {
+		"window_size" : 25,
+		"fair_rescorer" : {
+			"protected_key" : "gender",
+			"protected_value" : "f",
+			"significance_level" : 0.1,
+			"min_proportion_protected" : 0.5
+			}
+		}
+	
+```
+
 # Example Application
 
 See [EXAMPLE.md](EXAMPLE.md) for a detailed example of an Elasticsearch Application on your local machine.
