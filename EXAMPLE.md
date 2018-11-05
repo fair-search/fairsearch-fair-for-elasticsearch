@@ -10,6 +10,27 @@ Our target infrastructure will look like this:
 
 You can download all files of this Tutorial [HERE]()
 
+# Quick Version
+1. Download and install [Elasticsearch 6.2.4](https://www.elastic.co/de/downloads/past-releases/elasticsearch-6-2-4).
+2. Download and install the the snapshot build of the plugin [fairsearch-1.0-es6.2.4-snapshot.zip](https://github.com/fair-search/fairsearch-elasticsearch-plugin)
+3. Download and Install Node.js [from here](https://nodejs.org/en/download/)
+4. Download the example project [from here]()
+5. Open the example folder and do `npm init`
+6. Do 
+```
+C:\Users\Demo\App> npm install express
+C:\Users\Demo\App> npm install elasticsearch
+C:\Users\Demo\App> npm install xhr2
+C:\Users\Demo\App> npm install es-response-parser
+C:\Users\Demo\App> npm install bluebird
+C:\Users\Demo\App> npm install JSON
+C:\Users\Demo\App> npm install fs
+```
+7. Start elasticsearch with `path\to\es\elasticsearch-6.2.4\bin>elasticsearch`
+8. Start the server with `path\to\project\example>node server.js`
+9. Open your browser with `http://localhost:8080/` 
+10. Click on the buttons and see the results.
+
 # Setup the Project
 
 ### Install Elasticsearch
@@ -270,3 +291,13 @@ For this tutorial, the following frontend will be sufficient:
 </html>
 ```
 This will perform a Top10 query depending on which button you click. After receiving the response from the server, both methods will insert the response as a list into the html document.
+### Run everything
+First we have to start Elasticsearch. Open the bin directory in your elasticsearch folder and type
+`C:\Users\Demo\elasticsearch-6.2.4\bin>elasticsearch`
+Wait until Elasticsearch has started.
+
+After that we have to start the server. Open the Project directory and type:
+`C:\Users\Demo\App>node server.js`
+
+Now open your browser on `localhost:8080`.
+Clicking on one of the buttons will show you the results.
