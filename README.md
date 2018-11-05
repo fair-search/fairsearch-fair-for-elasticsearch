@@ -57,6 +57,14 @@ See the full list of [prebuilt versions](https://fair-search.github.io/). If you
 
 Notes if you want to dig into the code or build for a version there's no build for.
 
+### 1. Build with Gradle Wrapper
+
+```
+./gradlew clean check
+```
+
+This runs the tasks in the `esplugin` gradle plugin that builds, tests, generates a Elasticsearch plugin zip file.
+
 # How to use the Plugin
 Once you have a running Elasticsearch node with the fairsearch plugin installed you can perform search queries and get the results in a fair ordering according to the [FA*IR: A Fair Top-k Ranking Algorithm](https://arxiv.org/abs/1706.06368).
 
@@ -111,14 +119,6 @@ POST http://yourESNodeAdress/indexName/_search
 # Example Application
 
 See [EXAMPLE.md](EXAMPLE.md) for a detailed example of an Elasticsearch Application on your local machine.
-
-### 1. Build with Gradle Wrapper
-
-```
-./gradlew clean check
-```
-
-This runs the tasks in the `esplugin` gradle plugin that builds, tests, generates a Elasticsearch plugin zip file.
 
 # Who built this?
 
