@@ -6,7 +6,7 @@ We highly recommend to read [FA*IR: A Fair Top-k Ranking Algorithm](https://arxi
 Our goal with this tutorial is to set up a Node.js Web search application which uses Elasticsearch with the fairsearch plug-in.
 However there are uncountable ways to use Elasticsearch and many different possible infrastructures, we want to provide an easy tutorial to get a feeling how to work with the fairsearch plug-in and Elasticsearch.
 Our target infrastructure will look like this:
-(demoInfrastructure.png)
+[](https://github.com/fair-search/fairsearch-elasticsearch-plugin/blob/master/demoInfrastructure.png)
 
 ### Install Elasticsearch
 The first thing we need is Elasticsearch. Download [Elasticsearch 6.2.4](https://www.elastic.co/de/downloads/past-releases/elasticsearch-6-2-4).
