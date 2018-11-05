@@ -226,6 +226,47 @@ For this tutorial, the following frontend will be sufficient:
 		<button onclick="unfairQuery()" style="width: 100px; height: 50px;">Unfair Search</button>
 		<div id="ranking"> Rankings
 		</div>
-	</body> 
+	</body>
+	<script>
+	function unfairQuery(){
+	var http = new XMLHttpRequest();
+	var url = "/searchunfair/10/hello";
+	http.open("GET", url, true);
+	http.onreadystatechange =  function(){
+	if(http.readyState === 4 && http.status === 200) {
+	var arr = JSON.parse(http.responseText);
+	var ranking = document.getElementById("ranking");
+	var html = "";
+	for(var i = 0; i<arr.length; i++){
+		html +="<li>"+arr[i][0]+"</li>";
+		html+="<p></p>";
+	}
+	ranking.innerHTML=html;
+	}
+	};
+	
+	http.send();
+}
+	function fairQuery(){
+	var http = new XMLHttpRequest();
+	var url = "/searchfair/10/0.8/0.1/hello";
+	http.open("GET", url, true)
+	http.onreadystatechange =  function(){
+	if(http.readyState === 4 && http.status === 200) {
+	var arr = JSON.parse(http.responseText);
+	var ranking = document.getElementById("ranking");
+	var html = "Rankings<p/>";
+	for(var i = 0; i<arr.length; i++){
+		html +="<li>"+arr[i][0]+"</li>";
+		html+="<p></p>";
+	}
+	ranking.innerHTML=html;
+	}
+	};
+	
+	http.send();
+}
+	</script>
 </html>
 ```
+This will perform a Top10 query depending on which button you click. After receiving the response from the server, both methods will insert the response as a list into the html document.
