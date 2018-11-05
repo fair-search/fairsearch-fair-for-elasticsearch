@@ -43,3 +43,30 @@ Run the following command:
 C:\Users\Demo\App> npm init
 ```
 and follow the instructions. This will create a local npm module folder in our project directory.
+We will need some dependencies for the server to work with Elasticsearch and everything we need. Execute the following commands to install everything in your local module:
+```
+C:\Users\Demo\App> npm install express
+C:\Users\Demo\App> npm install elasticsearch
+C:\Users\Demo\App> npm install xhr2
+C:\Users\Demo\App> npm install es-response-parser
+C:\Users\Demo\App> npm install bluebird
+C:\Users\Demo\App> npm install JSON
+```
+### Create a Frontend with HTML
+For this tutorial, the following frontend will be sufficient:
+```
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en"> 
+	<head> 
+		<meta http-equiv="content-type" content="text/html; charset=utf-8">
+		<title>FA*IR Example</title> 
+	</head>
+	<body>
+	<button onclick="fairQuery()" style="width: 100px; height: 50px;">FA*IR Search</button>
+	<p/>
+	<button onclick="unfairQuery()" style="width: 100px; height: 50px;">Unfair Search</button>
+	<div id="ranking"> Rankings
+	</div>
+	</body> 
+ </html>
+```
