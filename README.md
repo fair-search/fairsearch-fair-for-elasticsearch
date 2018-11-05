@@ -34,17 +34,24 @@ Extra bits at [CONTRIBUTING.md](CONTRIBUTTING.md)
 # Installing
 
 ### Install Elasticsearch
-First intall [Elasticsearch Version 6.2.4](https://www.elastic.co/de/downloads/past-releases/elasticsearch-6-2-4)
+First intall [Elasticsearch Version 6.2.4](https://www.elastic.co/de/downloads/past-releases/elasticsearch-6-2-4).
+To install the fairsearch plugin you can run 
 
-See the full list of [prebuilt versions](https://fair-search.github.io/). If you don't see a version available, see the link below for building.
-
-To install, you'd run a command such as:
-
-`./bin/elasticsearch-plugin install https://fair-search.github.io/fair-reranker/fairsearch-1.0-es6.1.2-SNAPSHOT.zip`
-
+`./bin/elasticsearch-plugin install https://fair-search.github.io/fair-reranker/fairsearch-1.0-es6.2.4-SNAPSHOT.zip`
 (It's expected you'll confirm some security exceptions, you can pass `-b` to `elasticsearch-plugin` to automatically install)
 
-If you already are running Elasticsearch, don't forget to restart!
+or if you have made changes to the plugin you can run 
+
+```
+./gradlew clean check
+```
+and then install your build with the following command
+
+```
+./bin/elasticsearch-plugin install file:///path/to/project/build/distributions/fairsearch-1.0.0-es6.2.2.zip
+```
+
+See the full list of [prebuilt versions](https://fair-search.github.io/). If you don't see a version available, see the link below for building.
 
 # Development
 
@@ -57,12 +64,6 @@ Notes if you want to dig into the code or build for a version there's no build f
 ```
 
 This runs the tasks in the `esplugin` gradle plugin that builds, tests, generates a Elasticsearch plugin zip file.
-
-### 2. Install with `./bin/elasticsearch-plugin`
-
-```
-./bin/elasticsearch-plugin install file:///path/to/project/build/distributions/fairsearch-1.0.0-es6.2.2.zip
-```
 
 # Who built this?
 
