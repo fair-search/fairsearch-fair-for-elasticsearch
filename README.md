@@ -104,6 +104,7 @@ POST http://yourESNodeAdress/indexName/_search
 			"min_proportion_protected" : 0.5
 			}
 		}
+}
 	
 ```
 
