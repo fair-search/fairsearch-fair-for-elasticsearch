@@ -8,6 +8,8 @@ However there are uncountable ways to use Elasticsearch and many different possi
 Our target infrastructure will look like this:
 ![](demoInfrastructure.png)
 
+You can download all files of this Tutorial [HERE]()
+
 # Setup the Project
 
 ### Install Elasticsearch
@@ -51,6 +53,7 @@ C:\Users\Demo\App> npm install xhr2
 C:\Users\Demo\App> npm install es-response-parser
 C:\Users\Demo\App> npm install bluebird
 C:\Users\Demo\App> npm install JSON
+C:\Users\Demo\App> npm install fs
 ```
 ### Create the Server
 Create the a file called `server.js` in the directory `C:\Users\Demo\App\`.
@@ -63,6 +66,7 @@ var Promise = require('bluebird');
 var esParser = require('es-response-parser');
 var log = console.log.bind(console);
 var XMLHttpRequest = require('xhr2');
+var fs=require('fs');
 
 var client = new elasticsearch.Client({
   host: 'localhost:9200',
@@ -78,6 +82,61 @@ console.log('Demo server up and running.');
 });
 ```
 As we said above, Elasticsearch will run by default on port 9200. The elasticsearch package will create a connection to elasticsearch and helps us later.
+
+#### Create an Index with documents
+For this example we will create an Index in Elasticsearch called `test` and fill it with simple test data. The following function will create the Index:
+```
+function createIndex() {
+  return client.indices.create({
+    index: 'test',
+	body:{
+		settings:{
+			number_of_shards: '1',
+			number_of_replicas: '1'
+		},
+		mappings:{
+			test:{
+				properties:{
+					gender:{
+						type: 'text',
+						store: 'true'
+					}
+				}
+			}
+		}
+	}
+	
+  });
+```
+Our test documents will look like this:
+```
+{"index": "test", "type": "test", "id": 1, "body": {"body": "hello hello hello hello hello hello hello hello hello hello", "gender": "m"}}
+```
+We stored the test documents in `example_Data.json` we will insert every document through the following function:
+
+```
+function addAllToIndex(){
+var data = JSON.parse(fs.readFileSync('example_data.json', 'utf8'));
+for(var i=0; i<data.length; i++){
+	client.index({
+		index: 'test',
+		type: 'test',
+		id: ""+data[i].id,
+		body: {
+			body: ""+data[i].body.body,
+			gender: ""+data[i].body.gender
+		}
+		});
+	}
+}
+```
+Add the following lines to the bottom of the `server.js` file:
+```
+Promise.resolve()
+  .then(createIndex)
+  .then(addAllToIndex);
+```
+this will create the index and add all files with the server start.
 
 #### Handle Client Requests
 We will implement two types of requests:
@@ -110,9 +169,50 @@ app.get('/searchunfair/:k/:q', function(req, res){
 ```
 This will handle requests like `GET localhost:8080/searchunfair/10/hello` a completly default query to elasticsearch.
 However we assume here, that the documents indexed in your Elasticsearch node have a field called `gender`. We will come to that later.
+
+For a fair query we need the parameters k,p and alpha. And we have to create the mtable before we send the fair request. Add the following lines to `server.js`:
+
+```
+app.get('/searchfair/:k/:p/:alpha/:q', function(req, res){
+	var k = req.params.k;
+	var p = req.params.p;
+	var alpha = req.params.alpha;
+	var q = '"'+req.params.q+'"';
+	console.log(q);
+	
+	var xhrTable = new XMLHttpRequest();
+	xhrTable.addEventListener("readystatechange", function() {
+		if(this.readyState == 4){
+			var data = JSON.stringify({"from" : 0, "size" : k,"query": {"match": {"body": q}}, "rescore": {"window_size" : k, "fair_rescorer": {"protected_key": "gender","protected_value": "f","significance_level": alpha,"min_proportion_protected": p}}});
+
+			var xhr = new XMLHttpRequest();
+			xhr.withCredentials = true;
+			xhr.addEventListener("readystatechange", function () {
+			if (this.readyState === 4) {
+				var response = JSON.parse(this.responseText);
+				var answer = [];
+				for(var i=0; i<response.hits.hits.length; i++){
+					var person = [response.hits.hits[i]._source.body, response.hits.hits[i]._source.gender];
+					answer.push(person);
+				}
+			res.status(200);
+			res.send(answer);
+		}
+	});
+		xhr.open("POST", "http://localhost:9200/test/_search");
+		xhr.setRequestHeader("Content-Type", "application/json");
+		xhr.send(data);
+		}
+	
+	});
+	xhrTable.open("POST", "http://localhost:9200/_fs/_mtable/"+p+"/"+alpha+"/"+k);
+	xhrTable.send();
+});
+
+```
+This will get the request for a fair query and then creates the corresponding mtable. After that the fair query will be sent to elasticsearch.
 ### Create a Frontend with HTML
 For this tutorial, the following frontend will be sufficient:
-(All files of this tutorial can be found here:)
 ```
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html lang="en"> 
