@@ -8,13 +8,13 @@ However there are uncountable ways to use Elasticsearch and many different possi
 Our target infrastructure will look like this:
 ![](demoInfrastructure.png)
 
-You can download all files of this Tutorial [HERE]()
+You can download all files of this Tutorial [HERE](example)
 
 # Quick Version
 1. Download and install [Elasticsearch 6.2.4](https://www.elastic.co/de/downloads/past-releases/elasticsearch-6-2-4).
 2. Download and install the the snapshot build of the plugin [fairsearch-1.0-es6.2.4-snapshot.zip](https://github.com/fair-search/fairsearch-elasticsearch-plugin)
 3. Download and Install Node.js [from here](https://nodejs.org/en/download/)
-4. Download the example project [from here]()
+4. Download the example project [from here](example)
 5. Open the example folder and do `npm init`
 6. Do 
 ```
