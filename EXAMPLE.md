@@ -8,6 +8,8 @@ However there are uncountable ways to use Elasticsearch and many different possi
 Our target infrastructure will look like this:
 ![](demoInfrastructure.png)
 
+# Setup the Project
+
 ### Install Elasticsearch
 The first thing we need is Elasticsearch. Download [Elasticsearch 6.2.4](https://www.elastic.co/de/downloads/past-releases/elasticsearch-6-2-4).
 Once you have downloaded it, unzip it to a location of your choice. In this Tutorial, we will unzip it to "C:\Users\Demo\".
