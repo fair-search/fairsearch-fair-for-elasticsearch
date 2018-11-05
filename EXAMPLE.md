@@ -33,3 +33,11 @@ You have now installed the fairsearch plugin!
 
 ### Install Node.js
 Download Node.js [from here](https://nodejs.org/en/download/) and install it on your local machine.
+
+### Create the Project Directory
+Our Project directory will be located in `C:\Users\Demo\App\`. We will use [npm](https://www.npmjs.com/) to install all important dependencies for our node server.
+Run the following command:
+```
+C:\Users\Demo\App> npm init
+```
+and follow the instructions. This will create a local npm module folder in our project directory.
