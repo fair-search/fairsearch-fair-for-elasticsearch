@@ -52,8 +52,67 @@ C:\Users\Demo\App> npm install es-response-parser
 C:\Users\Demo\App> npm install bluebird
 C:\Users\Demo\App> npm install JSON
 ```
+### Create the Server
+Create the a file called `server.js` in the directory `C:\Users\Demo\App\`.
+Add the following lines to the file:
+```
+var express = require('express');
+var app = express();
+var elasticsearch = require('elasticsearch');
+var Promise = require('bluebird');
+var esParser = require('es-response-parser');
+var log = console.log.bind(console);
+var XMLHttpRequest = require('xhr2');
+
+var client = new elasticsearch.Client({
+  host: 'localhost:9200',
+  log: 'trace'
+});
+
+app.get('/', function(req, res) {
+  res.sendFile(__dirname + "/public/" + "index.html");
+});
+
+app.listen(8080, function(){
+console.log('Demo server up and running.');
+});
+```
+As we said above, Elasticsearch will run by default on port 9200. The elasticsearch package will create a connection to elasticsearch and helps us later.
+
+#### Handle Client Requests
+We will implement two types of requests:
+1. A fair query
+2. An unfair query
+To keep everything easy, we will model both as a get request to the server. Add the following lines to the `server.js` file:
+
+```
+app.get('/searchunfair/:k/:q', function(req, res){
+	var q = "'"+req.params.q+"'";
+	var k = req.params.k;
+	var xhr = new XMLHttpRequest();
+	var data = JSON.stringify({"from" : 0, "size" : k,"query": {"match": {"body": q}}});
+	xhr.addEventListener("readystatechange", function () {
+	if (this.readyState === 4) {
+		var response = JSON.parse(this.responseText);
+		var answer = [];
+		for(var i=0; i<response.hits.hits.length; i++){
+			var person = [response.hits.hits[i]._source.body, response.hits.hits[i]._source.gender];
+				answer.push(person);
+			}
+			res.status(200);
+			res.send(answer);
+	}
+	});
+	xhr.open("POST", "http://localhost:9200/test/_search");
+	xhr.setRequestHeader("Content-Type", "application/json");
+	xhr.send(data);
+});
+```
+This will handle requests like `GET localhost:8080/searchunfair/10/hello` a completly default query to elasticsearch.
+However we assume here, that the documents indexed in your Elasticsearch node have a field called `gender`. We will come to that later.
 ### Create a Frontend with HTML
 For this tutorial, the following frontend will be sufficient:
+(All files of this tutorial can be found here:)
 ```
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html lang="en"> 
@@ -62,11 +121,11 @@ For this tutorial, the following frontend will be sufficient:
 		<title>FA*IR Example</title> 
 	</head>
 	<body>
-	<button onclick="fairQuery()" style="width: 100px; height: 50px;">FA*IR Search</button>
-	<p/>
-	<button onclick="unfairQuery()" style="width: 100px; height: 50px;">Unfair Search</button>
-	<div id="ranking"> Rankings
-	</div>
+		<button onclick="fairQuery()" style="width: 100px; height: 50px;">FA*IR Search</button>
+		<p/>
+		<button onclick="unfairQuery()" style="width: 100px; height: 50px;">Unfair Search</button>
+		<div id="ranking"> Rankings
+		</div>
 	</body> 
- </html>
+</html>
 ```
