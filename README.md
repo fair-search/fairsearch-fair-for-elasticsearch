@@ -57,6 +57,10 @@ See the full list of [prebuilt versions](https://fair-search.github.io/). If you
 
 Notes if you want to dig into the code or build for a version there's no build for.
 
+# Example Application
+
+See [EXAMPLE.md](EXAMPLE.md) for a detailed example of an Elasticsearch Application on your local machine.
+
 ### 1. Build with Gradle Wrapper
 
 ```
