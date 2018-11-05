@@ -33,6 +33,9 @@ Extra bits at [CONTRIBUTING.md](CONTRIBUTTING.md)
 
 # Installing
 
+### Install Elasticsearch
+First intall [Elasticsearch Version 6.2.4](https://www.elastic.co/de/downloads/past-releases/elasticsearch-6-2-4)
+
 See the full list of [prebuilt versions](https://fair-search.github.io/). If you don't see a version available, see the link below for building.
 
 To install, you'd run a command such as:
