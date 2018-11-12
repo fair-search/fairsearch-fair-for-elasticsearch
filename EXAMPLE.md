@@ -9,27 +9,18 @@ Our target infrastructure will look like this:
 ![](demoInfrastructure.png)
 
 You can download all files of this Tutorial [HERE](example)
+You can download and run the [Data Transparency Lab](https://datatransparencylab.org/) Demo-Version [HERE](DTL_Demo.zip)
 
 # Quick Version
 1. Download and install [Elasticsearch 6.2.4](https://www.elastic.co/de/downloads/past-releases/elasticsearch-6-2-4).
 2. Download and install the the snapshot build of the plugin [fairsearch-1.0-es6.2.4-snapshot.zip](https://github.com/fair-search/fairsearch-elasticsearch-plugin)
 3. Download and Install Node.js [from here](https://nodejs.org/en/download/)
-4. Download the example project [from here](example)
-5. Open the example folder and do `npm init`
-6. Do 
-```
-C:\Users\Demo\App> npm install express
-C:\Users\Demo\App> npm install elasticsearch
-C:\Users\Demo\App> npm install xhr2
-C:\Users\Demo\App> npm install es-response-parser
-C:\Users\Demo\App> npm install bluebird
-C:\Users\Demo\App> npm install JSON
-C:\Users\Demo\App> npm install fs
-```
-7. Start elasticsearch with `path\to\es\elasticsearch-6.2.4\bin>elasticsearch`
-8. Start the server with `path\to\project\example>node server.js`
-9. Open your browser with `http://localhost:8080/` 
-10. Click on the buttons and see the results.
+4. Download the DTL_Demonstration project [from here](DTL_Demo.zip)
+5. Start elasticsearch with `path\to\es\elasticsearch-6.2.4\bin>elasticsearch`
+6. Create and fill a text Index with `path\to\project\elasticDemo\server>node server-ini.js`
+7. Start the server with `path\to\project\elasticDemo\server>node server.js`
+8. Open your browser with `http://localhost:8080/` 
+9. Click on the buttons and see the results.
 
 # Setup the Project
 
