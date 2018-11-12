@@ -9,6 +9,7 @@ Our target infrastructure will look like this:
 ![](demoInfrastructure.png)
 
 You can download all files of this Tutorial [HERE](example)
+
 You can download and run the [Data Transparency Lab](https://datatransparencylab.org/) Demo-Version [HERE](DTL_Demo.zip)
 
 # Quick Version
