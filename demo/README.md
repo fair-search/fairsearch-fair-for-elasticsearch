@@ -2,6 +2,11 @@
 This is a step-by-step tutorial to set up and run a Demo-Application of Elasticsearch with the FA*IR-search plugin on your local machine.
 We highly recommend to read [FA*IR: A Fair Top-k Ranking Algorithm](https://arxiv.org/abs/1706.06368) before you go through this tutorial since we will not explain the theory behind the plugin in this tutorial.
 
+The demo consists of a html frontend, a node.js server which handles the requests from the frontend and sends the processed queries to an elasticsearch node with the fairsearch plugin.
+![](https://github.com/fair-search/fairsearch-elasticsearch-plugin/blob/master/res/demoInfrastructure.png)
+
+For a more detailed explanation of the Demo-Application, and how it works, please visit our [tutorial.](TUTORIAL.md)
+
 # How to run the Demo (Quick Version)
 1. Download and install [Elasticsearch 6.2.4](https://www.elastic.co/de/downloads/past-releases/elasticsearch-6-2-4).
 2. Download and install the the snapshot build of the plugin [fairsearch-1.0-es6.2.4-snapshot.zip](https://github.com/fair-search/fairsearch-elasticsearch-plugin/blob/master/fairsearch-1.0-es6.2.4-snapshot.zip)
