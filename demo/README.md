@@ -29,7 +29,7 @@ You have now installed Elasticsearch! You can run it with `C:\Users\Demo\elastic
 Elasticsearch will run on the port 9200 per default.
 
 ### Install the Plugin
-Download the the snapshot build of the plugin [fairsearch-1.0-es6.2.4-snapshot.zip](https://github.com/fair-search/fairsearch-elasticsearch-plugin). This is just one way to get the current build of the plugin. See [README.md](README.md) for other options.
+Download the the snapshot build of the plugin [fairsearch-1.0-es6.2.4-snapshot.zip](https://github.com/fair-search/fairsearch-elasticsearch-plugin). This is just one way to get the current build of the plugin. See [our readme](https://github.com/fair-search/fairsearch-elasticsearch-plugin/blob/master/README.md) for other options.
 We will assume that we downloaded the plugin snapshot to the directory `C:\Users\Downloads\`. 
 Navigate to the bin folder of your Elasticsearch folder:
 ```
