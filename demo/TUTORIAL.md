@@ -65,197 +65,118 @@ app.get('/searchunfair/:k/:q', function(req, res){
 });
 ```
 ### FA*IR Search
-For this example we will create an Index in Elasticsearch called `test` and fill it with simple test data. The following function will create the Index:
-```
-function createIndex() {
-  return client.indices.create({
-    index: 'test',
-	body:{
-		settings:{
-			number_of_shards: '1',
-			number_of_replicas: '1'
-		},
-		mappings:{
-			test:{
-				properties:{
-					gender:{
-						type: 'text',
-						store: 'true'
-					}
-				}
-			}
-		}
-	}
-	
-  });
-```
-Our test documents will look like this:
-
-We stored the test documents in `example_Data.json` we will insert every document through the following function:
+Before we can make a fairsearch request to our es node, we have to create the mtable for the desired type of ranking.
+What a mtable is and why we need one is answered in the [FA*IR Ranking paper](https://arxiv.org/abs/1706.06368).
+Once a mtable is created, it is stored within elasticsearch. If you want to know which mtables already exist, you can adress the following endpoint:
 
 ```
-function addAllToIndex(){
-var data = JSON.parse(fs.readFileSync('example_data.json', 'utf8'));
-for(var i=0; i<data.length; i++){
-	client.index({
-		index: 'test',
-		type: 'test',
-		id: ""+data[i].id,
-		body: {
-			body: ""+data[i].body.body,
-			gender: ""+data[i].body.gender
-		}
-		});
-	}
-}
-```
-Add the following lines to the bottom of the `server.js` file:
-```
-Promise.resolve()
-  .then(createIndex)
-  .then(addAllToIndex);
-```
-this will create the index and add all files with the server start.
-
-#### Handle Client Requests
-We will implement two types of requests:
-1. A fair query
-2. An unfair query
-To keep everything easy, we will model both as a get request to the server. Add the following lines to the `server.js` file:
-
-```
-app.get('/searchunfair/:k/:q', function(req, res){
-	var q = "'"+req.params.q+"'";
-	var k = req.params.k;
+app.get('/mtables', function(req, res) {
 	var xhr = new XMLHttpRequest();
-	var data = JSON.stringify({"from" : 0, "size" : k,"query": {"match": {"body": q}}});
 	xhr.addEventListener("readystatechange", function () {
 	if (this.readyState === 4) {
-		var response = JSON.parse(this.responseText);
+		var mtables = JSON.parse(this.responseText).hits.hits;
+		console.log(mtables);
 		var answer = [];
-		for(var i=0; i<response.hits.hits.length; i++){
-			var person = [response.hits.hits[i]._source.body, response.hits.hits[i]._source.gender];
-				answer.push(person);
+		for(var i=0; i<mtables.length; i++){
+			var table ="";
+			for(var j=0; j<mtables[i]._source.mtable.length; j++){
+					table += mtables[i]._source.mtable[j];
+					if(j<mtables[i]._source.mtable.length-1){
+						table+=", ";
+						}
+				}
+			var tableArr = [mtables[i]._id, table];
+				answer.push(tableArr);
 			}
 			res.status(200);
 			res.send(answer);
+	}
+	});
+	xhr.open("GET", "http://localhost:9200/_fs/_mtable");
+	xhr.send();
+});
+```
+
+The unique identifier for a mtable is the tuple (k,p,alpha) where k is the length of the ranking, p the desired proportion of protected candidates and alpha the significance level.
+
+The Demo is built such that every time we perform a fair query, we will create the corresponding mtable. The following endpoint will initiate the process:
+
+```
+app.get('/searchfair/:k/:p/:alpha/:q', function(req, res){
+	var p = req.params.p;
+	var alpha = req.params.alpha;
+	var q = '"'+req.params.q+'"';
+	var k = req.params.k;
+	createMtableAndExecuteQuery(k,p,alpha,q, req, res);
+	console.log(q);
+	
+});
+```
+The first route leads us to
+
+```
+function createMtableAndExecuteQuery(k ,p, alpha, query, req, res){
+		var xhr = new XMLHttpRequest();
+		var data = JSON.stringify({"from" : 0, "size" : k,"query": {"match": {"body": query}}});
+		xhr.addEventListener("readystatechange", function() {
+		if (this.readyState === 4) {
+		var response = JSON.parse(this.responseText);
+		var realK = response.hits.hits.length;
+		console.log(realK);
+		var xhrTable = new XMLHttpRequest();
+		xhrTable.addEventListener("readystatechange", function() {
+			if(this.readyState === 4) {
+					executeFairQueryWithAdjustedParameters(k,p,alpha,query, req, res);
+			}
+		
+		});
+		xhrTable.open("POST", "http://localhost:9200/_fs/_mtable/"+p+"/"+alpha+"/"+realK);
+		xhrTable.send();
+		return response.hits.hits.length;
 	}
 	});
 	xhr.open("POST", "http://localhost:9200/test/_search");
 	xhr.setRequestHeader("Content-Type", "application/json");
 	xhr.send(data);
-});
+}
 ```
-This will handle requests like `GET localhost:8080/searchunfair/10/hello` a completly default query to elasticsearch.
-However we assume here, that the documents indexed in your Elasticsearch node have a field called `gender`. We will come to that later.
+The following taks are done in this method:
+1. Perform an unaware request to see how many results are there.
+	We have to do this, because if our desired ranking length is 20 but there are only 10 matches in our index, we have to 		built a mtable for k=10 instead of k=20. The variable `realK` holds this result size <=k.
+2. Built the mtable with parameters (realK, p ,alpha)
+3. Call `executeFairQueryWithAdjustedParameters`
 
-For a fair query we need the parameters k,p and alpha. And we have to create the mtable before we send the fair request. Add the following lines to `server.js`:
+Now we can be sure, that the mtable exists and we can perorm the FA*IR query with `executeFairQueryWithAdjustedParameters`.
 
 ```
-app.get('/searchfair/:k/:p/:alpha/:q', function(req, res){
-	var k = req.params.k;
-	var p = req.params.p;
-	var alpha = req.params.alpha;
-	var q = '"'+req.params.q+'"';
-	console.log(q);
-	
-	var xhrTable = new XMLHttpRequest();
-	xhrTable.addEventListener("readystatechange", function() {
-		if(this.readyState == 4){
-			var data = JSON.stringify({"from" : 0, "size" : k,"query": {"match": {"body": q}}, "rescore": {"window_size" : k, "fair_rescorer": {"protected_key": "gender","protected_value": "f","significance_level": alpha,"min_proportion_protected": p}}});
-
-			var xhr = new XMLHttpRequest();
-			xhr.withCredentials = true;
-			xhr.addEventListener("readystatechange", function () {
-			if (this.readyState === 4) {
-				var response = JSON.parse(this.responseText);
-				var answer = [];
-				for(var i=0; i<response.hits.hits.length; i++){
-					var person = [response.hits.hits[i]._source.body, response.hits.hits[i]._source.gender];
-					answer.push(person);
-				}
+function executeFairQueryWithAdjustedParameters(k,p,alpha,q, req, res){
+	var data = JSON.stringify({"from" : 0, "size" : k, "query":
+		{"match": {"body": q}}, "rescore":
+		{"window_size": k, "fair_rescorer":
+		{"protected_key": "gender","protected_value": "f","significance_level": alpha,"min_proportion_protected": p}}});
+	var xhr = new XMLHttpRequest();
+	xhr.withCredentials = true;
+	xhr.addEventListener("readystatechange", function () {
+	if (this.readyState === 4) {
+		var response = JSON.parse(this.responseText);
+		var answer = [];
+		if(response.status === 500){
+			res.status(404);
+			res.send();
+		}else{
+			for(var i=0; i<response.hits.hits.length; i++){
+				var person = [response.hits.hits[i]._source.body, response.hits.hits[i]._source.gender];
+				answer.push(person);
+			}
 			res.status(200);
 			res.send(answer);
 		}
+	}
 	});
-		xhr.open("POST", "http://localhost:9200/test/_search");
-		xhr.setRequestHeader("Content-Type", "application/json");
-		xhr.send(data);
-		}
-	
-	});
-	xhrTable.open("POST", "http://localhost:9200/_fs/_mtable/"+p+"/"+alpha+"/"+k);
-	xhrTable.send();
-});
-
-```
-This will get the request for a fair query and then creates the corresponding mtable. After that the fair query will be sent to elasticsearch.
-### Create a Frontend with HTML
-For this tutorial, the following frontend will be sufficient:
-```
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html lang="en"> 
-	<head> 
-		<meta http-equiv="content-type" content="text/html; charset=utf-8">
-		<title>FA*IR Example</title> 
-	</head>
-	<body>
-		<button onclick="fairQuery()" style="width: 100px; height: 50px;">FA*IR Search</button>
-		<p/>
-		<button onclick="unfairQuery()" style="width: 100px; height: 50px;">Unfair Search</button>
-		<div id="ranking"> Rankings
-		</div>
-	</body>
-	<script>
-	function unfairQuery(){
-	var http = new XMLHttpRequest();
-	var url = "/searchunfair/10/hello";
-	http.open("GET", url, true);
-	http.onreadystatechange =  function(){
-	if(http.readyState === 4 && http.status === 200) {
-	var arr = JSON.parse(http.responseText);
-	var ranking = document.getElementById("ranking");
-	var html = "";
-	for(var i = 0; i<arr.length; i++){
-		html +="<li>"+arr[i][0]+"</li>";
-		html+="<p></p>";
-	}
-	ranking.innerHTML=html;
-	}
-	};
-	
-	http.send();
+	xhr.open("POST", "http://localhost:9200/test/_search");
+	xhr.setRequestHeader("Content-Type", "application/json");
+	xhr.send(data);
 }
-	function fairQuery(){
-	var http = new XMLHttpRequest();
-	var url = "/searchfair/10/0.8/0.1/hello";
-	http.open("GET", url, true)
-	http.onreadystatechange =  function(){
-	if(http.readyState === 4 && http.status === 200) {
-	var arr = JSON.parse(http.responseText);
-	var ranking = document.getElementById("ranking");
-	var html = "Rankings<p/>";
-	for(var i = 0; i<arr.length; i++){
-		html +="<li>"+arr[i][0]+"</li>";
-		html+="<p></p>";
-	}
-	ranking.innerHTML=html;
-	}
-	};
-	
-	http.send();
-}
-	</script>
-</html>
 ```
-This will perform a Top10 query depending on which button you click. After receiving the response from the server, both methods will insert the response as a list into the html document.
-### Run everything
-First we have to start Elasticsearch. Open the bin directory in your elasticsearch folder and type
-`C:\Users\Demo\elasticsearch-6.2.4\bin>elasticsearch`
-Wait until Elasticsearch has started.
-
-After that we have to start the server. Open the Project directory and type:
-`C:\Users\Demo\App>node server.js`
-
-Now open your browser on `localhost:8080`.
-Clicking on one of the buttons will show you the results.
+The first part of this methods simply builts the JSON query with our desired parameters and sends it to our elasticsearch node.
+The second part looks exactly like the unaware query and will also built a simplified response for our frontend.
