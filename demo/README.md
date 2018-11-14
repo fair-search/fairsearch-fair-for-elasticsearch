@@ -6,7 +6,7 @@ We highly recommend to read [FA*IR: A Fair Top-k Ranking Algorithm](https://arxi
 1. Download and install [Elasticsearch 6.2.4](https://www.elastic.co/de/downloads/past-releases/elasticsearch-6-2-4).
 2. Download and install the the snapshot build of the plugin [fairsearch-1.0-es6.2.4-snapshot.zip](https://github.com/fair-search/fairsearch-elasticsearch-plugin/blob/master/fairsearch-1.0-es6.2.4-snapshot.zip)
 3. Download and Install Node.js [from here](https://nodejs.org/en/download/)
-4. Download the demo folder [from here](demo)
+4. Download the demo folder [from here]()
 5. Start elasticsearch with `path\to\es\elasticsearch-6.2.4\bin>elasticsearch`
 6. Create and fill a text Index with `path\to\project\elasticDemo\server>node server-ini.js`
 7. Start the server with `path\to\project\elasticDemo\server>node server.js`
