@@ -17,15 +17,15 @@ Before you go through this tutorial, please install the demo-application as desc
 # The Server
 In this parrt we will describe the [server.js](https://github.com/fair-search/fairsearch-elasticsearch-plugin/blob/master/demo/server/server.js) file, which contains the node.js server. The server will receive search requests, process them and then send them to your elasticsearch node. After receiving the response from elasticsearch, the server will again simplyfie the es-response and then send the results to the fronted. 
 
-### Search unaware
-The demo-app is able to perform "a normal" full-text search query and show the results. Every document has two fields:
+### The Data
+Every document has two fields:
 "body" which contains the resume-text and "gender" which contains the character `f` for female and `m` for male.
 Like this:
 ```
 {
 "index": "test",
 "type": "test", 
-"id": 1,
+"id": 1000,
 "body": {
 	"body": "Eddy Example - Computer Scientist - CV ...",
 	"gender": "m"
@@ -34,12 +34,14 @@ Like this:
 ```
 To learn more about our sample data, please visit our [data description](https://github.com/fair-search/fairsearch-elasticsearch-plugin/blob/master/demo/data/README.md).
 
+### Search unaware
+The demo-app is able to perform "a normal" full-text search query and show the results. The server provides the following endpoint to perform this unaware query.
 ```
 app.get('/searchunfair/:k/:q', function(req, res){
-	var q = "'"+req.params.q+"'";
-	var k = req.params.k;
+	var q = "'"+req.params.q+"'";	//get the query
+	var k = req.params.k;	//get the desired length of the ranking
 	var xhr = new XMLHttpRequest();
-	var data = JSON.stringify({"from" : 0, "size" : k,"query": {"match": {"body": q}}});
+	var data = JSON.stringify({"from" : 0, "size" : k,"query": {"match": {"body": q}}}); //JSON query for ES
 	xhr.addEventListener("readystatechange", function () {
 	if (this.readyState === 4) {
 		var response = JSON.parse(this.responseText);
@@ -48,23 +50,21 @@ app.get('/searchunfair/:k/:q', function(req, res){
 			res.status(404);
 			res.send();
 		}else{
-		for(var i=0; i<response.hits.hits.length; i++){
+		for(var i=0; i<response.hits.hits.length; i++){	//built a simple response array for the frontend
 		  var person = [response.hits.hits[i]._source.body,response.hits.hits[i]._source.gender];
 		  answer.push(person);
 		}		
 		res.status(200);
-		res.send(answer);
+		res.send(answer);	// send the response array to the frontend
 		}
 	}
 	});
-	xhr.open("POST", "http://localhost:9200/test/_search");
+	xhr.open("POST", "http://localhost:9200/test/_search");		//The ES node runs usually on port 9200
 	xhr.setRequestHeader("Content-Type", "application/json");
 	xhr.send(data);
 });
 ```
-As we said above, Elasticsearch will run by default on port 9200. The elasticsearch package will create a connection to elasticsearch and helps us later.
-
-#### Create an Index with documents
+### FA*IR Search
 For this example we will create an Index in Elasticsearch called `test` and fill it with simple test data. The following function will create the Index:
 ```
 function createIndex() {
