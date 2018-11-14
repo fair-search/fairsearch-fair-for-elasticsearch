@@ -3,6 +3,7 @@ This is a step-by-step tutorial to set up and run a Demo-Application of Elastics
 We highly recommend to read [FA*IR: A Fair Top-k Ranking Algorithm](https://arxiv.org/abs/1706.06368) before you go through this tutorial since we will not explain the theory behind the plugin in this tutorial.
 
 The demo consists of a html frontend, a node.js server which handles the requests from the frontend and sends the processed queries to an elasticsearch node with the fairsearch plugin.
+
 ![](https://github.com/fair-search/fairsearch-elasticsearch-plugin/blob/master/res/demoInfrastructure.png)
 
 For a more detailed explanation of the Demo-Application, and how it works, please visit our [tutorial.](TUTORIAL.md)
