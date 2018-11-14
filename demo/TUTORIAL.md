@@ -32,7 +32,7 @@ Like this:
 	}
 }
 ```
-
+To learn more about our sample data, please visit our [data description](https://github.com/fair-search/fairsearch-elasticsearch-plugin/blob/master/demo/data/README.md).
 
 ```
 app.get('/searchunfair/:k/:q', function(req, res){
