@@ -1,10 +1,11 @@
 html{
 	height:100%;
 	display:block;
+	font-family: sans-serif;
 }
 
 body{
-background: #eaeaea;	
+	background: #eee;	
 }
 .grid {
   display: grid;
@@ -52,6 +53,16 @@ ol>li:before {
 	
 	
  }
+
+ol#ranking li img {
+	margin-right: 10px;
+}
+ol#ranking li.male {
+	background: #f0f0ff;
+}
+ol#ranking li.female {
+	background: #fff0f0;
+}
   
 .sidebar-right {
 	margin:10px;
@@ -71,6 +82,11 @@ header, footer {
   article {
     grid-column: 1 / 4;
   }
+}
+
+aside.sidebar-left {
+	border: dashed thin #000;
+	background: #ddd;
 }
 
 .search_button {

@@ -9,7 +9,8 @@
 	<body onload="showHideParameters()">
 	<div class="grid">
 		<header>
-		<img src="eslogo.png" style="width: 856px; height: 165px;"/>
+		<h1>FA*IR Elasticsearch Plug-In Demo</h1>
+		<!-- img src="eslogo.png" style="width: 856px; height: 165px;" -->
 		</header>
 		<aside class="sidebar-left">
 			<label for="k" class="inp params" id="klabel">
@@ -50,9 +51,9 @@
 		</ol> 
 		</article>
 		<footer>
-		Partially funded by a grant from
-		<img src="dtl1.png" style="width: 150px; height: 45px;"/>
+		Thanks to <img src="dtl1.png" style="margin-left: 5px; width: 150px; height: 45px;"/>
 		</footer>
+		<hr style="margin-top: 1em;"/>
 		<footer>
 		Debug information: <a href="mtables.html"> see mtables.</a>
 		</footer>
@@ -129,11 +130,13 @@
 	for(var i = 0; i<arr.length; i++){
 		if(arr[i][1].charAt(0) === "f"){
 			var img ='<img src="female.png" style="width: 35px; height: 40px;"/>';
+			var licls = 'female';
 		}else{
 			var img ='<img src="male.png" style="width: 30px; height: 40px;"/>';
+			var licls = 'male';
 		}
 		var classname = '"item"';
-		html +="<li>"+img+arr[i][0]+"</li>";
+		html +='<li class="' + licls + '">'+img+arr[i][0]+"</li>";
 		
 	}
 	ranking.innerHTML=html;
@@ -157,18 +160,16 @@
 	var html = "";
 	for(var i = 0; i<arr.length; i++){
 		if(arr[i][1].charAt(0) === "f"){
+			var licls = 'female';
 			var img ='<img src="female.png" style="width: 35px; height: 40px;"/>';
 		}else{
+			var licls = 'male';
 			var img ='<img src="male.png" style="width: 30px; height: 40px;"/>';
 		}
-		html +="<li>"+img+arr[i][0]+"</li>";
+		html +='<li class="' + licls + '">'+img+arr[i][0]+"</li>";
 		
 	}
 	ranking.innerHTML=html;
-	}else if(http.status != 200){
-	
-		var ranking = document.getElementById("ranking");
-		ranking.innerHTML='<p style="text-align: center;"><b>No Results for this Query.</b></p>';
 	}
 	};
 	
