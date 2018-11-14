@@ -180,3 +180,24 @@ function executeFairQueryWithAdjustedParameters(k,p,alpha,q, req, res){
 ```
 The first part of this methods simply builts the JSON query with our desired parameters and sends it to our elasticsearch node.
 The second part looks exactly like the unaware query and will also built a simplified response for our frontend.
+
+# server-ini.js
+At the first start of your demo-application, you have to perform `>node server-ini.js` in order to create an index in elasticsearch and insert the testdata in this index.
+The `server-ini.js` uses an elasticsearch package installed via npm.
+```
+var client = new elasticsearch.Client({
+  host: 'localhost:9200',
+  log: 'trace'
+});
+```
+creates a connection to your local elasticsearch node. If your es node runs on a different port, you have to change the port here.
+
+Another important part of this file are the last four lines:
+
+```
+Promise.resolve()
+  //.then(dropIndex)
+  .then(createIndex)
+.then(addAllToIndex);
+```
+If you have already indexed your elasticsearch node, remove the comment from `.then(dropIndex)`. If you do `>node server-ini.js` now, the script will remove the `test` index and then create it with the example data.
