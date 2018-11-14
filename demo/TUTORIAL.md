@@ -16,27 +16,43 @@ Before you go through this tutorial, please install the demo-application as desc
 
 # The Server
 In this parrt we will describe the [server.js](https://github.com/fair-search/fairsearch-elasticsearch-plugin/blob/master/demo/server/server.js) file, which contains the node.js server. The server will receive search requests, process them and then send them to your elasticsearch node. After receiving the response from elasticsearch, the server will again simplyfie the es-response and then send the results to the fronted. 
+
+### Search unaware
+The demo-app is able to perform "a normal" full-text search query and show the results. Every document has two fields:
+"body" which contains the resume-text and "gender" which contains the character `f` for female and `m` for male.
+Like this:
 ```
-var express = require('express');
-var app = express();
-var elasticsearch = require('elasticsearch');
-var Promise = require('bluebird');
-var esParser = require('es-response-parser');
-var log = console.log.bind(console);
-var XMLHttpRequest = require('xhr2');
-var fs=require('fs');
+{"index": "test", "type": "test", "id": 1, "body": {"body": "Eddy Example - Computer Scientist - CV ...", "gender": "m"}}
+```
 
-var client = new elasticsearch.Client({
-  host: 'localhost:9200',
-  log: 'trace'
-});
 
-app.get('/', function(req, res) {
-  res.sendFile(__dirname + "/public/" + "index.html");
-});
-
-app.listen(8080, function(){
-console.log('Demo server up and running.');
+```
+app.get('/searchunfair/:k/:q', function(req, res){
+	var q = "'"+req.params.q+"'";
+	var k = req.params.k;
+	var xhr = new XMLHttpRequest();
+	var data = JSON.stringify({"from" : 0, "size" : k,"query": {"match": {"body": q}}});
+	xhr.addEventListener("readystatechange", function () {
+	if (this.readyState === 4) {
+		var response = JSON.parse(this.responseText);
+		var answer = [];
+		if(response.hits.hits.length === 0){
+			res.status(404);
+			res.send();
+		}else{
+		for(var i=0; i<response.hits.hits.length; i++){
+			var person = [response.hits.hits[i]._source.body, response.hits.hits[i]._source.gender];
+				answer.push(person);
+			}
+			
+			res.status(200);
+			res.send(answer);
+		}
+	}
+	});
+	xhr.open("POST", "http://localhost:9200/test/_search");
+	xhr.setRequestHeader("Content-Type", "application/json");
+	xhr.send(data);
 });
 ```
 As we said above, Elasticsearch will run by default on port 9200. The elasticsearch package will create a connection to elasticsearch and helps us later.
@@ -67,9 +83,7 @@ function createIndex() {
   });
 ```
 Our test documents will look like this:
-```
-{"index": "test", "type": "test", "id": 1, "body": {"body": "hello hello hello hello hello hello hello hello hello hello", "gender": "m"}}
-```
+
 We stored the test documents in `example_Data.json` we will insert every document through the following function:
 
 ```
