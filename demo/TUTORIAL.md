@@ -22,7 +22,15 @@ The demo-app is able to perform "a normal" full-text search query and show the r
 "body" which contains the resume-text and "gender" which contains the character `f` for female and `m` for male.
 Like this:
 ```
-{"index": "test", "type": "test", "id": 1, "body": {"body": "Eddy Example - Computer Scientist - CV ...", "gender": "m"}}
+{
+"index": "test",
+"type": "test", 
+"id": 1,
+"body": {
+	"body": "Eddy Example - Computer Scientist - CV ...",
+	"gender": "m"
+	}
+}
 ```
 
 
@@ -41,12 +49,11 @@ app.get('/searchunfair/:k/:q', function(req, res){
 			res.send();
 		}else{
 		for(var i=0; i<response.hits.hits.length; i++){
-			var person = [response.hits.hits[i]._source.body, response.hits.hits[i]._source.gender];
-				answer.push(person);
-			}
-			
-			res.status(200);
-			res.send(answer);
+		  var person = [response.hits.hits[i]._source.body,response.hits.hits[i]._source.gender];
+		  answer.push(person);
+		}		
+		res.status(200);
+		res.send(answer);
 		}
 	}
 	});
