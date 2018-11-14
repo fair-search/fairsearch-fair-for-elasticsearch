@@ -1,29 +1,17 @@
 # Data Transparency Lab Demo-Application
-This is a step-by-step tutorial to set up an Elasticsearch Application with the fairsearch plug-in on your local machine.
+This is a step-by-step tutorial to set up and run a Demo-Application of Elasticsearch with the FA*IR-search plugin on your local machine.
 We highly recommend to read [FA*IR: A Fair Top-k Ranking Algorithm](https://arxiv.org/abs/1706.06368) before you go through this tutorial since we will not explain the theory behind the plugin in this tutorial.
 
-Furthermore, you can also Download and Install the Data Transparency Lab (DTL) Demo-Version for a more pleasing user experience. The DTL-Demo-Version works very similar to the example described in this Tutorial but with a more sophisticated GUI and a larger set of test-data as well as the possibility to enter a search query in a text field and use custom parameters.
-
-# Goal of this Tutorial
-Our goal with this tutorial is to set up a Node.js Web search application which uses Elasticsearch with the fairsearch plug-in.
-However there are uncountable ways to use Elasticsearch and many different possible infrastructures, we want to provide an easy tutorial to get a feeling how to work with the fairsearch plug-in and Elasticsearch.
-Our target infrastructure will look like this:
-![](demoInfrastructure.png)
-
-You can download all files of this Tutorial [HERE](example)
-
-You can download and run the [Data Transparency Lab](https://datatransparencylab.org/) Demo-Version [HERE](DTL_Demo.zip)
-
-# Quick Version
+# How to run the Demo (Quick Version)
 1. Download and install [Elasticsearch 6.2.4](https://www.elastic.co/de/downloads/past-releases/elasticsearch-6-2-4).
-2. Download and install the the snapshot build of the plugin [fairsearch-1.0-es6.2.4-snapshot.zip](https://github.com/fair-search/fairsearch-elasticsearch-plugin)
+2. Download and install the the snapshot build of the plugin [fairsearch-1.0-es6.2.4-snapshot.zip](https://github.com/fair-search/fairsearch-elasticsearch-plugin/blob/master/fairsearch-1.0-es6.2.4-snapshot.zip)
 3. Download and Install Node.js [from here](https://nodejs.org/en/download/)
-4. Download the DTL_Demonstration project [from here](DTL_Demo.zip)
+4. Download the demo folder [from here](demo)
 5. Start elasticsearch with `path\to\es\elasticsearch-6.2.4\bin>elasticsearch`
 6. Create and fill a text Index with `path\to\project\elasticDemo\server>node server-ini.js`
 7. Start the server with `path\to\project\elasticDemo\server>node server.js`
 8. Open your browser with `http://localhost:8080/` 
-9. Click on the buttons and see the results.
+9. Enter a Query and see the results.
 
 # Setup the Project
 
