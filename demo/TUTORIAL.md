@@ -11,69 +11,11 @@ Our target infrastructure will look like this:
 
 ![](https://github.com/fair-search/fairsearch-elasticsearch-plugin/blob/master/res/demoInfrastructure.png)
 
-You can download all files of this Tutorial [HERE](example)
+# Installation
+Before you go through this tutorial, please install the demo-application as described [here](README.md).
 
-You can download and run the [Data Transparency Lab](https://datatransparencylab.org/) Demo-Version [HERE](DTL_Demo.zip)
-
-# Quick Version
-1. Download and install [Elasticsearch 6.2.4](https://www.elastic.co/de/downloads/past-releases/elasticsearch-6-2-4).
-2. Download and install the the snapshot build of the plugin [fairsearch-1.0-es6.2.4-snapshot.zip](https://github.com/fair-search/fairsearch-elasticsearch-plugin)
-3. Download and Install Node.js [from here](https://nodejs.org/en/download/)
-4. Download the DTL_Demonstration project [from here](DTL_Demo.zip)
-5. Start elasticsearch with `path\to\es\elasticsearch-6.2.4\bin>elasticsearch`
-6. Create and fill a text Index with `path\to\project\elasticDemo\server>node server-ini.js`
-7. Start the server with `path\to\project\elasticDemo\server>node server.js`
-8. Open your browser with `http://localhost:8080/` 
-9. Click on the buttons and see the results.
-
-# Setup the Project
-
-### Install Elasticsearch
-The first thing we need is Elasticsearch. Download [Elasticsearch 6.2.4](https://www.elastic.co/de/downloads/past-releases/elasticsearch-6-2-4).
-Once you have downloaded it, unzip it to a location of your choice. In this Tutorial, we will unzip it to "C:\Users\Demo\".
-You have now installed Elasticsearch! You can run it with `C:\Users\Demo\elasticsearch-6.2.4\bin>elasticsearch`.
-
-Elasticsearch will run on the port 9200 per default.
-
-### Install the Plugin
-Download the the snapshot build of the plugin [fairsearch-1.0-es6.2.4-snapshot.zip](https://github.com/fair-search/fairsearch-elasticsearch-plugin). This is just one way to get the current build of the plugin. See [README.md](README.md) for other options.
-We will assume that we downloaded the plugin snapshot to the directory `C:\Users\Downloads\`. 
-Navigate to the bin folder of your Elasticsearch folder:
-```
-C:\Users\Demo\elasticsearch-6.2.4\
-cd bin
-C:\Users\Demo\elasticsearch-6.2.4\bin>
-```
-and then enter the following command:
-```
-C:\Users\Demo\elasticsearch-6.2.4\bin>
-elasticsearch-plugin install file:///C:\Users\Downloads\fairsearch-1.0-es6.2.4-snapshot.zip
-```
-You have now installed the fairsearch plugin!
-
-### Install Node.js
-Download Node.js [from here](https://nodejs.org/en/download/) and install it on your local machine.
-
-### Create the Project Directory
-Our Project directory will be located in `C:\Users\Demo\App\`. We will use [npm](https://www.npmjs.com/) to install all important dependencies for our node server.
-Run the following command:
-```
-C:\Users\Demo\App> npm init
-```
-and follow the instructions. This will create a local npm module folder in our project directory.
-We will need some dependencies for the server to work with Elasticsearch and everything we need. Execute the following commands to install everything in your local module:
-```
-C:\Users\Demo\App> npm install express
-C:\Users\Demo\App> npm install elasticsearch
-C:\Users\Demo\App> npm install xhr2
-C:\Users\Demo\App> npm install es-response-parser
-C:\Users\Demo\App> npm install bluebird
-C:\Users\Demo\App> npm install JSON
-C:\Users\Demo\App> npm install fs
-```
-### Create the Server
-Create the a file called `server.js` in the directory `C:\Users\Demo\App\`.
-Add the following lines to the file:
+# The Server
+In this parrt we will describe the [server.js](https://github.com/fair-search/fairsearch-elasticsearch-plugin/blob/master/demo/server/server.js) file, which contains the node.js server. The server will receive search requests, process them and then send them to your elasticsearch node. After receiving the response from elasticsearch, the server will again simplyfie the es-response and then send the results to the fronted. 
 ```
 var express = require('express');
 var app = express();
