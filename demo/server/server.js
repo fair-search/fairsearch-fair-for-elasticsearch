@@ -10,9 +10,6 @@ app.get('/', function(req, res) {
 app.get('/stylesheet.css', function(req, res) {
   res.sendFile(__dirname + "/public/" + "stylesheet.css");
 });
-app.get('/main.js', function(req, res) {
-  res.sendFile(__dirname + "/public/" + "main.js");
-});
 app.get('/eslogo.png', function(req, res) {
   res.sendFile(__dirname + "/public/" + "eslogo.png");
 });
@@ -104,6 +101,11 @@ function createMtableAndExecuteQuery(k ,p, alpha, query, req, res){
 		if (this.readyState === 4) {
 		var response = JSON.parse(this.responseText);
 		var realK = response.hits.hits.length;
+		if(realK === 0){
+		res.status(404);
+		res.send();
+		return;
+		}
 		console.log(realK);
 		var xhrTable = new XMLHttpRequest();
 		xhrTable.addEventListener("readystatechange", function() {
