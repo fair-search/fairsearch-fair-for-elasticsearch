@@ -1,0 +1,5 @@
+#IDE folder
+.idea
+
+#Node modules
+node_modules

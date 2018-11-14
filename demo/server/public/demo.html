@@ -1,0 +1,178 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en"> 
+	<head> 
+		<script src="main.js"></script>
+		<link rel="stylesheet" type="text/css" href="stylesheet.css">
+		<meta http-equiv="content-type" content="text/html; charset=utf-8">
+		<title>Fair Elastic Search Demo</title> 
+	</head>
+	<body onload="showHideParameters()">
+	<div class="grid">
+		<header>
+		<img src="eslogo.png" style="width: 856px; height: 165px;"/>
+		</header>
+		<aside class="sidebar-left">
+			<label for="k" class="inp params" id="klabel">
+				<input class="params" type="text" id="k" placeholder="&nbsp;" value="20" readonly>
+					<span class="label params">Ranking size</span>
+					<span class="border params"></span>
+			</label>
+			<label for="p" class="inp params" id="plabel">
+				<input class="params" type="text" id="p" placeholder="&nbsp;" readonly>
+					<span class="label params">Protected proportion</span>
+					<span class="border params"></span>
+			</label>
+			<label for="a" class="inp params" id="alabel">
+				<input class="params" type="text" id="a" placeholder="&nbsp;" readonly>
+					<span class="label params">Significance level</span>
+					<span class="border params"></span>
+			</label>
+			<form>
+				<select class="params" name="preconfig" id="select" onchange="selectPreconfig()">
+					<option value="unaware">Unaware</option>
+					<option value="fair1">FA*IR - protected=female, p=20%, alpha=0.5</option>
+					<option value="fair2">FA*IR - protected=female, p=50%, alpha=0.5</option>
+					<option value="fairc">FA*IR custom</option>
+				</select>
+				<br><br>
+			</form>
+		</aside>
+		<aside class="sidebar-right">
+			<label for="inp" class="inp">
+				<input class="q" type="text" id="inp" placeholder="&nbsp;">
+					<span class="label">Search Query</span>
+					<span class="border"></span>
+			</label>
+			<div class="button_cont" align="center"><button class="search_button" onclick="query();">Search</div>
+		</aside>
+		<article>
+		<ol id="ranking">
+		</ol> 
+		</article>
+		<footer>
+		Partially funded by a grant from
+		<img src="dtl1.png" style="width: 150px; height: 45px;"/>
+		</footer>
+		<footer>
+		Debug information: <a href="mtables.html"> see mtables.</a>
+		</footer>
+	</div>
+	</body> 
+	<script>
+	function selectPreconfig(){
+		var selection = document.getElementById('select');
+		var k = document.getElementById('k');
+		var p = document.getElementById('p');
+		var a = document.getElementById('a');
+		showHideParameters();
+		if(selection.value === "fair1"){
+			p.value = "0.2";
+			a.value = "0.5";
+		}
+		if(selection.value === "fair2"){
+			p.value = "0.5";
+			a.value = "0.5";
+		}
+	}
+	
+	function showHideParameters(){
+		var p = document.getElementById('p');
+		var plabel = document.getElementById('plabel');
+		var a = document.getElementById('a');
+		var alabel = document.getElementById('alabel');
+		var k = document.getElementById('k');
+		if(document.getElementById('select').value === "fairc"){
+			p.readOnly = false
+			a.readOnly = false
+			k.readOnly = false
+			p.style.visibility = 'visible';
+			a.style.visibility = 'visible';
+			alabel.style.visibility = 'visible';
+			plabel.style.visibility = 'visible';
+			
+		}else if(document.getElementById('select').value === "unaware"){
+			k.readOnly = true
+			k.value = 20;
+			p.style.visibility = 'hidden';
+			a.style.visibility = 'hidden';
+			alabel.style.visibility = 'hidden';
+			plabel.style.visibility = 'hidden';
+			}
+		else{
+			p.readOnly = true
+			a.readOnly = true
+			k.readOnly = true
+			k.value = 20;
+			p.style.visibility = 'visible';
+			a.style.visibility = 'visible';
+			alabel.style.visibility = 'visible';
+			plabel.style.visibility = 'visible';
+		}
+	}
+	function query(){
+		var select = document.getElementById('select');
+		if(select.value === "fair1" || select.value === "fair2" || select.value === "fairc"){
+			fairQuery();
+		}else{
+			unfairQuery();
+		}
+	}
+	function unfairQuery(){
+	var http = new XMLHttpRequest();
+	var url = "/searchunfair/"+document.getElementById('k').value+"/"+document.getElementById('inp').value;
+	http.open("GET", url, true);
+	http.onreadystatechange =  function(){
+	if(http.readyState === 4 && http.status === 200) {
+	var arr = JSON.parse(http.responseText);
+	var ranking = document.getElementById("ranking");
+	var html = "";
+	for(var i = 0; i<arr.length; i++){
+		if(arr[i][1].charAt(0) === "f"){
+			var img ='<img src="female.png" style="width: 35px; height: 40px;"/>';
+		}else{
+			var img ='<img src="male.png" style="width: 30px; height: 40px;"/>';
+		}
+		var classname = '"item"';
+		html +="<li>"+img+arr[i][0]+"</li>";
+		
+	}
+	ranking.innerHTML=html;
+	}else if(http.status != 200){
+	
+		var ranking = document.getElementById("ranking");
+		ranking.innerHTML='<p style="text-align: center;"><b>No Results for this Query.</b></p>';
+	}
+	};
+	
+	http.send();
+}
+	function fairQuery(){
+	var http = new XMLHttpRequest();
+	var url = "/searchfair/"+document.getElementById('k').value+"/"+document.getElementById('p').value+"/"+document.getElementById('a').value+"/"+document.getElementById('inp').value;
+	http.open("GET", url, true)
+	http.onreadystatechange =  function(){
+	if(http.readyState === 4 && http.status === 200) {
+	var arr = JSON.parse(http.responseText);
+	var ranking = document.getElementById("ranking");
+	var html = "";
+	for(var i = 0; i<arr.length; i++){
+		if(arr[i][1].charAt(0) === "f"){
+			var img ='<img src="female.png" style="width: 35px; height: 40px;"/>';
+		}else{
+			var img ='<img src="male.png" style="width: 30px; height: 40px;"/>';
+		}
+		html +="<li>"+img+arr[i][0]+"</li>";
+		
+	}
+	ranking.innerHTML=html;
+	}else if(http.status != 200){
+	
+		var ranking = document.getElementById("ranking");
+		ranking.innerHTML='<p style="text-align: center;"><b>No Results for this Query.</b></p>';
+	}
+	};
+	
+	http.send();
+}
+</script>
+</html>

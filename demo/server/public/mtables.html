@@ -1,0 +1,54 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en"> 
+	<head> 
+		<script src="main.js"></script>
+		<link rel="stylesheet" type="text/css" href="stylesheet.css">
+		<meta http-equiv="content-type" content="text/html; charset=utf-8">
+		<title>Fair Elastic Search Demo</title> 
+	</head>
+	<body onload="getMtables()">
+	<div class="grid">
+		<header>
+		<img src="eslogo.png" style="width: 856px; height: 165px;"/>
+		</header>
+		<aside class="sidebar-left">
+		<ul id="tables">
+		</ul> 
+		</aside>
+		<aside class="sidebar-right">
+		</aside>
+		<article>
+		</article>
+		<footer>
+		Partially funded by a grant from
+		<img src="dtl1.png" style="width: 150px; height: 45px;"/>
+		</footer>
+		<footer>
+		Debug information: <a href="mtables.html"> see mtables.</a>
+		</footer>
+	</div>
+	</body> 
+	<script>
+	function getMtables(){
+		var http = new XMLHttpRequest();
+		var url = "/mtables";
+		http.open("GET", url, true);
+		http.onreadystatechange =  function(){
+			if(http.readyState === 4 && http.status === 200) {
+				var arr = JSON.parse(http.responseText);
+				var tables = document.getElementById("tables");
+				var html = "";
+				for(var i = 0; i<arr.length; i++){
+					
+					var classname = '"item"';
+					html +="<li><p><b>"+arr[i][0]+"</b>: "+arr[i][1]+"</p></li>";
+					html+="<p></p>";
+				}
+				tables.innerHTML=html;
+			}
+		};
+	
+		http.send();
+	}
+	</script>
+	</html>
