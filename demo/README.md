@@ -7,8 +7,6 @@ The demo consists of a html frontend, a node.js server which handles the request
 
 ![](https://github.com/fair-search/fairsearch-elasticsearch-plugin/blob/master/res/demoInfrastructure.png)
 
-For a more detailed explanation of the Demo-Application, and how it works, please visit our [tutorial.](TUTORIAL.md)
-
 # How to Run the Demo (Quick Start)
 
 1. Download and install [Elasticsearch 6.2.4](https://www.elastic.co/de/downloads/past-releases/elasticsearch-6-2-4).
@@ -21,31 +19,9 @@ For a more detailed explanation of the Demo-Application, and how it works, pleas
 8. Open your browser with `http://localhost:8080/` 
 9. Enter a query and see the results.
 
-# How to Install the Plugin
+# Understanding the Demo
 
-### Install Elasticsearch
-
-The first thing we need is Elasticsearch. Download [Elasticsearch 6.2.4](https://www.elastic.co/de/downloads/past-releases/elasticsearch-6-2-4).
-Once you have downloaded it, unzip it to a location of your choice. In this Tutorial, we will unzip it to "C:\Users\Demo\".
-You have now installed Elasticsearch! You can run it with `C:\Users\Demo\elasticsearch-6.2.4\bin>elasticsearch`.
-
-Elasticsearch will run on the port 9200 per default.
-
-### Install the Plugin
-Download the the snapshot build of the plugin [fairsearch-1.0-es6.2.4-snapshot.zip](https://github.com/fair-search/fairsearch-elasticsearch-plugin). This is just one way to get the current build of the plugin. See [our readme](https://github.com/fair-search/fairsearch-elasticsearch-plugin/blob/master/README.md) for other options.
-We will assume that we downloaded the plugin snapshot to the directory `C:\Users\Downloads\`. 
-Navigate to the bin folder of your Elasticsearch folder:
-```
-C:\Users\Demo\elasticsearch-6.2.4\
-cd bin
-C:\Users\Demo\elasticsearch-6.2.4\bin>
-```
-and then enter the following command:
-```
-C:\Users\Demo\elasticsearch-6.2.4\bin>
-elasticsearch-plugin install file:///C:\Users\Downloads\fairsearch-1.0-es6.2.4-snapshot.zip
-```
-You have now installed the fairsearch plugin!
+For a detailed explanation of this demo application, and to learn how to write your own application, visit our [tutorial.](TUTORIAL.md)
 
 # Credits
 
