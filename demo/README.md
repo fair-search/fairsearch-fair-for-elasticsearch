@@ -9,20 +9,22 @@ The demo consists of a html frontend, a node.js server which handles the request
 
 For a more detailed explanation of the Demo-Application, and how it works, please visit our [tutorial.](TUTORIAL.md)
 
-# How to run the Demo (Quick Version)
+# How to Run the Demo (Quick Start)
+
 1. Download and install [Elasticsearch 6.2.4](https://www.elastic.co/de/downloads/past-releases/elasticsearch-6-2-4).
 2. Download and install the the snapshot build of the plugin [fairsearch-1.0-es6.2.4-snapshot.zip](https://github.com/fair-search/fairsearch-elasticsearch-plugin/blob/master/fairsearch-1.0-es6.2.4-snapshot.zip)
-3. Download and Install Node.js [from here](https://nodejs.org/en/download/)
-4. Download the demo folder [from here]()
-5. Start elasticsearch with `path\to\es\elasticsearch-6.2.4\bin>elasticsearch`
-6. Create and fill a text Index with `path\to\project\elasticDemo\server>node server-ini.js`
-7. Start the server with `path\to\project\elasticDemo\server>node server.js`
+3. Download and Install [Node.js](https://nodejs.org/en/download/)
+4. Download the [demo/ folder](.)
+5. Start elasticsearch: `path/to/elasticsearch-6.2.4/bin> elasticsearch`
+6. Initialize your index with some test data: `path/to/demo/server> nodejs server-ini.js`
+7. Start the demo: `path/to/demo/server> nodejs server.js`
 8. Open your browser with `http://localhost:8080/` 
-9. Enter a Query and see the results.
+9. Enter a query and see the results.
 
 # How to Install the Plugin
 
 ### Install Elasticsearch
+
 The first thing we need is Elasticsearch. Download [Elasticsearch 6.2.4](https://www.elastic.co/de/downloads/past-releases/elasticsearch-6-2-4).
 Once you have downloaded it, unzip it to a location of your choice. In this Tutorial, we will unzip it to "C:\Users\Demo\".
 You have now installed Elasticsearch! You can run it with `C:\Users\Demo\elasticsearch-6.2.4\bin>elasticsearch`.
