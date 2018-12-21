@@ -12,7 +12,7 @@ The demo consists of a html frontend, a node.js server which handles the request
 1. Download and install [Elasticsearch 6.2.4](https://www.elastic.co/de/downloads/past-releases/elasticsearch-6-2-4).
 2. Download and install the the snapshot build of the plugin [fairsearch-1.0-es6.2.4-snapshot.zip](https://github.com/fair-search/fairsearch-elasticsearch-plugin/blob/master/fairsearch-1.0-es6.2.4-snapshot.zip)
 3. Download and Install [Node.js](https://nodejs.org/en/download/)
-4. Download the [demo/ folder](.)
+4. Download the [demo/ folder](.) (the data/ and server/ sub-directories)
 5. Start elasticsearch: `path/to/elasticsearch-6.2.4/bin> elasticsearch`
 6. Initialize your index with some test data: `path/to/demo/server> nodejs server-ini.js`
 7. Start the demo: `path/to/demo/server> nodejs server.js`
