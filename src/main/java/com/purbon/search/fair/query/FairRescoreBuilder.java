@@ -1,8 +1,9 @@
 package com.purbon.search.fair.query;
 
+import com.purbon.search.fair.ModelStore;
 import com.purbon.search.fair.lib.FairTopK;
 import com.purbon.search.fair.lib.FairTopKImpl;
-import com.purbon.search.fair.utils.DocumentPriorityQueue;
+import com.purbon.search.fair.lib.fairness.FairSearchCacheException;
 import org.apache.logging.log4j.Logger;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.Term;
@@ -10,9 +11,7 @@ import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
-import org.apache.lucene.util.PriorityQueue;
 import org.elasticsearch.ElasticsearchException;
-import org.elasticsearch.action.admin.indices.settings.get.GetSettingsRequest;
 import org.elasticsearch.action.search.SearchType;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.ParseField;
@@ -66,7 +65,7 @@ public class FairRescoreBuilder extends RescorerBuilder<FairRescoreBuilder> {
                               float protectedElementsProportion, float significance, String proportionStrategy,
                               int lookupForProportion, String onFewElementsAction) {
         this(protectedKey, protectedValue, protectedElementsProportion, significance, proportionStrategy,
-               lookupForProportion, onFewElementsAction, null);
+                lookupForProportion, onFewElementsAction, null);
     }
 
     public FairRescoreBuilder(StreamInput in) throws IOException {
@@ -227,11 +226,14 @@ public class FairRescoreBuilder extends RescorerBuilder<FairRescoreBuilder> {
         private final FairSearchConfig config;
         private final FairTopK fairTopK;
         private QueryShardContext context;
+        private final Client client;
 
         FairRescoreContext(int windowSize, FairSearchConfig config, QueryShardContext context) {
             super(windowSize, FairRescorer.INSTANCE);
             this.context = context;
             this.config = config;
+
+            this.client = context.getClient();
 
             this.fairTopK = new FairTopKImpl(context.getClient());
         }
@@ -242,6 +244,10 @@ public class FairRescoreBuilder extends RescorerBuilder<FairRescoreBuilder> {
 
         public FairSearchConfig getConfig() {
             return config;
+        }
+
+        public Client getClient() {
+            return client;
         }
     }
 
@@ -265,7 +271,7 @@ public class FairRescoreBuilder extends RescorerBuilder<FairRescoreBuilder> {
             FairSearchConfig config = context.getConfig();
             FairTopK fairTopK = context.fairTopK;
 
-            // Check if the index where this rescore is happening have the correct setup of shards.
+            // Check if the index where this rescore is happening has the correct setup of shards.
             int numOfShards   = context.getShardContext().getIndexSettings().getNumberOfShards();
             int numOfReplicas = context.getShardContext().getIndexSettings().getNumberOfReplicas();
 
@@ -274,12 +280,17 @@ public class FairRescoreBuilder extends RescorerBuilder<FairRescoreBuilder> {
                 throw new ElasticsearchException(message);
             }
 
-            int max = Math.min(topDocs.scoreDocs.length, rescoreContext.getWindowSize());
+            int k = Math.min(topDocs.scoreDocs.length, rescoreContext.getWindowSize());
+
+            float significance         = config.getSignificanceLevel();
+            float proportion           = config.getProtectedElementsProportion();
+            int protectedElementsCount = Math.round(proportion * k);
 
             List<ScoreDoc> npQueue = new ArrayList<>();
             List<ScoreDoc> pQueue = new ArrayList<>();
 
-            for(int i=0; i < max; i++) {
+            // return k items and make sure there are minimum protected elements to be rearranged in the top k
+            for(int i=0; i < k || (i < topDocs.scoreDocs.length && npQueue.size() < protectedElementsCount); i++) {
                 ScoreDoc scoreDoc = topDocs.scoreDocs[i];
                 Document doc = searcher.doc(scoreDoc.doc);
                 if (isProtected(doc, config)) {
@@ -288,29 +299,26 @@ public class FairRescoreBuilder extends RescorerBuilder<FairRescoreBuilder> {
                     npQueue.add(scoreDoc);
                 }
             }
-            assert npQueue.size() + pQueue.size() == max;
+            assert npQueue.size() + pQueue.size() >= k;
 
-            float significance         = config.getSignificanceLevel();
-            float proportion           = config.getProtectedElementsProportion();
-            int protectedElementsCount = Math.round(proportion * topDocs.scoreDocs.length);
-
-            if (protectedElementsCount > max) {
-                String message = "The protected elements count (k) can not be bigger than";
-                       message += "the number of elements to be processed in the rescore phase.";
+            // this should not happen now
+            if (protectedElementsCount > k) {
+                String message = "The protected elements count can not be bigger than";
+                message += "the number of elements to be processed in the rescore phase.";
                 throw new ElasticsearchException(message);
             }
 
             if ( config.hasVariableProportionStrategy() ) {
-                if (config.abortOnFewElements() && config.getLookupForProportion() < topDocs.scoreDocs.length) {
+                if (config.abortOnFewElements() && config.getLookupForProportion() < k) {
                     throw new ElasticsearchException("Lookup proportion below number of docs returned by the query");
                 }
                 int count = 0;
                 for(int i=0; i < config.getLookupForProportion(); i++) {
-                   ScoreDoc scoreDoc = topDocs.scoreDocs[i];
-                   Document doc = searcher.doc(scoreDoc.doc);
-                   if (isProtected(doc, config)) {
-                      count+=1;
-                   }
+                    ScoreDoc scoreDoc = topDocs.scoreDocs[i];
+                    Document doc = searcher.doc(scoreDoc.doc);
+                    if (isProtected(doc, config)) {
+                        count+=1;
+                    }
                 }
                 proportion = (float)(count / (config.getLookupForProportion()*1.0));
                 protectedElementsCount = count;
@@ -321,7 +329,10 @@ public class FairRescoreBuilder extends RescorerBuilder<FairRescoreBuilder> {
                 throw new ElasticsearchException("Fair rescorer can not proceed, too few protected elements");
             }
 
-            return fairTopK.fairTopK(npQueue, pQueue, topDocs.scoreDocs.length, proportion, significance);
+            if(k < 10 || k > 400)
+                throw new FairSearchCacheException("Fair rescorer can not proceed, size/window_size (k) should be in the range [10, 400]");
+
+            return fairTopK.fairTopK(npQueue, pQueue, k, proportion, significance);
         }
 
         private boolean isProtected(Document doc, FairSearchConfig config) {

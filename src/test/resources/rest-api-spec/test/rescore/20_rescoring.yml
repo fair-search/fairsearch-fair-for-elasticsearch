@@ -128,9 +128,10 @@ setup:
   - match:  { hits.hits.3._source: { "body": "hello hello hello hello hello hello hello hello bye bye", "gender": "m"} }
   - match:  { hits.hits.4._source: { "body": "hello hello hello hello bye bye bye bye bye bye", "gender": "f"} }
 ---
+# this test should pass now - FairnessCache create the mtable if it does not exist
 "abort for wrong k setup during rescoring":
   - do:
-      catch: request
+#      catch: request
       search:
         index: test
         body:
@@ -145,9 +146,10 @@ setup:
               proportion_strategy: fixed
               lookup_for_measuring_proportion: 100
 ---
+# this test should pass now - FairnessCache create the mtable if it does not exist
 "abort rescoring":
   - do:
-     catch: request
+#     catch: request
      search:
         index: test
         body:

@@ -1,5 +1,6 @@
 package com.purbon.search.fair.action;
 
+import com.purbon.search.fair.ModelStore;
 import org.elasticsearch.action.Action;
 import org.elasticsearch.action.ActionRequest;
 import org.elasticsearch.action.ActionRequestBuilder;
@@ -45,8 +46,8 @@ public class MTableStoreAction extends Action<MTableStoreAction.MTableStoreReque
     }
 
     public static class MTableStoreRequestBuilder extends ActionRequestBuilder<MTableStoreRequest,
-            MTableStoreResponse,
-            MTableStoreRequestBuilder> {
+                        MTableStoreResponse,
+                        MTableStoreRequestBuilder> {
 
         private ElasticsearchClient client;
 
@@ -74,12 +75,7 @@ public class MTableStoreAction extends Action<MTableStoreAction.MTableStoreReque
         private List<Integer> mtable;
 
         public String getId() {
-            return new StringBuilder()
-                    .append("name(")
-                        .append(proportion).append(",")
-                        .append(alpha).append(",")
-                        .append(k)
-                    .append(")").toString();
+            return ModelStore.generateId(proportion, alpha, k);
         }
 
         public enum Action {

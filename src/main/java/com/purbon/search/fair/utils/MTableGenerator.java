@@ -66,11 +66,10 @@ public class MTableGenerator {
 
     private boolean alphaIsValid(double alpha) {
         if (alpha < 0 || alpha >=1) {
-            throw new IllegalArgumentException("Parameter alpha must be at in [0, 1[");
+            throw new IllegalArgumentException("Parameter alpha must be at in [0, 1]");
         } else {
             return true;
         }
-
     }
 
     private boolean nIsValid(int n) {
