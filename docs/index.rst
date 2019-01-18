@@ -8,7 +8,7 @@ Fairsearch Plugin for Elasticsearch
 
 The *Fairsearch* plug-in for Elasticsearch is an implementation of the `FA*IR algorithm <https://arxiv.org/abs/1706.06368>`_. It enables you to apply a *positive action* policy in which elements are re-ranked to ensure a fair representation of minorities or disadvantaged people.
 
-This plugin has been developed by Pere Urbón in collaboration with researchers at TU Berlin and Pompeu Fabra University, with  support from a grant by the `Data Transparency Lab <http://datatransparencylab.org/dtl2017_program_fair/>`_.
+This plugin has been developed by Pere Urbón and, later, by Ivan Kitanovski in collaboration with researchers at TU Berlin and Pompeu Fabra University, with  support from a grant by the `Data Transparency Lab <http://datatransparencylab.org/dtl2017_program_fair/>`_.
 
 Get started
 -------------------------------
