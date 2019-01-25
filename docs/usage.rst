@@ -107,8 +107,8 @@ Elasticsearch size parameters
 -------------------------
 Elasticsearch supports the following size parameters:
 
-- ``size``, which is the number of documents returned by the query (defaults to 10)
-- ``window_size``, which is the number of documents to be re-ranked by the re-score function (defaults to 10).
+- ``size``, which is the total number of documents returned by ElasticSearch (defaults to 10)
+- ``window_size``, which is the number of documents to be re-ranked by the re-score function and returned to the user (defaults to 10).
 
 For example, if you make a query like this:
 
