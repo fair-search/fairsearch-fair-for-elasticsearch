@@ -7,14 +7,12 @@
 The Fair Search Elasticsearch plugin uses machine learning to provide a fair search result with relevant protected 
 and non protected classes. 
 
-:warning: This is a work in progress, will be launched officially end of November 2018.
-
 # What this plugin does...
 
 This plugin:
 
-- Store fairness distribution tables to use during rescoring.
-- Allows you to rescore fairly any query in elasticsearch.
+- Storeс fairness distribution tables to use during rescoring.
+- Allows you to rescore fairly any query in Еlasticsearch.
 
 ## Where's the docs?
 
@@ -68,30 +66,10 @@ This runs the tasks in the `esplugin` gradle plugin that builds, tests, generate
 # How to use the Plugin
 Once you have a running Elasticsearch node with the fairsearch plugin installed you can perform search queries and get the results in a fair ordering according to the [FA*IR: A Fair Top-k Ranking Algorithm](https://arxiv.org/abs/1706.06368).
 
-### Create a MTable
-
-A MTable is a representation for a fair ranking. Before we can perform a fair query we have to create and store one mtable in our Elasticsearch node. Before we create the mtable we have to think about some parameters:
-```
-k=25 "The length of the Ranking"
-p=0.5 "The desired proportion of candidates with an protected attribute"
-alpha = 0.1 "The significance level"
-```
-We recommend to read [FA*IR: A Fair Top-k Ranking Algorithm](https://arxiv.org/abs/1706.06368) in order to understand why we need these parameters.
-
-For this description of a fair ranking we can now create the mtable with the following query:
-
-```
-POST http://yourESNodeAdress/_fs/_mtable/0.5/0.1/25
-```
-The Mtable is now stored in your Elasticsearch node.
-To get a list of all mtables in your node you can make the following request:
-
-```
-GET http://yourESNodeAdress/_fs/_mtable
-```
 
 ### Get a Fair Ranking
-After you have created the mtable for your Ranking we can make a fair search query as follows:
+
+In order to use the plugin we need to make a Elasticsearch query with a re-scorer. Here is a sample query:
 
 ```
 POST http://yourESNodeAdress/indexName/_search
@@ -113,18 +91,37 @@ POST http://yourESNodeAdress/indexName/_search
 			}
 		}
 }
-	
 ```
 
-# Example Application
+The parameters used in the query are the following:
 
-See [EXAMPLE.md](EXAMPLE.md) for a detailed example of an Elasticsearch Application on your local machine.
+- `size/window_size` is the length of the (re)ranking
+- `min_proportion_protected` is the desired proportion of candidates with a protected attribute
+- `significance_level` is the significance level
+- `protected_key` specifies which attribute of the store document keeps the key which divides the documents in to protected or not protected
+- `protected_value` specifies the value in the protected_key which tells when a document is protected
+
+We recommend reading [FA*IR: A Fair Top-k Ranking Algorithm](https://arxiv.org/abs/1706.06368) in order to understand why we need these parameters.
+
+### Manually create a MTable
+
+An M table is a representation for a fair ranking. The plugin also allows us to create a M table manually with following call:
+
+```
+POST http://yourESNodeAdress/_fs/_mtable/0.5/0.1/25
+```
+The M table is now stored in your Elasticsearch node. To get a list of all M tables in your node you can make the following request:
+
+```
+GET http://yourESNodeAdress/_fs/_mtable
+```
 
 # Who built this?
 
-Initially developed by:
+Developed by:
 - Pere Urbón Bayes
 - Tom Sühr
+- Ivan Kitanovski
 
 Special thanks to Meike Zehlike and Carlos Castillo, the minds behind the science in this plugin.
 
