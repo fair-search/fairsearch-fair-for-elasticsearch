@@ -25,4 +25,4 @@ For a detailed explanation of this demo application, and to learn how to write y
 
 # Credits
 
-This demo was prepared by Tom Sühr and was first demonstrated at the DTL workshop in November 2018.
+This demo was prepared by [Tom Sühr](https://github.com/tsuehr) and was first demonstrated at the DTL workshop in November 2018.
