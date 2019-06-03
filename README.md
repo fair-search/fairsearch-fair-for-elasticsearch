@@ -11,7 +11,7 @@ and non protected classes.
 
 This plugin:
 
-- Storeс fairness distribution tables to use during rescoring.
+- Store fairness distribution tables to be used during rescoring.
 - Allows you to rescore fairly any query in Еlasticsearch.
 
 ## Where's the docs?
