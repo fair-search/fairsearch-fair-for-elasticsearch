@@ -129,7 +129,7 @@ The plugin was developed based on the paper by:
 
 See the [license](https://github.com/fair-search/fairsearch-fair-for-elasticsearch/blob/master/LICENSE)
 
-For inquires contact [Mieke Zehlike].
+For any questions contact [Mieke Zehlike].(https://de.linkedin.com/in/meike-zehlike-366bba131)
 
 ## See also
 
