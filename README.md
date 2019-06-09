@@ -116,15 +116,23 @@ The M table is now stored in your Elasticsearch node. To get a list of all M tab
 GET http://yourESNodeAdress/_fs/_mtable
 ```
 
-# Who built this?
+## Credits
 
-Developed by:
+The FA*IR algorithm is described on this paper:
+
+* Meike Zehlike, Francesco Bonchi, Carlos Castillo, Sara Hajian, Mohamed Megahed, Ricardo Baeza-Yates: "[FA*IR: A Fair Top-k Ranking Algorithm](https://doi.org/10.1145/3132847.3132938)". Proc. of the 2017 ACM on Conference on Information and Knowledge Management (CIKM).
+
+The plugin was developed based on the paper by:
 - Pere Urbón Bayes
-- Tom Sühr
-- Ivan Kitanovski
+- [Tom Sühr](https://github.com/tsuehr)
+- [Ivan Kitanovski](http://ivankitanovski.com/)
 
-Special thanks to Meike Zehlike and Carlos Castillo, the minds behind the science in this plugin.
+See the [license](https://github.com/fair-search/fairsearch-fair-for-elasticsearch/blob/master/LICENSE)
 
-## Other Acknowledgments & Stuff To Read
+For inquires contact [Mieke Zehlike].
 
-- [FA*IR: A Fair Top-k Ranking Algorithm](https://arxiv.org/abs/1706.06368)
+## See also
+
+- [FA*IR search core Java library](https://github.com/fair-search/fairsearch-fair-java)
+- [FA*IR search core Python library](https://github.com/fair-search/fairsearch-fair-python).
+- [DELTR for ElasticSearch](https://github.com/fair-search/fairsearch-deltr-for-elasticsearch)
