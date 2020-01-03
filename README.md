@@ -32,13 +32,14 @@ Extra bits at [CONTRIBUTING.md](CONTRIBUTTING.md)
 # Installing
 
 ### Install Elasticsearch
-First intall [Elasticsearch Version 6.2.4](https://www.elastic.co/de/downloads/past-releases/elasticsearch-6-2-4).
-To install the fairsearch plugin you can run 
+First download the zip-file of [Elasticsearch Version 6.2.4](https://www.elastic.co/de/downloads/past-releases/elasticsearch-6-2-4). Extract and go to directory `elasticsearch-6.2.4`
 
-`./bin/elasticsearch-plugin install https://fair-search.github.io/fair-reranker/fairsearch-1.0-es6.2.4-SNAPSHOT.zip`
-(It's expected you'll confirm some security exceptions, you can pass `-b` to `elasticsearch-plugin` to automatically install)
+To install the fairsearch plugin run 
 
-or if you have made changes to the plugin you can run 
+`./bin/elasticsearch-plugin install https://fair-search.github.io/fair-reranker/fairsearch-1.0-es6.2.4-snapshot.zip`
+(It's expected you'll confirm some security exceptions, you can pass `-b` to `elasticsearch-plugin` to automatically install).
+
+If you have made changes to the plugin you can run 
 
 ```
 ./gradlew clean check
