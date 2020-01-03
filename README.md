@@ -34,7 +34,7 @@ Extra bits at [CONTRIBUTING.md](CONTRIBUTTING.md)
 ### Install Elasticsearch and the FA\*IR plugin
 First download the zip-file of [Elasticsearch Version 6.2.4](https://www.elastic.co/de/downloads/past-releases/elasticsearch-6-2-4). Extract and go to directory `elasticsearch-6.2.4`
 
-To install the fairsearch plugin run from within your current working directory:
+Within this folder run the following command to install the fairsearch plugin:
 
 `./bin/elasticsearch-plugin install https://fair-search.github.io/fair-reranker/fairsearch-1.0-es6.2.4-snapshot.zip`
 (It's expected you'll confirm some security exceptions, you can pass `-b` to `elasticsearch-plugin` to automatically install).
