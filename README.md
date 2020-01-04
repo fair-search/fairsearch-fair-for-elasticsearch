@@ -5,7 +5,7 @@
 [![Maintainability](https://api.codeclimate.com/v1/badges/d1782dfbff41827f33f9/maintainability)](https://codeclimate.com/github/fair-search/fairsearch-elasticsearch-plugin/maintainability)
 
 The Fair Search Elasticsearch plugin uses machine learning to provide a fair search result with relevant protected 
-and non protected classes. 
+and non protected classes.  
 
 # What this plugin does...
 
