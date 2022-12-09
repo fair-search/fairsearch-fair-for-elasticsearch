@@ -13,7 +13,7 @@
     "bluebird": "^3.5.2",
     "elasticsearch": "^15.1.1",
     "es-response-parser": "^1.0.1",
-    "express": "^4.16.4",
+    "express": "^4.17.3",
     "fs": "0.0.1-security",
     "http": "0.0.0",
     "path": "^0.12.7",
